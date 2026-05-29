@@ -27,6 +27,12 @@ type ComplaintRow = {
   status: string | null
 }
 
+type Card = {
+  title: string
+  description: string
+  href: string
+}
+
 export default async function PropertyAiCenterPage({ params }: PageProps) {
   const { id: propertyId } = await params
   const companyId = await getUserCompanyId()
@@ -77,22 +83,7 @@ export default async function PropertyAiCenterPage({ params }: PageProps) {
   const openTasks = safeTasks.filter((item) => item.status !== '完了')
   const openComplaints = safeComplaints.filter((item) => item.status !== '完了')
 
-  const cards = [
-    {
-      title: 'AI対応提案（物件単位）',
-      description: '物件全体の案件・タスク・クレームを見て、今の優先順位をAIが提案します。',
-      href: `/properties/${propertyId}/ai-management-brief`,
-    },
-    {
-      title: '物件AI次アクション提案',
-      description: '物件全体で今やるべきことを、順番つきでAIが整理します。',
-      href: `/properties/${propertyId}/ai-property-next-actions`,
-    },
-    {
-      title: 'AI月次報告（役員向け）',
-      description: '理事会や役員報告で使いやすい月次文章をAIで作ります。',
-      href: `/properties/${propertyId}/ai-monthly-report-board`,
-    },
+  const coreCards: Card[] = [
     {
       title: 'AI理事会報告ドラフト',
       description: '物件内の理事会候補案件をまとめて、理事会報告文を生成します。',
@@ -104,14 +95,27 @@ export default async function PropertyAiCenterPage({ params }: PageProps) {
       href: `/properties/${propertyId}/ai-complaint-brief`,
     },
     {
+      title: 'AI月次報告（役員向け）',
+      description: '理事会や役員報告で使いやすい月次文章をAIで作ります。',
+      href: `/properties/${propertyId}/ai-monthly-report-board`,
+    },
+  ]
+
+  const subCards: Card[] = [
+    {
+      title: 'AI対応提案（物件単位）',
+      description: '物件全体の案件・タスク・クレームを見て、今の優先順位をAIが提案します。',
+      href: `/properties/${propertyId}/ai-management-brief`,
+    },
+    {
+      title: '物件AI次アクション提案',
+      description: '物件全体で今やるべきことを、順番つきでAIが整理します。',
+      href: `/properties/${propertyId}/ai-property-next-actions`,
+    },
+    {
       title: 'AI月次報告',
       description: '物件・案件・タスク・クレームをもとに、月次報告文を作ります。',
       href: `/properties/${propertyId}/monthly-report-ai`,
-    },
-    {
-      title: 'AIクレーム要約',
-      description: 'クレームの傾向や再発防止コメントをAIで整理します。',
-      href: `/properties/${propertyId}/complaints-ai`,
     },
   ]
 
@@ -123,12 +127,6 @@ export default async function PropertyAiCenterPage({ params }: PageProps) {
           className="px-4 py-2 rounded-lg border bg-white hover:bg-gray-50"
         >
           物件詳細へ戻る
-        </Link>
-        <Link
-          href={`/properties/${propertyId}/tools`}
-          className="px-4 py-2 rounded-lg border bg-white hover:bg-gray-50"
-        >
-          物件ツール一覧へ
         </Link>
       </div>
 
@@ -154,19 +152,40 @@ export default async function PropertyAiCenterPage({ params }: PageProps) {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        {cards.map((card) => (
-          <Link
-            key={card.href}
-            href={card.href}
-            className="rounded-2xl border bg-white p-5 hover:bg-gray-50 transition"
-          >
-            <div className="font-semibold">{card.title}</div>
-            <div className="text-sm text-gray-600 mt-2 leading-6">
-              {card.description}
-            </div>
-          </Link>
-        ))}
+      <div>
+        <h2 className="text-base font-bold text-gray-900 mb-3">中核機能</h2>
+        <div className="grid md:grid-cols-2 gap-4">
+          {coreCards.map((card) => (
+            <Link
+              key={card.href}
+              href={card.href}
+              className="rounded-2xl border border-gray-200 bg-white p-5 hover:border-green-300 hover:bg-green-50 transition"
+            >
+              <div className="font-semibold text-gray-900">{card.title}</div>
+              <div className="text-sm text-gray-600 mt-2 leading-6">
+                {card.description}
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-sm font-semibold text-slate-400 mb-3">補助機能</h2>
+        <div className="grid md:grid-cols-2 gap-4">
+          {subCards.map((card) => (
+            <Link
+              key={card.href}
+              href={card.href}
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-5 hover:border-slate-300 hover:bg-slate-100 transition"
+            >
+              <div className="font-semibold text-slate-600">{card.title}</div>
+              <div className="text-sm text-slate-400 mt-2 leading-6">
+                {card.description}
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   )

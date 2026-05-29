@@ -15,7 +15,7 @@ type PropertyDailyReportPageProps = {
   }>
 }
 
-type AnyRow = Record<string, any>
+type AnyRow = Record<string, unknown>
 
 type SavedReportRow = {
   id: string
@@ -25,11 +25,11 @@ type SavedReportRow = {
   created_at: string
 }
 
-function pickValue(row: AnyRow, keys: string[], fallback = '') {
+function pickValue(row: AnyRow, keys: string[], fallback = ''): string {
   for (const key of keys) {
     const value = row?.[key]
     if (value !== undefined && value !== null && value !== '') {
-      return value
+      return String(value)
     }
   }
   return fallback
@@ -99,7 +99,10 @@ function isToday(value?: string | null) {
 }
 
 function includesTodayByKeys(row: AnyRow, keys: string[]) {
-  return keys.some((key) => isToday(row?.[key]))
+  return keys.some((key) => {
+    const v = row?.[key]
+    return isToday(typeof v === 'string' ? v : null)
+  })
 }
 
 function looksCompleted(task: AnyRow) {
@@ -285,7 +288,7 @@ function buildPropertyDailyReport(params: {
   const pendingTasks = todayTasks.filter((task) => !looksCompleted(task))
   const overdueTasks = tasks.filter((task) => {
     const dueDate = task?.due_date
-    if (!dueDate) return false
+    if (!dueDate || typeof dueDate !== 'string') return false
     if (looksCompleted(task)) return false
 
     const due = new Date(dueDate)
@@ -655,7 +658,7 @@ export default async function PropertyDailyReportPage({
 
   const overdueTasks = propertyTasks.filter((task) => {
     const dueDate = task?.due_date
-    if (!dueDate) return false
+    if (!dueDate || typeof dueDate !== 'string') return false
     if (looksCompleted(task)) return false
 
     const due = new Date(dueDate)

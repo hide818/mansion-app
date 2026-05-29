@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import type { AiSection, AiResponseBody } from '@/lib/utils'
 
 type AiPackTool = {
   key: string
@@ -17,7 +18,7 @@ type MultiAiPackClientProps = {
   featureList: string[]
 }
 
-function pickTextFromResponse(data: any): string {
+function pickTextFromResponse(data: AiResponseBody): string {
   const candidates = [
     data?.generatedText,
     data?.text,
@@ -39,7 +40,7 @@ function pickTextFromResponse(data: any): string {
 
   if (Array.isArray(data?.sections)) {
     const joined = data.sections
-      .map((section: any) => {
+      .map((section: AiSection) => {
         const sectionTitle =
           typeof section?.title === 'string' && section.title.trim()
             ? `【${section.title.trim()}】\n`
@@ -69,13 +70,13 @@ function pickTextFromResponse(data: any): string {
   return JSON.stringify(data, null, 2)
 }
 
-async function readResponse(response: Response) {
+async function readResponse(response: Response): Promise<AiResponseBody> {
   const raw = await response.text()
 
   if (!raw) return {}
 
   try {
-    return JSON.parse(raw)
+    return JSON.parse(raw) as AiResponseBody
   } catch {
     return { text: raw }
   }

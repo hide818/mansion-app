@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
 export async function POST(request: NextRequest) {
-  let response = NextResponse.json({ ok: true })
+  const response = NextResponse.json({ ok: true })
 
   try {
     const body = await request.json()

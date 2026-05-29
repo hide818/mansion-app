@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import type { AiSection, AiResponseBody } from '@/lib/utils'
 
 type PackTool = {
   key: string
@@ -17,7 +18,7 @@ type PropertyAiPackClientProps = {
   referenceText: string
 }
 
-function extractGeneratedText(data: any): string {
+function extractGeneratedText(data: AiResponseBody): string {
   const candidates = [
     data?.generatedText,
     data?.text,
@@ -40,7 +41,7 @@ function extractGeneratedText(data: any): string {
 
   if (Array.isArray(data?.sections)) {
     const joined = data.sections
-      .map((section: any) => {
+      .map((section: AiSection) => {
         const sectionTitle =
           typeof section?.title === 'string' && section.title.trim()
             ? `【${section.title.trim()}】\n`
@@ -70,13 +71,13 @@ function extractGeneratedText(data: any): string {
   return JSON.stringify(data, null, 2)
 }
 
-async function readResponseBody(response: Response) {
+async function readResponseBody(response: Response): Promise<AiResponseBody> {
   const raw = await response.text()
 
   if (!raw) return {}
 
   try {
-    return JSON.parse(raw)
+    return JSON.parse(raw) as AiResponseBody
   } catch {
     return { text: raw }
   }

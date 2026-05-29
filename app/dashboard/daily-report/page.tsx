@@ -2,13 +2,13 @@ import Link from 'next/link'
 import CopyReportButton from './CopyReportButton'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 
-type AnyRow = Record<string, any>
+type AnyRow = Record<string, unknown>
 
-function pickValue(row: AnyRow, keys: string[], fallback = '') {
+function pickValue(row: AnyRow, keys: string[], fallback = ''): string {
   for (const key of keys) {
     const value = row?.[key]
     if (value !== undefined && value !== null && value !== '') {
-      return value
+      return String(value)
     }
   }
   return fallback
@@ -63,7 +63,10 @@ function isToday(value?: string | null) {
 }
 
 function includesTodayByKeys(row: AnyRow, keys: string[]) {
-  return keys.some((key) => isToday(row?.[key]))
+  return keys.some((key) => {
+    const v = row?.[key]
+    return isToday(typeof v === 'string' ? v : null)
+  })
 }
 
 function looksCompleted(task: AnyRow) {
@@ -76,14 +79,13 @@ function looksCompleted(task: AnyRow) {
   ]
 
   for (const key of booleanKeys) {
-    if (typeof task?.[key] === 'boolean') {
-      return task[key] === true
+    const v = task?.[key]
+    if (typeof v === 'boolean') {
+      return v === true
     }
   }
 
-  const statusValue = String(
-    pickValue(task, ['status', 'task_status', 'state'], '')
-  ).toLowerCase()
+  const statusValue = pickValue(task, ['status', 'task_status', 'state'], '').toLowerCase()
 
   if (
     statusValue === '完了' ||
@@ -261,10 +263,10 @@ export default async function DailyReportPage() {
     supabase.from('logs').select('*').limit(100),
   ])
 
-  const cases = toArray(casesRes.data)
-  const tasks = toArray(tasksRes.data)
-  const complaints = toArray(complaintsRes.data)
-  const logs = toArray(logsRes.data)
+  const cases = toArray(casesRes.data) as AnyRow[]
+  const tasks = toArray(tasksRes.data) as AnyRow[]
+  const complaints = toArray(complaintsRes.data) as AnyRow[]
+  const logs = toArray(logsRes.data) as AnyRow[]
 
   const errors = [
     { name: 'cases', error: casesRes.error },

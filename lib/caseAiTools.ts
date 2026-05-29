@@ -5,6 +5,19 @@ import {
   getCaseSupportDataOrNull,
 } from '@/lib/caseSupportData'
 
+type OpenAIResponseContent = {
+  text?: string
+}
+
+type OpenAIResponseItem = {
+  content?: OpenAIResponseContent[]
+}
+
+type OpenAIResponseShape = {
+  output_text?: string
+  output?: OpenAIResponseItem[]
+}
+
 function getOpenAIClient() {
   const apiKey = process.env.OPENAI_API_KEY
 
@@ -15,7 +28,7 @@ function getOpenAIClient() {
   return new OpenAI({ apiKey })
 }
 
-function extractOutputText(response: any) {
+function extractOutputText(response: OpenAIResponseShape) {
   if (typeof response?.output_text === 'string' && response.output_text.trim()) {
     return response.output_text.trim()
   }
@@ -157,7 +170,7 @@ ${sourceText}`,
     ],
   })
 
-  const text = extractOutputText(response)
+  const text = extractOutputText(response as OpenAIResponseShape)
 
   if (!text) {
     throw new Error('EMPTY_AI_RESPONSE')

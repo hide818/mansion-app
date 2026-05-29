@@ -1,6 +1,14 @@
 import Link from 'next/link'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import {
+  formatDate,
+  getStatusLabel,
+  pickCaseTitle,
+  pickCaseDueDate,
+  getDueLevel,
+  type DueLevel,
+} from '@/lib/utils'
 
 type SearchParams = Promise<{
   sort?: string
@@ -45,44 +53,6 @@ function normalizeSort(value?: string): SortKey {
   return 'due'
 }
 
-function formatDate(value: string | null) {
-  if (!value) return '未設定'
-
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return String(value)
-
-  return new Intl.DateTimeFormat('ja-JP', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(date)
-}
-
-function getStatusLabel(status: string | null) {
-  if (!status) return '未設定'
-
-  switch (status) {
-    case 'todo':
-      return '未着手'
-    case 'doing':
-      return '進行中'
-    case 'done':
-      return '完了'
-    case 'pending':
-      return '保留'
-    default:
-      return status
-  }
-}
-
-function pickCaseTitle(item: RawCaseRow) {
-  return item.title ?? item.name ?? '無題案件'
-}
-
-function pickCaseDueDate(item: RawCaseRow) {
-  return item.due_date ?? item.deadline ?? item.due_at ?? item.limit_date ?? null
-}
-
 function sortCases(rows: CaseRow[], sort: SortKey) {
   const items = [...rows]
 
@@ -112,32 +82,7 @@ function sortButtonClass(active: boolean) {
     : 'rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50'
 }
 
-function getDueLevel(value: string | null): 'danger' | 'warning' | 'normal' | 'none' {
-  if (!value) return 'none'
-
-  const due = new Date(value)
-  if (Number.isNaN(due.getTime())) return 'none'
-
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
-  const tomorrow = new Date(today)
-  tomorrow.setDate(today.getDate() + 1)
-
-  due.setHours(0, 0, 0, 0)
-
-  if (due.getTime() <= today.getTime()) {
-    return 'danger'
-  }
-
-  if (due.getTime() === tomorrow.getTime()) {
-    return 'warning'
-  }
-
-  return 'normal'
-}
-
-function getCardClass(level: 'danger' | 'warning' | 'normal' | 'none') {
+function getCardClass(level: DueLevel) {
   switch (level) {
     case 'danger':
       return 'rounded-2xl border border-red-200 bg-red-50 p-4'
@@ -148,7 +93,7 @@ function getCardClass(level: 'danger' | 'warning' | 'normal' | 'none') {
   }
 }
 
-function getDueBadgeClass(level: 'danger' | 'warning' | 'normal' | 'none') {
+function getDueBadgeClass(level: DueLevel) {
   switch (level) {
     case 'danger':
       return 'rounded-full bg-white px-2 py-1 text-red-700'
@@ -221,9 +166,9 @@ export default async function CasesPage({
   const cases: CaseRow[] = sortCases(
     rawCases.map((item) => ({
       id: item.id,
-      title: pickCaseTitle(item),
+      title: pickCaseTitle(item as Record<string, unknown>),
       status: item.status ?? null,
-      dueDate: pickCaseDueDate(item),
+      dueDate: pickCaseDueDate(item as Record<string, unknown>),
       createdAt: item.created_at ?? null,
       propertyId: item.property_id ?? null,
       propertyName: item.property_id ? (propertyNameMap.get(item.property_id) ?? null) : null,

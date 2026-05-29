@@ -6,7 +6,7 @@ export default function Sidebar() {
     {
       label: 'ホーム',
       href: '/dashboard',
-      summary: '今日やることと全体状況',
+      summary: '今日の状況をすぐ確認',
       children: [
         {
           label: 'ダッシュボード',
@@ -21,19 +21,36 @@ export default function Sidebar() {
       ],
     },
     {
-      label: '案件・タスク管理',
-      summary: '業務の軸となる管理機能',
+      label: '物件管理',
+      summary: '物件を起点に全業務へ',
       children: [
         {
           label: '物件一覧',
           href: '/properties',
           description: '物件ごとの案件・タスク管理',
         },
+      ],
+    },
+    {
+      label: '案件管理',
+      summary: '案件の進捗と優先度を管理',
+      children: [
         {
           label: '案件一覧',
           href: '/cases',
           description: '案件を一覧で確認',
         },
+        {
+          label: '案件リスク判定',
+          href: '/analytics/case-risk',
+          description: '停滞・期限切れ・担当未設定を一覧確認',
+        },
+      ],
+    },
+    {
+      label: 'タスク管理',
+      summary: '締め切りと作業を整理',
+      children: [
         {
           label: 'タスク一覧',
           href: '/tasks',
@@ -42,41 +59,62 @@ export default function Sidebar() {
       ],
     },
     {
-      label: 'AI事務アシスタント',
-      summary: '事務処理を自動化',
+      label: '理事会',
+      summary: '議事録と理事会対応をまとめる',
       children: [
         {
-          label: '議事録AI',
+          label: 'AI議事録',
           href: '/ai-minutes',
           description: '音声から議事録を作成',
         },
         {
-          label: '見積比較・議案作成',
-          href: '/properties',
-          description: '案件から見積比較・議案作成へ',
+          label: '理事会対象案件',
+          href: '/board-cases',
+          description: '理事会に上げる案件を確認',
         },
       ],
     },
     {
-      label: '引き継ぎDX',
+      label: '引き継ぎ・文書',
       summary: '担当変更でも事故らない',
       children: [
-        {
-          label: '引き継ぎ一覧',
-          href: '/handover-documents',
-          description: '保存済みの引き継ぎ書を確認',
-        },
         {
           label: '引き継ぎ書を作成',
           href: '/handover-documents/new',
           description: '物件を選んで新規作成',
         },
+        {
+          label: '引き継ぎ一覧',
+          href: '/handover-documents',
+          description: '保存済みの引き継ぎ書を確認',
+        },
       ],
     },
     {
-      label: '管理',
+      label: '検索・保存済み',
+      summary: '保存済みデータをすぐ参照',
+      children: [
+        {
+          label: '保存済み議事録',
+          href: '/ai-minutes/records',
+          description: '作成した議事録を確認',
+        },
+        {
+          label: '物件カルテ',
+          href: '/property-cards',
+          description: '全物件の重要情報を横断確認',
+        },
+      ],
+    },
+    {
+      label: '管理者',
       summary: '管理者向け機能',
       children: [
+        {
+          label: '管理者ダッシュボード',
+          href: '/manager',
+          description: '日次確認・リスク・分析の入口',
+        },
         {
           label: 'ユーザー管理',
           href: '/users',

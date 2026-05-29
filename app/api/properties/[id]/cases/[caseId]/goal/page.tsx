@@ -16,7 +16,7 @@ function buildGoalText(data: NonNullable<Awaited<ReturnType<typeof getCaseSuppor
 
   let goal = '案件の完了条件を明文化する必要があります。'
   let doneState = '完了判定がまだ曖昧です。'
-  let nextMove = nextAction
+  const nextMove = nextAction
 
   if (data.caseItem.status === '完了') {
     goal = '必要な対応を終え、記録を残したうえで案件を安全にクローズすることです。'

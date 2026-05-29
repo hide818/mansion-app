@@ -3,7 +3,17 @@
 import { useState } from "react"
 import { supabase } from "@/lib/supabase"
 
-export default function TaskItem({ task }: any) {
+type Task = {
+  id: string
+  title: string | null
+  status: string | null
+}
+
+type TaskItemProps = {
+  task: Task | null
+}
+
+export default function TaskItem({ task }: TaskItemProps) {
 
   const [status, setStatus] = useState(task?.status || "")
 

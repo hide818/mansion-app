@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { formatDate, isToday, isOverdue, getStatusLabel } from '@/lib/utils'
 
 type TaskRow = {
   id: string
@@ -15,66 +16,6 @@ type PropertyRow = {
   id: string
   name: string | null
   created_at: string | null
-}
-
-function formatDate(value: string | null) {
-  if (!value) return '未設定'
-
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return String(value)
-
-  return new Intl.DateTimeFormat('ja-JP', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(date)
-}
-
-function isToday(value: string | null) {
-  if (!value) return false
-
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return false
-
-  const now = new Date()
-
-  return (
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate()
-  )
-}
-
-function isOverdue(value: string | null) {
-  if (!value) return false
-
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return false
-
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
-  const due = new Date(date)
-  due.setHours(0, 0, 0, 0)
-
-  return due < today
-}
-
-function getStatusLabel(status: string | null) {
-  if (!status) return '未設定'
-
-  switch (status) {
-    case 'todo':
-      return '未着手'
-    case 'doing':
-      return '進行中'
-    case 'done':
-      return '完了'
-    case 'pending':
-      return '保留'
-    default:
-      return status
-  }
 }
 
 function sortByDueDate(tasks: TaskRow[]) {

@@ -195,13 +195,12 @@ export default async function LogsPage({ searchParams }: LogsPageProps) {
 
   const totalCount = logs.length
   const commentCount = logs.filter((log) => log.type === 'comment').length
+
+  const threeDaysAgo = new Date()
+  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3)
   const latestCount = logs.filter((log) => {
     if (!log.created_at) return false
-    const created = new Date(log.created_at).getTime()
-    const now = Date.now()
-    const diff = now - created
-    const threeDays = 1000 * 60 * 60 * 24 * 3
-    return diff <= threeDays
+    return new Date(log.created_at) >= threeDaysAgo
   }).length
 
   return (

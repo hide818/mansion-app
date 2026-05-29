@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import AiToolSelectorClient from '@/app/components/AiToolSelectorClient'
 
 type PageProps = {
   params: Promise<{
@@ -91,19 +92,7 @@ export default async function AiCenterPage({ params }: PageProps) {
 
   const basePath = `/properties/${id}/cases/${caseId}`
 
-  const mainLinks: AiLink[] = [
-    {
-      title: '案件詳細へ戻る',
-      description: '通常の案件詳細画面へ戻る',
-      href: basePath,
-      badge: '基本',
-    },
-    {
-      title: '文書センター',
-      description: '案件文書のたたき台をまとめて作る',
-      href: `${basePath}/ai-workbench`,
-      badge: '文章',
-    },
+  const primaryLinks: AiLink[] = [
     {
       title: '理事会パック',
       description: '議案化、理事会報告、議案書、想定質問を一気に作る',
@@ -122,6 +111,9 @@ export default async function AiCenterPage({ params }: PageProps) {
       href: `${basePath}/vendor-pack`,
       badge: '業者対応',
     },
+  ]
+
+  const subLinks: AiLink[] = [
     {
       title: '上司共有パック',
       description: '上司向けの短文共有や状況整理を出す',
@@ -130,49 +122,19 @@ export default async function AiCenterPage({ params }: PageProps) {
     },
   ]
 
-  const subLinks: AiLink[] = [
-    {
-      title: '案件司令塔AI',
-      description: '今どうなっているか、危険度、次アクションを確認',
-      href: `${basePath}/ai-command-center`,
-      badge: '司令塔',
-    },
-    {
-      title: 'AI議事録 本格版',
-      description: '文字起こしから会社標準の議事録を作る',
-      href: `${basePath}/ai-board-minutes-pro`,
-      badge: '目玉',
-    },
-    {
-      title: '引き継ぎAI',
-      description: '引き継ぎサマリーを出す',
-      href: `${basePath}/handover-ai`,
-      badge: '引き継ぎ',
-    },
-    {
-      title: '次アクションAI',
-      description: '次にやるべきことを提案',
-      href: `${basePath}/next-action-ai`,
-      badge: '判断補助',
-    },
-    {
-      title: '対応漏れチェック',
-      description: '抜けや漏れをざっと点検',
-      href: `${basePath}/coverage-check`,
-      badge: '事故防止',
-    },
-    {
-      title: '想定質問',
-      description: '理事会・上司から来そうな質問を出す',
-      href: `${basePath}/question-simulation`,
-      badge: '準備',
-    },
-  ]
-
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="mb-4">
+            <Link
+              href={basePath}
+              className="text-sm text-gray-500 hover:text-gray-700"
+            >
+              ← 案件詳細へ戻る
+            </Link>
+          </div>
+
           <p className="text-sm font-semibold text-green-700">案件AIツールセンター</p>
 
           <h1 className="mt-3 text-3xl font-bold tracking-tight text-gray-900">
@@ -203,7 +165,7 @@ export default async function AiCenterPage({ params }: PageProps) {
         <section className="mt-6 rounded-3xl border border-gray-200 bg-white p-4 shadow-sm">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">中核パック</h2>
+              <h2 className="text-lg font-bold text-gray-900">主要パック</h2>
               <p className="mt-1 text-sm text-gray-600">
                 まずはここから使えば、案件の骨格が一気に整う。
               </p>
@@ -218,7 +180,7 @@ export default async function AiCenterPage({ params }: PageProps) {
           </div>
 
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {mainLinks.map((item) => (
+            {primaryLinks.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -270,11 +232,11 @@ export default async function AiCenterPage({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="mt-6 rounded-3xl border border-gray-200 bg-white p-4 shadow-sm">
+        <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="mb-4">
-            <h2 className="text-lg font-bold text-gray-900">個別AI</h2>
-            <p className="mt-1 text-sm text-gray-600">
-              必要なものだけ個別に叩きたい時はこちら。
+            <h2 className="text-sm font-semibold text-slate-400">補助パック</h2>
+            <p className="mt-1 text-xs text-slate-400">
+              必要なときに使う追加機能。
             </p>
           </div>
 
@@ -283,19 +245,21 @@ export default async function AiCenterPage({ params }: PageProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-2xl border border-gray-200 bg-white p-4 transition hover:border-green-300 hover:bg-gray-50"
+                className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-slate-300 hover:bg-slate-100"
               >
                 <div className="mb-2 flex items-center justify-between gap-2">
-                  <h3 className="text-sm font-bold text-gray-900">{item.title}</h3>
-                  <span className="rounded-full bg-gray-100 px-2 py-1 text-[10px] font-bold text-gray-700">
+                  <h3 className="text-sm font-bold text-slate-600">{item.title}</h3>
+                  <span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-500">
                     {item.badge}
                   </span>
                 </div>
-                <p className="text-xs leading-6 text-gray-600">{item.description}</p>
+                <p className="text-xs leading-6 text-slate-400">{item.description}</p>
               </Link>
             ))}
           </div>
         </section>
+
+        <AiToolSelectorClient propertyId={id} caseId={caseId} />
       </div>
     </main>
   )
