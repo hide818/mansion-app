@@ -3,19 +3,6 @@ import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 
-type CaseRow = {
-  id: string
-  property_id: string | null
-  title: string | null
-  status: string | null
-  assignee: string | null
-  created_at: string | null
-  board_status: string | null
-  board_scheduled_for: string | null
-  board_agenda_title: string | null
-  board_next_action: string | null
-}
-
 type PropertyRow = {
   id: string
   name: string | null

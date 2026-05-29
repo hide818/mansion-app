@@ -14,16 +14,6 @@ type PropertyRow = {
   name: string | null
 }
 
-type ComplaintRow = {
-  id: string
-  title: string | null
-  detail: string | null
-  status: string | null
-  created_at: string | null
-  property_id: string | null
-  company_id: string | null
-}
-
 function formatDateTime(value: string | null) {
   if (!value) return '-'
 

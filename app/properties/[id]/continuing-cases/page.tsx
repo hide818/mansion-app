@@ -14,16 +14,6 @@ type PropertyRow = {
   name: string | null
 }
 
-type CaseRow = {
-  id: string
-  title: string | null
-  status: string | null
-  assignee: string | null
-  created_at: string | null
-  board_status: string | null
-  board_next_action: string | null
-}
-
 type TaskRow = {
   id: string
   case_id: string | null

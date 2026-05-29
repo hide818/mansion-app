@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   formatDateTime,
@@ -271,7 +271,7 @@ export default function BoardMinutesRecordsClient({
     return next
   }, [records, sortOption])
 
-  async function loadRecords(nextFilters: SearchFilters) {
+  const loadRecords = useCallback(async (nextFilters: SearchFilters) => {
     setIsLoading(true)
     setErrorMessage('')
     setMessage('')
@@ -316,11 +316,11 @@ export default function BoardMinutesRecordsClient({
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [apiBasePath])
 
   useEffect(() => {
     void loadRecords(initialSearchFilters)
-  }, [apiBasePath])
+  }, [loadRecords])
 
   async function handleCreate() {
     if (!form.minutesText.trim()) {

@@ -294,14 +294,6 @@ function buildDocuments(input: {
       ? input.missingChecks.map((item) => `・${item}`).join('\n')
       : '・目立った抜け漏れ候補なし'
 
-  const complaintLines =
-    input.complaints.length > 0
-      ? input.complaints
-          .slice(0, 5)
-          .map((item) => `・${item.title || 'クレーム記録あり'}`)
-          .join('\n')
-      : '・クレーム記録なし'
-
   const handoverReport = [
     `【案件名】`,
     `${caseTitle}`,

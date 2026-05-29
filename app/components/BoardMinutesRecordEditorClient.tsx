@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   formatDateTime,
@@ -169,7 +169,7 @@ export default function BoardMinutesRecordEditorClient({
     return `/api/properties/${propertyId}/cases/${caseId}/board-minutes-records`
   }, [propertyId, caseId])
 
-  async function loadRecord() {
+  const loadRecord = useCallback(async () => {
     setIsLoading(true)
     setErrorMessage('')
     setMessage('')
@@ -203,11 +203,11 @@ export default function BoardMinutesRecordEditorClient({
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [apiPath])
 
   useEffect(() => {
     void loadRecord()
-  }, [apiPath])
+  }, [loadRecord])
 
   async function handleSave() {
     if (!form) return

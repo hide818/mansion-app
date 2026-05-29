@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 type EstimateComparisonCenterClientProps = {
   propertyId: string
@@ -468,7 +468,7 @@ export default function EstimateComparisonCenterClient({
     setBanner(null)
   }
 
-  async function loadRecords() {
+  const loadRecords = useCallback(async () => {
     setIsLoadingHistory(true)
 
     try {
@@ -503,15 +503,15 @@ export default function EstimateComparisonCenterClient({
       setRecords(normalized)
     } catch (error) {
       console.error(error)
-      showBanner('error', '保存履歴の読み込みに失敗しました。')
+      setBanner({ type: 'error', text: '保存履歴の読み込みに失敗しました。' })
     } finally {
       setIsLoadingHistory(false)
     }
-  }
+  }, [apiBasePath])
 
   useEffect(() => {
     void loadRecords()
-  }, [apiBasePath])
+  }, [loadRecords])
 
   async function runComparison() {
     if (activeVendors.length < 2) {

@@ -910,7 +910,7 @@ export default function AiMinutesPage() {
   const [bylawsArticle, setBylawsArticle] = useState('')
   const [signatureDate, setSignatureDate] = useState('')
   const [managementCompanyDisplay, setManagementCompanyDisplay] = useState('')
-  const [minutesLayoutType, setMinutesLayoutType] = useState<'standard' | 'board_formal'>('standard')
+  const [, setMinutesLayoutType] = useState<'standard' | 'board_formal'>('standard')
 
   const [generalMeetingCategory, setGeneralMeetingCategory] = useState<'通常総会' | '臨時総会'>('通常総会')
   const [extraordinaryMeetingCount, setExtraordinaryMeetingCount] = useState('')

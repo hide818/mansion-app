@@ -27,19 +27,6 @@ type CaseRow = {
   board_next_action: string | null
 }
 
-type TaskRow = {
-  id: string
-  title: string | null
-  status: string | null
-  due_date: string | null
-}
-
-type LogRow = {
-  id: string
-  message: string | null
-  created_at: string | null
-}
-
 type QuestionRow = {
   question: string
   answerHint: string

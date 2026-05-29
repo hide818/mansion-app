@@ -2,7 +2,6 @@ import OpenAI from 'openai'
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import {
-  COMPANY_STANDARD_FORMATTING,
   extractSectionItemsFromText,
   mergeBoardMinutesFormattingOptions,
   type BoardMinutesGenerationResult,

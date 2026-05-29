@@ -14,23 +14,11 @@ type PropertyRow = {
   name: string | null
 }
 
-type CaseRow = {
-  id: string
-  status: string | null
-  created_at: string | null
-}
-
 type TaskRow = {
   id: string
   status: string | null
   due_date: string | null
   case_id: string | null
-}
-
-type ComplaintRow = {
-  id: string
-  status: string | null
-  created_at: string | null
 }
 
 type PropertyCardRow = {
