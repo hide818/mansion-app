@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 type AgendaRow = {
@@ -898,7 +898,7 @@ function buildGeneralMeetingPrintHtml(params: {
   `.trim()
 }
 
-export default function AiMinutesPage() {
+function AiMinutesInner() {
   const searchParams = useSearchParams()
   const reuseRecordId = searchParams.get('reuseRecordId') ?? ''
 
@@ -2156,7 +2156,7 @@ export default function AiMinutesPage() {
                 <input
                   type="text"
                   value={managementCompanyDisplay}
-                  onChange={(e) => setManagementCompanyDisplay(e.target.value)}
+                  onChange={(e) => setCompanyNameDisplay(e.target.value)}
                   className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
                   placeholder="例：総合システム管理株式会社　小松"
                 />
@@ -2650,5 +2650,13 @@ export default function AiMinutesPage() {
         </>
       ) : null}
     </div>
+  )
+}
+
+export default function AiMinutesPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-sm text-slate-500">読み込み中...</div>}>
+      <AiMinutesInner />
+    </Suspense>
   )
 }

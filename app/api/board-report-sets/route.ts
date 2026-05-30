@@ -59,7 +59,7 @@ function toFileRows(files: BoardReportSetFileInput[] | undefined, boardReportSet
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient()
-    const companyId = await getUserCompanyId(supabase)
+    const companyId = await getUserCompanyId()
 
     const { searchParams } = new URL(request.url)
     const propertyId = searchParams.get('propertyId')
@@ -135,7 +135,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient()
-    const companyId = await getUserCompanyId(supabase)
+    const companyId = await getUserCompanyId()
 
     const body = (await request.json()) as BoardReportSetInput
 

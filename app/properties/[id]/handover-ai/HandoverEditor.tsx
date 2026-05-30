@@ -4,9 +4,11 @@ import { useState } from 'react'
 
 type HandoverEditorProps = {
   propertyId: string
+  propertyName?: string | null
   initialTitle?: string | null
   initialContent?: string | null
   generatedContent?: string | null
+  updatedAt?: string | null
 }
 
 type AIReferenceData = {

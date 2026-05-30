@@ -74,7 +74,7 @@ export default async function BoardCasesPage({ searchParams }: PageProps) {
   const boardStatusFilter = String(params.status ?? '').trim()
 
   const supabase = await createSupabaseServerClient()
-  const companyId = await getUserCompanyId(supabase)
+  const companyId = await getUserCompanyId()
 
   const { data: properties, error: propertyError } = await supabase
     .from('properties')
