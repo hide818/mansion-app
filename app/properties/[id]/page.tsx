@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 
@@ -7,23 +7,57 @@ type Props = {
   params: Promise<{
     id: string
   }>
+  searchParams?: Promise<{
+    saved?: string
+  }>
 }
 
 type PropertyRow = {
   id: string
   name: string | null
   address: string | null
+  bylaws_article: string | null
+  owners_total_count: string | null
+  voting_rights_total_count: string | null
 }
 
-export default async function PropertyDetailPage({ params }: Props) {
+async function updateMinutesSettingsAction(formData: FormData) {
+  'use server'
+
+  const supabase = await createSupabaseServerClient()
+  const companyId = await getUserCompanyId()
+  const propertyId = String(formData.get('property_id') ?? '').trim()
+
+  if (!propertyId) return
+
+  const bylawsArticle = String(formData.get('bylaws_article') ?? '').trim()
+  const ownersTotalCount = String(formData.get('owners_total_count') ?? '').trim()
+  const votingRightsTotalCount = String(formData.get('voting_rights_total_count') ?? '').trim()
+
+  await supabase
+    .from('properties')
+    .update({
+      bylaws_article: bylawsArticle || null,
+      owners_total_count: ownersTotalCount || null,
+      voting_rights_total_count: votingRightsTotalCount || null,
+    })
+    .eq('id', propertyId)
+    .eq('company_id', companyId)
+
+  redirect(`/properties/${propertyId}?saved=minutes`)
+}
+
+export default async function PropertyDetailPage({ params, searchParams }: Props) {
   const { id } = await params
+  const resolvedSearchParams = searchParams ? await searchParams : {}
+  const minutesSaved = resolvedSearchParams?.saved === 'minutes'
 
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
 
   const { data: property } = await supabase
     .from('properties')
-    .select('id, name, address')
+    .select('id, name, address, bylaws_article, owners_total_count, voting_rights_total_count')
     .eq('id', id)
     .eq('company_id', companyId)
     .maybeSingle<PropertyRow>()
@@ -193,6 +227,82 @@ export default async function PropertyDetailPage({ params }: Props) {
             </Link>
           </div>
         </div>
+      </section>
+
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-slate-900">議事録設定</h2>
+        <p className="mt-1 text-sm text-slate-500">
+          総会議事録作成時に自動反映される物件固有情報です。一度登録すると毎回の入力が不要になります。
+        </p>
+
+        {minutesSaved ? (
+          <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            議事録設定を保存しました。
+          </div>
+        ) : null}
+
+        <form action={updateMinutesSettingsAction} className="mt-5 space-y-5">
+          <input type="hidden" name="property_id" value={id} />
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700">
+              規約根拠条文番号
+            </label>
+            <input
+              type="text"
+              name="bylaws_article"
+              defaultValue={property.bylaws_article ?? ''}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500 md:w-64"
+              placeholder="例：49"
+            />
+            <p className="mt-1 text-xs text-slate-400">
+              「管理規約第◯条の規定に基づき…」の◯に入る数字
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 md:max-w-md">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                組合員総数
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  name="owners_total_count"
+                  defaultValue={property.owners_total_count ?? ''}
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                  placeholder="例：120"
+                />
+                <span className="shrink-0 text-sm text-slate-500">人</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                議決権総数
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  name="voting_rights_total_count"
+                  defaultValue={property.voting_rights_total_count ?? ''}
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                  placeholder="例：120"
+                />
+                <span className="shrink-0 text-sm text-slate-500">個</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800"
+            >
+              保存する
+            </button>
+          </div>
+        </form>
       </section>
     </div>
   )
