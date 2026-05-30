@@ -109,6 +109,19 @@ type MinutesSection =
       body: string
     }
 
+type PropertyMinutesSettings = {
+  bylawsArticle: string
+  ownersTotalCount: string
+  votingRightsTotalCount: string
+  companyName: string
+  currentUserDisplayName: string
+  staff: Array<{ displayName: string }>
+}
+
+type StaffMember = {
+  displayName: string
+}
+
 function createAgenda(index: number, title?: string): AgendaRow {
   return {
     id: crypto.randomUUID(),
@@ -909,8 +922,13 @@ export default function AiMinutesPage() {
   const [chairpersonName, setChairpersonName] = useState('')
   const [bylawsArticle, setBylawsArticle] = useState('')
   const [signatureDate, setSignatureDate] = useState('')
-  const [managementCompanyDisplay, setManagementCompanyDisplay] = useState('')
   const [, setMinutesLayoutType] = useState<'standard' | 'board_formal'>('standard')
+
+  const [settingsLoading, setSettingsLoading] = useState(false)
+  const [autoFillEnabled, setAutoFillEnabled] = useState(true)
+  const [companyNameDisplay, setCompanyNameDisplay] = useState('')
+  const [staffAssignee, setStaffAssignee] = useState('')
+  const [staffList, setStaffList] = useState<StaffMember[]>([])
 
   const [generalMeetingCategory, setGeneralMeetingCategory] = useState<'通常総会' | '臨時総会'>('通常総会')
   const [extraordinaryMeetingCount, setExtraordinaryMeetingCount] = useState('')
@@ -991,7 +1009,10 @@ export default function AiMinutesPage() {
   const safeAttendeesText = attendeesText.trim()
   const safeChairpersonName = chairpersonName.trim()
   const safeBylawsArticle = bylawsArticle.trim()
-  const safeManagementCompanyDisplay = managementCompanyDisplay.trim()
+  const managementCompanyDisplay = [companyNameDisplay.trim(), staffAssignee.trim()]
+    .filter(Boolean)
+    .join(' ')
+  const safeManagementCompanyDisplay = managementCompanyDisplay
   const displayGeneralTerm = termNumber.trim() ? `第${termNumber.trim()}期` : ''
   const heldOnText = formatMeetingDateTime(heldOn, startTime, endTime)
 
@@ -1090,6 +1111,41 @@ export default function AiMinutesPage() {
   }, [meetingType])
 
   useEffect(() => {
+    if (!propertyId || !autoFillEnabled) return
+    let cancelled = false
+
+    async function fetchPropertySettings() {
+      setSettingsLoading(true)
+      try {
+        const response = await fetch(
+          `/api/ai-minutes/setup?propertyId=${encodeURIComponent(propertyId)}`,
+          { cache: 'no-store' },
+        )
+        if (!response.ok || cancelled) return
+        const data = (await response.json()) as PropertyMinutesSettings
+        if (cancelled) return
+        setBylawsArticle(data.bylawsArticle || '')
+        setOwnersTotalCount(data.ownersTotalCount || '')
+        setVotingRightsTotalCount(data.votingRightsTotalCount || '')
+        setCompanyNameDisplay(data.companyName || '')
+        setStaffList(data.staff || [])
+        if (data.currentUserDisplayName) {
+          setStaffAssignee(data.currentUserDisplayName)
+        }
+      } catch (error) {
+        console.error('property settings fetch error:', error)
+      } finally {
+        if (!cancelled) setSettingsLoading(false)
+      }
+    }
+
+    fetchPropertySettings()
+    return () => {
+      cancelled = true
+    }
+  }, [propertyId, autoFillEnabled])
+
+  useEffect(() => {
     if (generalMeetingCategory === '通常総会') {
       setExtraordinaryMeetingCount('')
     }
@@ -1128,6 +1184,7 @@ export default function AiMinutesPage() {
 
         const nextMeetingType = normalizeMeetingType(record.meetingType)
 
+        setAutoFillEnabled(false)
         setCurrentEditingRecordId(record.id)
         setMeetingType(nextMeetingType)
         setPropertyId(record.propertyId)
@@ -1142,7 +1199,8 @@ export default function AiMinutesPage() {
         setChairpersonName(record.chairpersonName ?? '')
         setBylawsArticle(record.bylawsArticle ?? '')
         setSignatureDate(record.signatureDate ?? record.heldOn ?? '')
-        setManagementCompanyDisplay(record.managementCompanyDisplay ?? '')
+        setCompanyNameDisplay(record.managementCompanyDisplay ?? '')
+        setStaffAssignee('')
         setMinutesLayoutType(nextMeetingType === '理事会' ? 'board_formal' : 'standard')
 
         const loadedAgendas: AgendaRow[] =
@@ -1704,7 +1762,16 @@ export default function AiMinutesPage() {
               <label className="mb-2 block text-sm font-medium text-slate-700">マンション名</label>
               <select
                 value={propertyId}
-                onChange={(e) => setPropertyId(e.target.value)}
+                onChange={(e) => {
+                  setPropertyId(e.target.value)
+                  setAutoFillEnabled(true)
+                  setBylawsArticle('')
+                  setOwnersTotalCount('')
+                  setVotingRightsTotalCount('')
+                  setCompanyNameDisplay('')
+                  setStaffAssignee('')
+                  setStaffList([])
+                }}
                 disabled={propertiesLoading || reusingLoading}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500 disabled:bg-slate-100"
               >
@@ -1751,175 +1818,257 @@ export default function AiMinutesPage() {
           </div>
 
           {isGeneralMeeting ? (
-            <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-5 space-y-6">
+              {/* 物件固定情報（自動反映） */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">総会種別</label>
-                <select
-                  value={generalMeetingCategory}
-                  onChange={(e) => setGeneralMeetingCategory(e.target.value as '通常総会' | '臨時総会')}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                >
-                  <option value="通常総会">通常総会</option>
-                  <option value="臨時総会">臨時総会</option>
-                </select>
-              </div>
-
-              {generalMeetingCategory === '臨時総会' ? (
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-700">臨時総会回数</label>
-                  <input
-                    type="text"
-                    value={extraordinaryMeetingCount}
-                    onChange={(e) => setExtraordinaryMeetingCount(e.target.value)}
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                    placeholder="例：第2回"
-                  />
+                <div className="mb-3 flex items-center gap-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    物件固定情報
+                  </p>
+                  {settingsLoading ? (
+                    <span className="text-xs text-slate-400">読み込み中...</span>
+                  ) : propertyId ? (
+                    <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-700">
+                      自動反映済み・直接編集可
+                    </span>
+                  ) : null}
                 </div>
-              ) : (
-                <div />
-              )}
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">第〇期</label>
-                <input
-                  type="text"
-                  value={termNumber}
-                  onChange={(e) => setTermNumber(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                  placeholder="例：10"
-                />
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      規約条番号
+                    </label>
+                    <input
+                      type="text"
+                      value={bylawsArticle}
+                      onChange={(e) => setBylawsArticle(e.target.value)}
+                      className="w-full rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm outline-none focus:border-sky-400 focus:bg-white"
+                      placeholder="物件選択後に自動反映"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      組合員総数
+                    </label>
+                    <input
+                      type="text"
+                      value={ownersTotalCount}
+                      onChange={(e) => setOwnersTotalCount(e.target.value)}
+                      className="w-full rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm outline-none focus:border-sky-400 focus:bg-white"
+                      placeholder="物件選択後に自動反映"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      議決権総数
+                    </label>
+                    <input
+                      type="text"
+                      value={votingRightsTotalCount}
+                      onChange={(e) => setVotingRightsTotalCount(e.target.value)}
+                      className="w-full rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm outline-none focus:border-sky-400 focus:bg-white"
+                      placeholder="物件選択後に自動反映"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      管理会社名
+                    </label>
+                    <input
+                      type="text"
+                      value={companyNameDisplay}
+                      onChange={(e) => setCompanyNameDisplay(e.target.value)}
+                      className="w-full rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm outline-none focus:border-sky-400 focus:bg-white"
+                      placeholder="物件選択後に自動反映"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      担当者名
+                    </label>
+                    {staffList.length > 0 ? (
+                      <select
+                        value={staffAssignee}
+                        onChange={(e) => setStaffAssignee(e.target.value)}
+                        className="w-full rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm outline-none focus:border-sky-400 focus:bg-white"
+                      >
+                        <option value="">選択してください</option>
+                        {staffList.map((staff) => (
+                          <option key={staff.displayName} value={staff.displayName}>
+                            {staff.displayName}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        value={staffAssignee}
+                        onChange={(e) => setStaffAssignee(e.target.value)}
+                        className="w-full rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm outline-none focus:border-sky-400 focus:bg-white"
+                        placeholder="担当者名"
+                      />
+                    )}
+                  </div>
+                </div>
               </div>
 
+              {/* 開催情報 */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">規約条番号</label>
-                <input
-                  type="text"
-                  value={bylawsArticle}
-                  onChange={(e) => setBylawsArticle(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                  placeholder="例：49"
-                />
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  開催情報
+                </p>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      総会種別
+                    </label>
+                    <select
+                      value={generalMeetingCategory}
+                      onChange={(e) =>
+                        setGeneralMeetingCategory(e.target.value as '通常総会' | '臨時総会')
+                      }
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                    >
+                      <option value="通常総会">通常総会</option>
+                      <option value="臨時総会">臨時総会</option>
+                    </select>
+                  </div>
+
+                  {generalMeetingCategory === '臨時総会' ? (
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        臨時総会回数
+                      </label>
+                      <input
+                        type="text"
+                        value={extraordinaryMeetingCount}
+                        onChange={(e) => setExtraordinaryMeetingCount(e.target.value)}
+                        className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                        placeholder="例：第2回"
+                      />
+                    </div>
+                  ) : (
+                    <div />
+                  )}
+
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      第〇期
+                    </label>
+                    <input
+                      type="text"
+                      value={termNumber}
+                      onChange={(e) => setTermNumber(e.target.value)}
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      placeholder="例：10"
+                    />
+                  </div>
+                </div>
               </div>
 
+              {/* 出席状況 */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">組合員総数</label>
-                <input
-                  type="text"
-                  value={ownersTotalCount}
-                  onChange={(e) => setOwnersTotalCount(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                  placeholder="例：120"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">議決権総数</label>
-                <input
-                  type="text"
-                  value={votingRightsTotalCount}
-                  onChange={(e) => setVotingRightsTotalCount(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                  placeholder="例：120"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">出席者</label>
-                <input
-                  type="text"
-                  value={attendeesCount}
-                  onChange={(e) => setAttendeesCount(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                  placeholder="例：45"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">議決権数</label>
-                <input
-                  type="text"
-                  value={attendeesVotingRightsCount}
-                  onChange={(e) => setAttendeesVotingRightsCount(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                  placeholder="例：80"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">委任状</label>
-                <input
-                  type="text"
-                  value={proxyCount}
-                  onChange={(e) => setProxyCount(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                  placeholder="例：20"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">議決権数</label>
-                <input
-                  type="text"
-                  value={proxyVotingRightsCount}
-                  onChange={(e) => setProxyVotingRightsCount(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                  placeholder="例：20"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">議決権行使者数</label>
-                <input
-                  type="text"
-                  value={writtenVoteCount}
-                  onChange={(e) => setWrittenVoteCount(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                  placeholder="例：15"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">議決権数</label>
-                <input
-                  type="text"
-                  value={writtenVoteRightsCount}
-                  onChange={(e) => setWrittenVoteRightsCount(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                  placeholder="例：15"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">有効議決権数</label>
-                <input
-                  type="text"
-                  value={effectiveVotingRightsCount}
-                  onChange={(e) => setEffectiveVotingRightsCount(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                  placeholder="例：115"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">議長名</label>
-                <input
-                  type="text"
-                  value={chairpersonName}
-                  onChange={(e) => setChairpersonName(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                  placeholder="例：岡本"
-                />
-              </div>
-
-              <div className="lg:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-slate-700">管理会社</label>
-                <input
-                  type="text"
-                  value={managementCompanyDisplay}
-                  onChange={(e) => setManagementCompanyDisplay(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                  placeholder="例：総合システム管理株式会社　小松"
-                />
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  出席状況
+                </p>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      出席者
+                    </label>
+                    <input
+                      type="text"
+                      value={attendeesCount}
+                      onChange={(e) => setAttendeesCount(e.target.value)}
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      placeholder="例：45"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      議決権数（出席）
+                    </label>
+                    <input
+                      type="text"
+                      value={attendeesVotingRightsCount}
+                      onChange={(e) => setAttendeesVotingRightsCount(e.target.value)}
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      placeholder="例：80"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      委任状
+                    </label>
+                    <input
+                      type="text"
+                      value={proxyCount}
+                      onChange={(e) => setProxyCount(e.target.value)}
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      placeholder="例：20"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      議決権数（委任）
+                    </label>
+                    <input
+                      type="text"
+                      value={proxyVotingRightsCount}
+                      onChange={(e) => setProxyVotingRightsCount(e.target.value)}
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      placeholder="例：20"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      議決権行使者数
+                    </label>
+                    <input
+                      type="text"
+                      value={writtenVoteCount}
+                      onChange={(e) => setWrittenVoteCount(e.target.value)}
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      placeholder="例：15"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      議決権数（行使）
+                    </label>
+                    <input
+                      type="text"
+                      value={writtenVoteRightsCount}
+                      onChange={(e) => setWrittenVoteRightsCount(e.target.value)}
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      placeholder="例：15"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      有効議決権数
+                    </label>
+                    <input
+                      type="text"
+                      value={effectiveVotingRightsCount}
+                      onChange={(e) => setEffectiveVotingRightsCount(e.target.value)}
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      placeholder="例：115"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      議長名
+                    </label>
+                    <input
+                      type="text"
+                      value={chairpersonName}
+                      onChange={(e) => setChairpersonName(e.target.value)}
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      placeholder="例：岡本"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           ) : null}
