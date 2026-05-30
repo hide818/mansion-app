@@ -15,15 +15,23 @@ function SectionCard({
   title,
   description,
   items,
+  featured,
 }: {
   title: string
   description: string
   items: EntryItem[]
+  featured?: boolean
 }) {
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+    <section
+      className={`rounded-2xl border p-5 shadow-sm ${
+        featured ? 'border-sky-200 bg-sky-50' : 'border-gray-200 bg-white'
+      }`}
+    >
       <div className="mb-4">
-        <h2 className="text-base font-bold text-gray-900">{title}</h2>
+        <h2 className={`text-base font-bold ${featured ? 'text-sky-900' : 'text-gray-900'}`}>
+          {title}
+        </h2>
         <p className="mt-1 text-sm text-gray-600">{description}</p>
       </div>
 
@@ -32,7 +40,11 @@ function SectionCard({
           <Link
             key={item.href}
             href={item.href}
-            className="rounded-xl border border-gray-200 bg-gray-50 p-4 transition hover:border-blue-300 hover:bg-blue-50"
+            className={`rounded-xl border p-4 transition ${
+              featured
+                ? 'border-sky-200 bg-white hover:border-sky-400 hover:bg-sky-100'
+                : 'border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50'
+            }`}
           >
             <div className="text-sm font-bold text-gray-900">{item.title}</div>
             <div className="mt-1 text-xs leading-5 text-gray-600">
@@ -180,32 +192,31 @@ export default function PropertyAiEntryCards({
         ]
       : []
 
+  const minutesItems: EntryItem[] = [
+    {
+      title: 'AI議事録を作成',
+      description: '音声から理事会議事録を自動生成します。',
+      href: '/ai-minutes',
+    },
+    {
+      title: 'この物件の保存済み議事録',
+      description: '作成済みの議事録を確認・編集・出力します。',
+      href: `/ai-minutes/records?propertyId=${propertyId}`,
+    },
+  ]
+
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
-        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="text-lg font-bold text-blue-950">
-              すぐ使うAI導線
-            </h2>
-            <p className="mt-1 text-sm text-blue-900">
-              社長、この物件でよく使うAI導線を上に固めています。引き継ぎ・理事会・共有・判断補助を迷わず開ける構成です。
-            </p>
-          </div>
-
-          <div className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-semibold text-blue-900">
-            {role === 'admin'
-              ? '管理者モード'
-              : role === 'general'
-                ? '一般ユーザーモード'
-                : '閲覧モード'}
-          </div>
-        </div>
-      </div>
+      <SectionCard
+        title="議事録"
+        description="AI議事録の作成と保存済み議事録の確認はこちらから。"
+        items={minutesItems}
+        featured
+      />
 
       <SectionCard
         title="引き継ぎ・属人化解消"
-        description="担当変更や共有前に使う導線です。まずここが売り機能です。"
+        description="担当変更や共有前に使う導線です。"
         items={handoverItems}
       />
 

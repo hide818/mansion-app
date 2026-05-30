@@ -21,6 +21,28 @@ export default function Sidebar() {
       ],
     },
     {
+      label: '議事録',
+      summary: '作成・保存・確認をまとめて',
+      featured: true,
+      children: [
+        {
+          label: 'AI議事録を作成',
+          href: '/ai-minutes',
+          description: '音声から議事録を自動生成',
+        },
+        {
+          label: '保存済み議事録',
+          href: '/ai-minutes/records',
+          description: '作成した議事録を確認・編集・出力',
+        },
+        {
+          label: '理事会対象案件',
+          href: '/board-cases',
+          description: '理事会に上げる案件を確認',
+        },
+      ],
+    },
+    {
       label: '物件管理',
       summary: '物件を起点に全業務へ',
       children: [
@@ -28,6 +50,11 @@ export default function Sidebar() {
           label: '物件一覧',
           href: '/properties',
           description: '物件ごとの案件・タスク管理',
+        },
+        {
+          label: '物件カルテ',
+          href: '/property-cards',
+          description: '全物件の重要情報を横断確認',
         },
       ],
     },
@@ -59,22 +86,6 @@ export default function Sidebar() {
       ],
     },
     {
-      label: '理事会',
-      summary: '議事録と理事会対応をまとめる',
-      children: [
-        {
-          label: 'AI議事録',
-          href: '/ai-minutes',
-          description: '音声から議事録を作成',
-        },
-        {
-          label: '理事会対象案件',
-          href: '/board-cases',
-          description: '理事会に上げる案件を確認',
-        },
-      ],
-    },
-    {
       label: '引き継ぎ・文書',
       summary: '担当変更でも事故らない',
       children: [
@@ -87,22 +98,6 @@ export default function Sidebar() {
           label: '引き継ぎ一覧',
           href: '/handover-documents',
           description: '保存済みの引き継ぎ書を確認',
-        },
-      ],
-    },
-    {
-      label: '検索・保存済み',
-      summary: '保存済みデータをすぐ参照',
-      children: [
-        {
-          label: '保存済み議事録',
-          href: '/ai-minutes/records',
-          description: '作成した議事録を確認',
-        },
-        {
-          label: '物件カルテ',
-          href: '/property-cards',
-          description: '全物件の重要情報を横断確認',
         },
       ],
     },

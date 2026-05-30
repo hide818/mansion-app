@@ -38,6 +38,20 @@ export default function CaseDetailAiShortcutBar({
 
   const items: ShortcutItem[] = [
     {
+      label: 'AI議事録を作成',
+      href: '/ai-minutes',
+      description: '音声から理事会議事録を自動生成します。保存・編集・出力まで進めます。',
+      accent: 'border-sky-300 bg-sky-50 text-sky-700',
+    },
+    {
+      label: '保存済み議事録',
+      href: hasCaseContext
+        ? `/ai-minutes/records?propertyId=${propertyId}`
+        : '/ai-minutes/records',
+      description: '作成した議事録を確認・編集・出力します。',
+      accent: 'border-sky-200 bg-white text-sky-800',
+    },
+    {
       label: '案件司令塔AI',
       href: hasCaseContext
         ? `/properties/${propertyId}/cases/${caseId}`
@@ -45,32 +59,16 @@ export default function CaseDetailAiShortcutBar({
       description: '現在の状況、危険度、次アクション、理事会提出判断を確認します。',
       accent: 'border-slate-200 bg-white text-slate-900',
     },
-    {
-      label: 'AI議事録 本格版',
-      href: hasCaseContext
-        ? `/properties/${propertyId}/cases/${caseId}/ai-board-minutes-pro`
-        : '/ai-minutes',
-      description: '案件単位で理事会議事録を整え、保存・印刷まで進めます。',
-      accent: 'border-sky-200 bg-sky-50 text-sky-700',
-    },
-    {
-      label: 'AI見積比較センター',
-      href: hasCaseContext
-        ? `/properties/${propertyId}/cases/${caseId}/estimate-ai-center`
-        : '/estimate-ai-center',
-      description: '見積比較、推奨判断、理事会用コメント作成まで一気に進めます。',
-      accent: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-    },
   ]
 
   return (
     <section className={`space-y-3 ${className}`}>
       <div>
-        <div className="text-sm font-semibold tracking-[0.18em] text-slate-400">
-          AIショートカット
+        <div className="text-sm font-semibold tracking-[0.18em] text-sky-500">
+          議事録ショートカット
         </div>
         <h2 className="mt-1 text-xl font-bold text-slate-900">
-          主要AI機能へすぐ移動
+          議事録の作成・確認はここから
         </h2>
       </div>
 

@@ -14,6 +14,7 @@ export type NavGroup = {
   label: string
   href?: string
   summary?: string
+  featured?: boolean
   children?: NavChild[]
 }
 
@@ -71,11 +72,16 @@ export default function SidebarClient({ menuGroups }: SidebarClientProps) {
             const hasChildren = Boolean(group.children?.length)
             const isOpen = openMap[group.label]
             const isGroupDirectActive = group.href ? isChildActive(pathname, group.href) : false
+            const featured = Boolean(group.featured)
 
             return (
               <section
                 key={group.label}
-                className="rounded-2xl border border-slate-800 bg-slate-900/80"
+                className={`rounded-2xl border ${
+                  featured
+                    ? 'border-emerald-500/60 bg-emerald-950/40'
+                    : 'border-slate-800 bg-slate-900/80'
+                }`}
               >
                 <div className="flex items-center justify-between gap-2 px-4 py-4">
                   {group.href ? (
@@ -85,18 +91,22 @@ export default function SidebarClient({ menuGroups }: SidebarClientProps) {
                         isGroupDirectActive ? 'text-white' : 'text-slate-100'
                       }`}
                     >
-                      <p className="text-sm font-semibold">{group.label}</p>
+                      <p className={`text-sm font-semibold ${featured ? 'text-emerald-300' : 'text-slate-100'}`}>
+                        {group.label}
+                      </p>
                       {group.summary ? (
-                        <p className="mt-1 text-xs leading-5 text-slate-400">
+                        <p className={`mt-1 text-xs leading-5 ${featured ? 'text-emerald-500' : 'text-slate-400'}`}>
                           {group.summary}
                         </p>
                       ) : null}
                     </Link>
                   ) : (
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-slate-100">{group.label}</p>
+                      <p className={`text-sm font-semibold ${featured ? 'text-emerald-300' : 'text-slate-100'}`}>
+                        {group.label}
+                      </p>
                       {group.summary ? (
-                        <p className="mt-1 text-xs leading-5 text-slate-400">
+                        <p className={`mt-1 text-xs leading-5 ${featured ? 'text-emerald-500' : 'text-slate-400'}`}>
                           {group.summary}
                         </p>
                       ) : null}
@@ -107,7 +117,11 @@ export default function SidebarClient({ menuGroups }: SidebarClientProps) {
                     <button
                       type="button"
                       onClick={() => toggleGroup(group.label)}
-                      className="rounded-lg border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:bg-slate-800"
+                      className={`rounded-lg border px-2 py-1 text-xs hover:bg-slate-800 ${
+                        featured
+                          ? 'border-emerald-600 text-emerald-300'
+                          : 'border-slate-700 text-slate-300'
+                      }`}
                     >
                       {isOpen ? '閉じる' : '開く'}
                     </button>
@@ -115,7 +129,7 @@ export default function SidebarClient({ menuGroups }: SidebarClientProps) {
                 </div>
 
                 {hasChildren && isOpen ? (
-                  <div className="space-y-2 border-t border-slate-800 px-3 py-3">
+                  <div className={`space-y-2 border-t px-3 py-3 ${featured ? 'border-emerald-800/60' : 'border-slate-800'}`}>
                     {group.children?.map((child) => {
                       const active = isChildActive(pathname, child.href)
 
@@ -126,12 +140,14 @@ export default function SidebarClient({ menuGroups }: SidebarClientProps) {
                           className={`block rounded-xl border px-3 py-3 transition ${
                             active
                               ? 'border-emerald-500 bg-emerald-500/10 text-white'
-                              : 'border-slate-800 bg-slate-950 text-slate-200 hover:border-slate-700 hover:bg-slate-900'
+                              : featured
+                                ? 'border-emerald-800/40 bg-emerald-950/60 text-emerald-100 hover:border-emerald-600 hover:bg-emerald-900/50'
+                                : 'border-slate-800 bg-slate-950 text-slate-200 hover:border-slate-700 hover:bg-slate-900'
                           }`}
                         >
                           <p className="text-sm font-medium">{child.label}</p>
                           {child.description ? (
-                            <p className="mt-1 text-xs leading-5 text-slate-400">
+                            <p className={`mt-1 text-xs leading-5 ${featured && !active ? 'text-emerald-400/80' : 'text-slate-400'}`}>
                               {child.description}
                             </p>
                           ) : null}

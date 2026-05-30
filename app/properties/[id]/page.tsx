@@ -111,10 +111,14 @@ export default async function PropertyDetailPage({ params }: Props) {
           <p className="mt-2 text-3xl font-bold text-slate-900">{handoverCount ?? 0}</p>
         </div>
 
-        <div className="rounded-2xl border border-sky-200 bg-sky-50 p-5 shadow-sm">
+        <Link
+          href={`/ai-minutes/records?propertyId=${id}`}
+          className="rounded-2xl border border-sky-200 bg-sky-50 p-5 shadow-sm transition hover:border-sky-400 hover:bg-sky-100"
+        >
           <p className="text-sm text-sky-600">保存済み議事録数</p>
           <p className="mt-2 text-3xl font-bold text-sky-900">{minutesCount ?? 0}</p>
-        </div>
+          <p className="mt-2 text-xs font-medium text-sky-700">一覧を見る →</p>
+        </Link>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
@@ -123,6 +127,12 @@ export default async function PropertyDetailPage({ params }: Props) {
             主要アクション
           </p>
           <div className="flex flex-col gap-2">
+            <Link
+              href="/ai-minutes"
+              className="rounded-xl bg-sky-700 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-sky-800"
+            >
+              AI議事録を作成
+            </Link>
             <Link
               href={`/properties/${id}/cases/new`}
               className="rounded-xl bg-slate-900 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-slate-800"

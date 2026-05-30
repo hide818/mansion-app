@@ -91,6 +91,18 @@ export default async function DashboardPage() {
 
           <div className="flex flex-wrap gap-3">
             <Link
+              href="/ai-minutes"
+              className="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600"
+            >
+              AI議事録を作成
+            </Link>
+            <Link
+              href="/ai-minutes/records"
+              className="rounded-xl border border-emerald-300 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50"
+            >
+              保存済み議事録
+            </Link>
+            <Link
               href="/today-tasks"
               className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
             >
