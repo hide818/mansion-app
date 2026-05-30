@@ -397,48 +397,60 @@ function buildBoardFormalPrintHtml(params: {
   }
 
   .signature-page {
-    padding-top: 12mm;
+    padding-top: 20mm;
+    padding-bottom: 28mm;
     page-break-before: always;
     break-before: page;
   }
-  .signature-text {
+  .signature-close {
     text-align: left;
-    white-space: pre-wrap;
+    line-height: 2;
+    margin-bottom: 12pt;
+  }
+  .signature-reg {
+    text-align: left;
     line-height: 2;
   }
-  .signature-date {
-    margin-top: 28pt;
-    text-align: left;
+  .signature-bottom {
+    margin-top: 44pt;
+    padding-left: 18%;
   }
-
-  /* ここを左基準に固定 */
-  .signature-block {
-    width: 100%;
-    margin-top: 22pt;
-  }
+  .signature-date { font-size: 11pt; }
   .signature-org {
-    width: 100%;
-    margin-left: 110pt;
-    text-align: left;
+    font-size: 11pt;
+    margin-left: 2em;
+    margin-top: 10pt;
   }
-  .signature-grid {
-    width: 100%;
-    margin-top: 20pt;
-    margin-left: 110pt;
-    border-collapse: separate;
-    border-spacing: 0 18pt;
+  .signature-block {
+    margin-left: 2em;
+    margin-top: 14pt;
+    display: flex;
+    flex-direction: column;
+    gap: 22pt;
+  }
+  .signature-row {
+    display: flex;
+    align-items: baseline;
+    white-space: nowrap;
   }
   .signature-role {
-    width: 180pt;
+    display: inline-block;
+    width: 90pt;
     text-align: left;
+    flex-shrink: 0;
   }
-  .signature-name {
-    width: 140pt;
-    text-align: left;
+  .signature-line {
+    display: inline-block;
+    width: 172pt;
+    border-bottom: 1px solid #111827;
+    margin: 0 8pt;
+    flex-shrink: 0;
   }
   .signature-seal {
-    width: 60pt;
-    text-align: left;
+    display: inline-block;
+    width: 24pt;
+    text-align: center;
+    flex-shrink: 0;
   }
 
   @media print {
@@ -489,28 +501,29 @@ function buildBoardFormalPrintHtml(params: {
   </section>
 
   <section class="page signature-page">
-    <div class="signature-text">${escapeHtml(formatIndentedParagraphs(`${closeLine}\n${regulationLine}`)).replace(/\n/g, '<br>')}</div>
-    <div class="signature-date">${escapeHtml(signatureDateText)}</div>
+    <div class="signature-close">　${escapeHtml(closeLine)}</div>
+    <div class="signature-reg">　${escapeHtml(regulationLine)}</div>
 
-    <div class="signature-block">
+    <div class="signature-bottom">
+      <div class="signature-date">${escapeHtml(signatureDateText)}</div>
       <div class="signature-org">${escapeHtml(propertyName)}管理組合</div>
-      <table class="signature-grid">
-        <tr>
-          <td class="signature-role">議長</td>
-          <td class="signature-name"></td>
-          <td class="signature-seal">印</td>
-        </tr>
-        <tr>
-          <td class="signature-role">議事録署名人</td>
-          <td class="signature-name"></td>
-          <td class="signature-seal">印</td>
-        </tr>
-        <tr>
-          <td class="signature-role">議事録署名人</td>
-          <td class="signature-name"></td>
-          <td class="signature-seal">印</td>
-        </tr>
-      </table>
+      <div class="signature-block">
+        <div class="signature-row">
+          <span class="signature-role">議長</span>
+          <span class="signature-line"></span>
+          <span class="signature-seal">印</span>
+        </div>
+        <div class="signature-row">
+          <span class="signature-role">議事録署名人</span>
+          <span class="signature-line"></span>
+          <span class="signature-seal">印</span>
+        </div>
+        <div class="signature-row">
+          <span class="signature-role">議事録署名人</span>
+          <span class="signature-line"></span>
+          <span class="signature-seal">印</span>
+        </div>
+      </div>
     </div>
   </section>
 </body>
@@ -772,48 +785,60 @@ function buildGeneralMeetingPrintHtml(params: {
   }
 
   .signature-page {
-    padding-top: 12mm;
+    padding-top: 20mm;
+    padding-bottom: 28mm;
     page-break-before: always;
     break-before: page;
   }
-  .signature-text {
+  .signature-close {
     text-align: left;
-    white-space: pre-wrap;
+    line-height: 2;
+    margin-bottom: 12pt;
+  }
+  .signature-reg {
+    text-align: left;
     line-height: 2;
   }
-  .signature-date {
-    margin-top: 28pt;
-    text-align: left;
+  .signature-bottom {
+    margin-top: 44pt;
+    padding-left: 18%;
   }
-
-  /* 総会最終ページを左基準で固定 */
-  .signature-block {
-    width: 100%;
-    margin-top: 22pt;
-  }
+  .signature-date { font-size: 11pt; }
   .signature-org {
-    width: 100%;
-    margin-left: 110pt;
-    text-align: left;
+    font-size: 11pt;
+    margin-left: 2em;
+    margin-top: 10pt;
   }
-  .signature-grid {
-    width: 100%;
-    margin-top: 20pt;
-    margin-left: 110pt;
-    border-collapse: separate;
-    border-spacing: 0 18pt;
+  .signature-block {
+    margin-left: 2em;
+    margin-top: 14pt;
+    display: flex;
+    flex-direction: column;
+    gap: 22pt;
+  }
+  .signature-row {
+    display: flex;
+    align-items: baseline;
+    white-space: nowrap;
   }
   .signature-role {
-    width: 180pt;
+    display: inline-block;
+    width: 90pt;
     text-align: left;
+    flex-shrink: 0;
   }
-  .signature-name {
-    width: 140pt;
-    text-align: left;
+  .signature-line {
+    display: inline-block;
+    width: 172pt;
+    border-bottom: 1px solid #111827;
+    margin: 0 8pt;
+    flex-shrink: 0;
   }
   .signature-seal {
-    width: 60pt;
-    text-align: left;
+    display: inline-block;
+    width: 24pt;
+    text-align: center;
+    flex-shrink: 0;
   }
 
   @media print {
@@ -869,28 +894,29 @@ function buildGeneralMeetingPrintHtml(params: {
   </section>
 
   <section class="page signature-page">
-    <div class="signature-text">${escapeHtml(formatIndentedParagraphs(`${closeLine}\n${regulationLine}`)).replace(/\n/g, '<br>')}</div>
-    <div class="signature-date">${escapeHtml(signatureDateText)}</div>
+    <div class="signature-close">　${escapeHtml(closeLine)}</div>
+    <div class="signature-reg">　${escapeHtml(regulationLine)}</div>
 
-    <div class="signature-block">
+    <div class="signature-bottom">
+      <div class="signature-date">${escapeHtml(signatureDateText)}</div>
       <div class="signature-org">${escapeHtml(propertyName)}管理組合</div>
-      <table class="signature-grid">
-        <tr>
-          <td class="signature-role">議長</td>
-          <td class="signature-name"></td>
-          <td class="signature-seal">印</td>
-        </tr>
-        <tr>
-          <td class="signature-role">議事録署名人</td>
-          <td class="signature-name"></td>
-          <td class="signature-seal">印</td>
-        </tr>
-        <tr>
-          <td class="signature-role">議事録署名人</td>
-          <td class="signature-name"></td>
-          <td class="signature-seal">印</td>
-        </tr>
-      </table>
+      <div class="signature-block">
+        <div class="signature-row">
+          <span class="signature-role">議長</span>
+          <span class="signature-line"></span>
+          <span class="signature-seal">印</span>
+        </div>
+        <div class="signature-row">
+          <span class="signature-role">議事録署名人</span>
+          <span class="signature-line"></span>
+          <span class="signature-seal">印</span>
+        </div>
+        <div class="signature-row">
+          <span class="signature-role">議事録署名人</span>
+          <span class="signature-line"></span>
+          <span class="signature-seal">印</span>
+        </div>
+      </div>
     </div>
   </section>
 </body>
