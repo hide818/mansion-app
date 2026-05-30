@@ -136,12 +136,6 @@ export default async function PropertyDetailPage({ params }: Props) {
               物件タスクを追加
             </Link>
             <Link
-              href={`/properties/${id}/ai-center`}
-              className="rounded-xl bg-sky-700 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-sky-800"
-            >
-              AI操作センター
-            </Link>
-            <Link
               href={`/handover-documents/new?propertyId=${id}`}
               className="rounded-xl bg-indigo-700 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-indigo-800"
             >

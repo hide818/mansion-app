@@ -352,13 +352,6 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
             </Link>
 
             <Link
-              href={`/properties/${id}/cases/${caseId}/ai-center`}
-              className="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
-            >
-              AIツールを使う
-            </Link>
-
-            <Link
               href={`/properties/${id}/tasks/new?caseId=${caseId}`}
               className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
             >
