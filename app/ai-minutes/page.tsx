@@ -2474,38 +2474,13 @@ function AiMinutesInner() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  コピー
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handlePrintMinutesOnly}
-                  className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  議事録のみ印刷
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleDownloadWord}
-                  disabled={downloadingWord}
-                  className="rounded-xl border border-indigo-300 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-50 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {downloadingWord ? '保存中...' : 'Word互換HTML保存'}
-                </button>
-
                 {currentEditingRecordId ? (
                   <>
                     <button
                       type="button"
                       onClick={handleOverwriteSave}
                       disabled={!canSaveMinutes || savingMinutes}
-                      className="rounded-xl border border-emerald-300 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400"
+                      className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
                     >
                       {savingMinutes ? '保存中...' : '上書き保存'}
                     </button>
@@ -2514,7 +2489,7 @@ function AiMinutesInner() {
                       type="button"
                       onClick={handleSaveAsNew}
                       disabled={!canSaveMinutes || savingMinutes}
-                      className="rounded-xl border border-sky-300 px-4 py-2 text-sm font-medium text-sky-700 hover:bg-sky-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400"
+                      className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400"
                     >
                       {savingMinutes ? '保存中...' : '別名保存'}
                     </button>
@@ -2524,11 +2499,43 @@ function AiMinutesInner() {
                     type="button"
                     onClick={handleSaveAsNew}
                     disabled={!canSaveMinutes || savingMinutes}
-                    className="rounded-xl border border-sky-300 px-4 py-2 text-sm font-medium text-sky-700 hover:bg-sky-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400"
+                    className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
                   >
-                    {savingMinutes ? '保存中...' : 'この議事録を保存する'}
+                    {savingMinutes ? '保存中...' : '保存'}
                   </button>
                 )}
+
+                <button
+                  type="button"
+                  onClick={handlePrintMinutesOnly}
+                  className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  印刷
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDownloadWord}
+                  disabled={downloadingWord}
+                  className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {downloadingWord ? '出力中...' : 'Word出力'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50"
+                >
+                  コピー
+                </button>
+
+                <Link
+                  href="/ai-minutes/records"
+                  className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50"
+                >
+                  一覧へ戻る
+                </Link>
               </div>
             </div>
 

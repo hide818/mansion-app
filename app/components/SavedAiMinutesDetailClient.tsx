@@ -1248,36 +1248,28 @@ export default function SavedAiMinutesDetailClient({
             <div className="flex flex-wrap gap-3">
               <button
                 type="button"
-                onClick={handleCopy}
-                className="inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-black"
-              >
-                {copied ? 'コピーしました' : '全文コピー'}
-              </button>
-
-              <button
-                type="button"
                 onClick={handlePrint}
-                className="inline-flex items-center rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                className="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
               >
-                議事録のみ印刷
+                印刷
               </button>
 
               <button
                 type="button"
                 onClick={handleDownloadPdf}
                 disabled={downloadingPdf}
-                className="inline-flex items-center rounded-xl border border-sky-300 bg-white px-4 py-2 text-sm font-semibold text-sky-700 hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {downloadingPdf ? 'PDF作成中...' : 'PDFダウンロード'}
+                {downloadingPdf ? 'PDF作成中...' : 'PDF出力'}
               </button>
 
               <button
                 type="button"
                 onClick={handleDownloadWord}
                 disabled={downloadingWord}
-                className="inline-flex items-center rounded-xl border border-indigo-300 bg-white px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {downloadingWord ? 'Word作成中...' : 'Wordダウンロード'}
+                {downloadingWord ? 'Word作成中...' : 'Word出力'}
               </button>
 
               <Link
@@ -1286,22 +1278,41 @@ export default function SavedAiMinutesDetailClient({
               >
                 再編集
               </Link>
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-gray-100 pt-3">
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50"
+              >
+                {copied ? 'コピーしました' : 'コピー'}
+              </button>
+
+              <Link
+                href="/ai-minutes/records"
+                className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50"
+              >
+                一覧へ戻る
+              </Link>
 
               <Link
                 href={`/properties/${propertyId}`}
-                className="inline-flex items-center rounded-xl border border-emerald-300 bg-white px-4 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50"
+                className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50"
               >
-                この物件の詳細を見る
+                物件詳細
               </Link>
 
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={deleting}
-                className="inline-flex items-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {deleting ? '削除中...' : '削除'}
-              </button>
+              <div className="ml-auto">
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="inline-flex items-center rounded-xl border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {deleting ? '削除中...' : '削除'}
+                </button>
+              </div>
             </div>
           </div>
 

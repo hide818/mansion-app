@@ -192,9 +192,9 @@ export default function AiMinutesRecordsListClient({
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/ai-minutes"
-                className="inline-flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                className="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
               >
-                議事録AIへ戻る
+                新規作成
               </Link>
             </div>
           </div>
@@ -372,14 +372,14 @@ export default function AiMinutesRecordsListClient({
                         <div className="flex flex-wrap gap-2">
                           <Link
                             href={`/ai-minutes/records/${record.id}`}
-                            className="inline-flex items-center rounded-xl bg-emerald-600 px-3 py-2 font-semibold text-white hover:bg-emerald-700"
+                            className="inline-flex items-center rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
                           >
                             開く
                           </Link>
 
                           <Link
                             href={`/ai-minutes?reuseRecordId=${record.id}`}
-                            className="inline-flex items-center rounded-xl border border-sky-300 bg-white px-3 py-2 font-semibold text-sky-700 hover:bg-sky-50"
+                            className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                           >
                             再編集
                           </Link>
@@ -388,7 +388,7 @@ export default function AiMinutesRecordsListClient({
                             type="button"
                             onClick={() => handleDelete(record.id)}
                             disabled={deletingId === record.id}
-                            className="inline-flex items-center rounded-xl border border-red-300 bg-white px-3 py-2 font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="inline-flex items-center rounded-xl border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             {deletingId === record.id ? '削除中...' : '削除'}
                           </button>
