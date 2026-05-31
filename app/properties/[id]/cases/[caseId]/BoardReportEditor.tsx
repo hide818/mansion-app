@@ -608,7 +608,7 @@ export default function BoardReportEditor({
           onClick={() => setMode('report')}
           className={`rounded-lg px-4 py-2 text-sm font-medium ${
             mode === 'report'
-              ? 'bg-slate-900 text-white'
+              ? 'bg-slate-900 !text-white'
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
           }`}
         >
@@ -620,7 +620,7 @@ export default function BoardReportEditor({
           onClick={() => setMode('resolution')}
           className={`rounded-lg px-4 py-2 text-sm font-medium ${
             mode === 'resolution'
-              ? 'bg-slate-900 text-white'
+              ? 'bg-slate-900 !text-white'
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
           }`}
         >
@@ -632,7 +632,7 @@ export default function BoardReportEditor({
           onClick={() => setMode('proposal')}
           className={`rounded-lg px-4 py-2 text-sm font-medium ${
             mode === 'proposal'
-              ? 'bg-slate-900 text-white'
+              ? 'bg-slate-900 !text-white'
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
           }`}
         >

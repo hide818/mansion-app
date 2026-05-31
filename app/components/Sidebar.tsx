@@ -40,6 +40,11 @@ export default function Sidebar() {
           href: '/board-cases',
           description: '理事会に上げる案件を確認',
         },
+        {
+          label: '議事録担当者設定',
+          href: '/settings/minutes-staff',
+          description: '議事録作成画面で選択する担当者を管理',
+        },
       ],
     },
     {

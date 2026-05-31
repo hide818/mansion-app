@@ -67,8 +67,15 @@ async function updateMinutesSettingsAction(formData: FormData) {
   redirect(`/properties/${propertyId}?saved=minutes`)
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export default async function PropertyDetailPage({ params, searchParams }: Props) {
   const { id } = await params
+
+  if (!UUID_RE.test(id)) {
+    return notFound()
+  }
+
   const resolvedSearchParams = searchParams ? await searchParams : {}
   const savedParam = resolvedSearchParams?.saved ?? ''
 
@@ -200,25 +207,25 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
           <div className="flex flex-col gap-2">
             <Link
               href="/ai-minutes"
-              className="rounded-xl bg-sky-700 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-sky-800"
+              className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-sky-700 px-4 py-2.5 text-sm font-medium !text-white hover:bg-sky-800"
             >
               AI議事録を作成
             </Link>
             <Link
               href={`/properties/${id}/cases/new`}
-              className="rounded-xl bg-slate-900 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-slate-800"
+              className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium !text-white hover:bg-slate-800"
             >
               案件を追加
             </Link>
             <Link
               href={`/properties/${id}/tasks/new`}
-              className="rounded-xl bg-emerald-700 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-emerald-800"
+              className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-medium !text-white hover:bg-emerald-800"
             >
               物件タスクを追加
             </Link>
             <Link
               href={`/handover-documents/new?propertyId=${id}`}
-              className="rounded-xl bg-indigo-700 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-indigo-800"
+              className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-indigo-700 px-4 py-2.5 text-sm font-medium !text-white hover:bg-indigo-800"
             >
               引き継ぎ書を作成
             </Link>
@@ -354,7 +361,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
           <div>
             <button
               type="submit"
-              className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800"
+              className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium !text-white hover:bg-slate-800"
             >
               保存する
             </button>

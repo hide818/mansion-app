@@ -34,6 +34,16 @@ textarea {
   resize: vertical;
 }
 
+@layer utilities {
+  .text-white {
+    color: #ffffff !important;
+  }
+
+  .file\:text-white::file-selector-button {
+    color: #ffffff !important;
+  }
+}
+
 @media print {
   html,
   body {

@@ -208,7 +208,7 @@ export default async function EstimateAiCenterEntryPage() {
             <div className="mt-6">
               <Link
                 href="/properties"
-                className="inline-flex rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+                className="inline-flex min-w-[64px] items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold !text-white transition hover:opacity-90"
               >
                 物件一覧へ
               </Link>
@@ -276,7 +276,7 @@ export default async function EstimateAiCenterEntryPage() {
                         <div className="mt-4">
                           <Link
                             href={`/properties/${property.id}/cases`}
-                            className="inline-flex rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+                            className="inline-flex min-w-[64px] items-center justify-center rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold !text-white transition hover:opacity-90"
                           >
                             この物件の案件一覧へ
                           </Link>

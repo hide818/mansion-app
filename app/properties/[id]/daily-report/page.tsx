@@ -731,9 +731,9 @@ export default async function PropertyDailyReportPage({
         <div className="mb-6 flex flex-wrap gap-3">
           <Link
             href={`/properties/${id}/daily-report?mode=short`}
-            className={`rounded-xl px-4 py-2 font-medium ${
+            className={`inline-flex min-w-[64px] items-center justify-center rounded-xl px-4 py-2 font-medium ${
               mode === 'short'
-                ? 'bg-slate-900 text-white'
+                ? 'bg-slate-900 !text-white'
                 : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
             }`}
           >
@@ -742,9 +742,9 @@ export default async function PropertyDailyReportPage({
 
           <Link
             href={`/properties/${id}/daily-report?mode=detail`}
-            className={`rounded-xl px-4 py-2 font-medium ${
+            className={`inline-flex min-w-[64px] items-center justify-center rounded-xl px-4 py-2 font-medium ${
               mode === 'detail'
-                ? 'bg-slate-900 text-white'
+                ? 'bg-slate-900 !text-white'
                 : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
             }`}
           >

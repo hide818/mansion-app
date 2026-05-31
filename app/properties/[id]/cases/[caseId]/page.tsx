@@ -353,7 +353,7 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
 
             <Link
               href={`/properties/${id}/tasks/new?caseId=${caseId}`}
-              className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+              className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium !text-white hover:bg-slate-800"
             >
               タスクを追加
             </Link>
@@ -532,7 +532,7 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
             <div className="flex flex-wrap gap-3">
               <button
                 type="submit"
-                className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800"
+                className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium !text-white hover:bg-slate-800"
               >
                 保存する
               </button>

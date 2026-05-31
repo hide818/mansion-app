@@ -215,7 +215,7 @@ export default async function BoardCasesPage({ searchParams }: PageProps) {
           <div className="flex items-end gap-3">
             <button
               type="submit"
-              className="inline-flex h-10 items-center rounded-lg bg-black px-4 text-sm font-medium text-white hover:opacity-90"
+              className="inline-flex min-w-[64px] h-10 items-center justify-center rounded-lg bg-black px-4 text-sm font-medium !text-white hover:opacity-90"
             >
               絞り込む
             </button>
@@ -281,7 +281,7 @@ export default async function BoardCasesPage({ searchParams }: PageProps) {
 
                       <Link
                         href={`/properties/${item.property_id}/cases/${item.id}/board-settings`}
-                        className="inline-flex items-center rounded-lg bg-black px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
+                        className="inline-flex min-w-[64px] items-center justify-center rounded-lg bg-black px-3 py-1.5 text-xs font-medium !text-white hover:opacity-90"
                       >
                         理事会予定設定
                       </Link>

@@ -192,7 +192,7 @@ export default function AiMinutesRecordsListClient({
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/ai-minutes"
-                className="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold !text-white hover:bg-slate-800"
               >
                 新規作成
               </Link>
@@ -372,7 +372,7 @@ export default function AiMinutesRecordsListClient({
                         <div className="flex flex-wrap gap-2">
                           <Link
                             href={`/ai-minutes/records/${record.id}`}
-                            className="inline-flex items-center rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                            className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold !text-white hover:bg-slate-800"
                           >
                             開く
                           </Link>

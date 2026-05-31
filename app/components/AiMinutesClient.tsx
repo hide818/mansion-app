@@ -827,7 +827,7 @@ export default function AiMinutesClient({
                   accept="audio/*,.m4a,.mp3,.wav,.mp4,.mpeg,.mpga,.webm,.oga"
                   onChange={handleFileChange}
                   disabled={isBusy}
-                  className="block w-full text-sm text-slate-700 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-800"
+                  className="block w-full text-sm text-slate-700 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-medium file:!text-white hover:file:bg-slate-800"
                 />
                 <p className="mt-2 text-sm text-slate-600">
                   選択中：
@@ -1055,7 +1055,7 @@ export default function AiMinutesClient({
                   onClick={() => setSaveMode('task')}
                   className={`rounded-xl border px-4 py-3 text-sm font-semibold transition ${
                     saveMode === 'task'
-                      ? 'border-slate-900 bg-slate-900 text-white'
+                      ? 'border-slate-900 bg-slate-900 !text-white'
                       : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
                   }`}
                 >
@@ -1175,7 +1175,7 @@ export default function AiMinutesClient({
                       </label>
 
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="inline-flex rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
+                        <span className="inline-flex rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold !text-white">
                           {actionItemSourceLabel}
                         </span>
 

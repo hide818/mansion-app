@@ -68,8 +68,15 @@ function getPriorityLabel(priority: string | null) {
   }
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export default async function PropertyTasksPage({ params, searchParams }: Props) {
   const { id } = await params
+
+  if (!UUID_RE.test(id)) {
+    return notFound()
+  }
+
   const resolvedSearchParams = searchParams ? await searchParams : {}
   const created = resolvedSearchParams?.created === '1'
 
@@ -164,7 +171,7 @@ export default async function PropertyTasksPage({ params, searchParams }: Props)
 
             <Link
               href={`/properties/${id}/tasks/new`}
-              className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+              className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium !text-white hover:bg-slate-800"
             >
               物件タスクを追加
             </Link>

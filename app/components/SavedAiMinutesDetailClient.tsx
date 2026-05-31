@@ -1249,7 +1249,7 @@ export default function SavedAiMinutesDetailClient({
               <button
                 type="button"
                 onClick={handlePrint}
-                className="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold !text-white hover:bg-slate-800"
               >
                 印刷
               </button>
@@ -1539,7 +1539,7 @@ export default function SavedAiMinutesDetailClient({
                       type="button"
                       onClick={handleSaveActionItems}
                       disabled={savingItems}
-                      className="rounded-xl bg-emerald-700 px-5 py-3 text-sm font-medium text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                      className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-emerald-700 px-5 py-3 text-sm font-medium !text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:!text-slate-500"
                     >
                       {savingItems ? '追加中...' : '選択した宿題を案件・タスクに追加'}
                     </button>
