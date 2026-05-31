@@ -924,6 +924,13 @@ function buildGeneralMeetingPrintHtml(params: {
   `.trim()
 }
 
+function parseVotingCount(value: string): number | null {
+  const stripped = value.trim().replace(/,/g, '')
+  if (stripped === '') return null
+  const n = Number(stripped)
+  return Number.isFinite(n) ? n : null
+}
+
 function AiMinutesInner() {
   const searchParams = useSearchParams()
   const reuseRecordId = searchParams.get('reuseRecordId') ?? ''
@@ -1107,7 +1114,16 @@ function AiMinutesInner() {
       if (!proxyVotingRightsCount.trim()) missing.push({ key: 'proxyVotingRightsCount', label: '議決権数（委任）' })
       if (!writtenVoteCount.trim()) missing.push({ key: 'writtenVoteCount', label: '議決権行使者数' })
       if (!writtenVoteRightsCount.trim()) missing.push({ key: 'writtenVoteRightsCount', label: '議決権数（行使）' })
-      if (!effectiveVotingRightsCount.trim()) missing.push({ key: 'effectiveVotingRightsCount', label: '有効議決権数' })
+      // 有効議決権数は自動計算。ソース3項目が全て入力済みなのに計算できていない場合は非数値エラー
+      const sourcesFilled =
+        attendeesVotingRightsCount.trim() !== '' &&
+        proxyVotingRightsCount.trim() !== '' &&
+        writtenVoteRightsCount.trim() !== ''
+      if (sourcesFilled && !effectiveVotingRightsCount.trim()) {
+        missing.push({ key: 'effectiveVotingRightsCount', label: '議決権数（出席/委任/行使）は数字で入力してください' })
+      } else if (!effectiveVotingRightsCount.trim()) {
+        missing.push({ key: 'effectiveVotingRightsCount', label: '有効議決権数（元の3項目を入力してください）' })
+      }
     }
     if (meetingType === '理事会') {
       if (!meetingTerm.trim()) missing.push({ key: 'meetingTerm', label: '理事会期' })
@@ -1332,6 +1348,17 @@ function AiMinutesInner() {
       cancelled = true
     }
   }, [reuseRecordId, propertiesLoading])
+
+  useEffect(() => {
+    const a = parseVotingCount(attendeesVotingRightsCount)
+    const b = parseVotingCount(proxyVotingRightsCount)
+    const c = parseVotingCount(writtenVoteRightsCount)
+    if (a !== null && b !== null && c !== null) {
+      setEffectiveVotingRightsCount(String(a + b + c))
+    } else {
+      setEffectiveVotingRightsCount('')
+    }
+  }, [attendeesVotingRightsCount, proxyVotingRightsCount, writtenVoteRightsCount])
 
   function updateAgenda(id: string, value: string) {
     setAgendas((prev) => prev.map((item) => (item.id === id ? { ...item, title: value } : item)))
@@ -2143,15 +2170,28 @@ function AiMinutesInner() {
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
                       有効議決権数
+                      <span className="ml-2 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">自動計算</span>
                     </label>
                     <input
                       type="text"
+                      readOnly
                       value={effectiveVotingRightsCount}
-                      onChange={(e) => setEffectiveVotingRightsCount(e.target.value)}
-                      className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('effectiveVotingRightsCount') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
-                      placeholder="例：115"
+                      placeholder="3項目入力後に自動計算されます"
+                      className={`w-full cursor-default rounded-xl border px-4 py-3 text-sm outline-none ${
+                        fieldErr('effectiveVotingRightsCount')
+                          ? 'border-red-400 bg-red-50 text-red-700'
+                          : effectiveVotingRightsCount
+                            ? 'border-emerald-200 bg-emerald-50 text-slate-800'
+                            : 'border-slate-200 bg-slate-100 text-slate-400'
+                      }`}
                     />
-                    {fieldErr('effectiveVotingRightsCount') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
+                    {fieldErr('effectiveVotingRightsCount') ? (
+                      <p className="mt-1 text-xs text-red-600">
+                        {effectiveVotingRightsCount === '' && attendeesVotingRightsCount.trim() && proxyVotingRightsCount.trim() && writtenVoteRightsCount.trim()
+                          ? '数字で入力してください'
+                          : '元の3項目（出席/委任/行使の議決権数）を入力してください'}
+                      </p>
+                    ) : null}
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
