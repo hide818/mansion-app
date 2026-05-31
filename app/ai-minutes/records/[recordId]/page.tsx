@@ -33,7 +33,9 @@ type RecordDetailRow = {
   minutes: string | null
   agendas: unknown
   action_items: unknown
+  status: string | null
   created_at: string | null
+  updated_at: string | null
 }
 
 type PropertyRow = {
@@ -71,7 +73,9 @@ export default async function AiMinutesRecordDetailPage({ params }: PageProps) {
       minutes,
       agendas,
       action_items,
-      created_at
+      status,
+      created_at,
+      updated_at
     `)
     .eq('id', recordId)
     .eq('company_id', companyId)
@@ -157,7 +161,9 @@ export default async function AiMinutesRecordDetailPage({ params }: PageProps) {
           minutes={row.minutes ?? ''}
           agendas={agendas}
           actionItems={actionItems}
+          status={row.status ?? 'draft'}
           createdAt={row.created_at}
+          updatedAt={row.updated_at}
         />
       </div>
     </main>

@@ -24,6 +24,7 @@ type RecordRow = {
   managementCompanyDisplay: string
   minutesLayoutType: string
   minutes: string
+  status: string
   createdAt: string | null
   versionType: 'original' | 'derived'
   sourceRecordId: string | null
@@ -60,6 +61,20 @@ function formatMeetingType(value: string) {
   return value
 }
 
+function getStatusLabel(status: string): string {
+  if (status === 'reviewing') return '確認中'
+  if (status === 'finalized') return '確定済み'
+  if (status === 'sent') return '送付済み'
+  return '下書き'
+}
+
+function getStatusBadgeClass(status: string): string {
+  if (status === 'reviewing') return 'bg-amber-100 text-amber-700'
+  if (status === 'finalized') return 'bg-emerald-100 text-emerald-700'
+  if (status === 'sent') return 'bg-sky-100 text-sky-700'
+  return 'bg-gray-100 text-gray-600'
+}
+
 function matchesDateFilter(value: string | null, fromDate: string, toDate: string) {
   if (!fromDate && !toDate) return true
   if (!value) return false
@@ -90,6 +105,7 @@ export default function AiMinutesRecordsListClient({
 
   const [propertyFilter, setPropertyFilter] = useState(initialPropertyFilter)
   const [meetingTypeFilter, setMeetingTypeFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
   const [titleKeyword, setTitleKeyword] = useState('')
   const [createdFrom, setCreatedFrom] = useState('')
   const [createdTo, setCreatedTo] = useState('')
@@ -110,11 +126,13 @@ export default function AiMinutesRecordsListClient({
         ? record.meetingType === meetingTypeFilter
         : true
 
+      const matchesStatus = statusFilter ? record.status === statusFilter : true
+
       const targetTitle = `${record.title} ${record.officialTitle}`.toLowerCase()
       const matchesTitle = keyword ? targetTitle.includes(keyword) : true
       const matchesDate = matchesDateFilter(record.createdAt, createdFrom, createdTo)
 
-      return matchesProperty && matchesMeetingType && matchesTitle && matchesDate
+      return matchesProperty && matchesMeetingType && matchesStatus && matchesTitle && matchesDate
     })
 
     next.sort((a, b) => {
@@ -128,6 +146,7 @@ export default function AiMinutesRecordsListClient({
     records,
     propertyFilter,
     meetingTypeFilter,
+    statusFilter,
     titleKeyword,
     createdFrom,
     createdTo,
@@ -170,6 +189,7 @@ export default function AiMinutesRecordsListClient({
   function clearFilters() {
     setPropertyFilter('')
     setMeetingTypeFilter('')
+    setStatusFilter('')
     setTitleKeyword('')
     setCreatedFrom('')
     setCreatedTo('')
@@ -232,6 +252,23 @@ export default function AiMinutesRecordsListClient({
                 <option value="">すべて</option>
                 <option value="general_meeting">総会</option>
                 <option value="board_meeting">理事会</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
+                ステータスで絞り込み
+              </label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-gray-500"
+              >
+                <option value="">すべて</option>
+                <option value="draft">下書き</option>
+                <option value="reviewing">確認中</option>
+                <option value="finalized">確定済み</option>
+                <option value="sent">送付済み</option>
               </select>
             </div>
 
@@ -322,6 +359,7 @@ export default function AiMinutesRecordsListClient({
                     <th className="px-4 py-3 font-semibold">物件名</th>
                     <th className="px-4 py-3 font-semibold">会議種別</th>
                     <th className="px-4 py-3 font-semibold">タイトル</th>
+                    <th className="min-w-[96px] px-4 py-3 font-semibold">ステータス</th>
                     <th className="px-4 py-3 font-semibold">版情報</th>
                     <th className="px-4 py-3 font-semibold">メタ情報</th>
                     <th className="px-4 py-3 font-semibold">作成日時</th>
@@ -344,6 +382,13 @@ export default function AiMinutesRecordsListClient({
                             </p>
                           ) : null}
                         </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <span
+                          className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${getStatusBadgeClass(record.status)}`}
+                        >
+                          {getStatusLabel(record.status)}
+                        </span>
                       </td>
                       <td className="px-4 py-4 text-gray-700">
                         <div className="space-y-1 text-xs">

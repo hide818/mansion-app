@@ -21,6 +21,7 @@ type RecordRow = {
   management_company_display: string | null
   minutes_layout_type: string | null
   minutes: string | null
+  status: string | null
   created_at: string | null
   source_record_id: string | null
 }
@@ -55,6 +56,7 @@ export default async function AiMinutesRecordsPage() {
       management_company_display,
       minutes_layout_type,
       minutes,
+      status,
       created_at,
       source_record_id
     `)
@@ -107,6 +109,7 @@ export default async function AiMinutesRecordsPage() {
     managementCompanyDisplay: row.management_company_display ?? '',
     minutesLayoutType: row.minutes_layout_type ?? 'standard',
     minutes: row.minutes ?? '',
+    status: row.status ?? 'draft',
     createdAt: row.created_at,
     versionType: row.source_record_id ? ('derived' as const) : ('original' as const),
     sourceRecordId: row.source_record_id,

@@ -1,5 +1,5 @@
 export type MeetingType = 'board' | 'general' | 'meeting'
-export type BoardMinutesRecordStatus = 'draft' | 'final'
+export type BoardMinutesRecordStatus = 'draft' | 'final' | 'reviewing' | 'finalized' | 'sent'
 
 export type BoardMinutesFormattingOptions = {
   tone: string
@@ -27,6 +27,20 @@ export type BoardMinutesRecord = {
   created_by_user_id: string | null
   created_at: string
   updated_at: string
+}
+
+export function getStatusLabel(status: string): string {
+  if (status === 'reviewing') return '確認中'
+  if (status === 'finalized') return '確定済み'
+  if (status === 'sent') return '送付済み'
+  return '下書き'
+}
+
+export function getStatusBadgeClass(status: string): string {
+  if (status === 'reviewing') return 'bg-amber-100 text-amber-700'
+  if (status === 'finalized') return 'bg-emerald-100 text-emerald-700'
+  if (status === 'sent') return 'bg-sky-100 text-sky-700'
+  return 'bg-gray-100 text-gray-600'
 }
 
 export function getMeetingTypeLabel(meetingType: MeetingType) {

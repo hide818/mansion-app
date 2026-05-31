@@ -49,7 +49,18 @@ type DetailResponse = {
     versionType: 'original' | 'derived'
     linkedCases: LinkedRow[]
     linkedTasks: LinkedRow[]
+    status: string
   }
+}
+
+type PatchResponse = {
+  success?: boolean
+  record?: {
+    id: string
+    status?: string
+    updatedAt?: string | null
+  }
+  error?: string
 }
 
 type SavedAiMinutesDetailClientProps = {
@@ -75,7 +86,23 @@ type SavedAiMinutesDetailClientProps = {
   minutes: string
   agendas: AgendaRow[]
   actionItems: ActionItemRow[]
+  status?: string
   createdAt: string | null
+  updatedAt?: string | null
+}
+
+function getStatusLabel(status: string): string {
+  if (status === 'reviewing') return '確認中'
+  if (status === 'finalized') return '確定済み'
+  if (status === 'sent') return '送付済み'
+  return '下書き'
+}
+
+function getStatusBadgeClass(status: string): string {
+  if (status === 'reviewing') return 'bg-amber-100 text-amber-700'
+  if (status === 'finalized') return 'bg-emerald-100 text-emerald-700'
+  if (status === 'sent') return 'bg-sky-100 text-sky-700'
+  return 'bg-gray-100 text-gray-600'
 }
 
 function formatMeetingType(value: string) {
@@ -752,7 +779,8 @@ function downloadBlob(blob: Blob, fileName: string) {
   document.body.appendChild(anchor)
   anchor.click()
   anchor.remove()
-  URL.revokeObjectURL(url)
+  // ブラウザがダウンロードを開始した後に解放する
+  window.setTimeout(() => URL.revokeObjectURL(url), 200)
 }
 
 export default function SavedAiMinutesDetailClient({
@@ -778,9 +806,21 @@ export default function SavedAiMinutesDetailClient({
   minutes,
   agendas,
   actionItems,
+  status = 'draft',
   createdAt,
 }: SavedAiMinutesDetailClientProps) {
   const router = useRouter()
+
+  // 編集・ステータス管理の状態
+  const [currentStatus, setCurrentStatus] = useState(status)
+  const [currentMinutes, setCurrentMinutes] = useState(minutes)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedMinutes, setEditedMinutes] = useState(minutes)
+  const [saving, setSaving] = useState(false)
+  const [statusChanging, setStatusChanging] = useState(false)
+  const [editSaveMessage, setEditSaveMessage] = useState('')
+
+  // 既存の状態
   const [copied, setCopied] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [downloadingPdf, setDownloadingPdf] = useState(false)
@@ -846,6 +886,9 @@ export default function SavedAiMinutesDetailClient({
         setVersionType(data.record.versionType ?? 'original')
         setSourceRecordId(data.record.sourceRecordId ?? null)
         setSourceRecordTitle(data.record.sourceRecordTitle ?? '')
+        if (data.record.status) {
+          setCurrentStatus(data.record.status)
+        }
       } catch (error) {
         console.error(error)
       }
@@ -857,6 +900,119 @@ export default function SavedAiMinutesDetailClient({
       cancelled = true
     }
   }, [recordId])
+
+  // PATCHリクエスト用の共通ペイロードビルダー
+  function buildPatchBody(overrides: { minutes?: string; status?: string } = {}) {
+    return {
+      propertyId,
+      meetingType,
+      title,
+      officialTitle,
+      ...(heldOn !== null && { heldOn }),
+      meetingNumber,
+      termLabel,
+      meetingTerm: safeMeetingTerm,
+      meetingRound: safeMeetingRound,
+      meetingPlace: safeMeetingPlace,
+      attendeesText: safeAttendeesText,
+      chairpersonName: safeChairpersonName,
+      bylawsArticle: safeBylawsArticle,
+      ...(signatureDate !== null && { signatureDate }),
+      managementCompanyDisplay: safeManagementCompanyDisplay,
+      minutesLayoutType: minutesLayoutType ?? 'standard',
+      transcript,
+      minutes: overrides.minutes ?? currentMinutes,
+      agendas,
+      actionItems,
+      ...(overrides.status !== undefined && { status: overrides.status }),
+    }
+  }
+
+  function handleStartEdit() {
+    if (currentStatus === 'finalized' || currentStatus === 'sent') {
+      const ok = window.confirm(
+        '確定済みの議事録を編集しますか？\n編集後に必要に応じて「確定する」を押してください。',
+      )
+      if (!ok) return
+    }
+    setEditedMinutes(currentMinutes)
+    setIsEditing(true)
+    setEditSaveMessage('')
+  }
+
+  function handleCancelEdit() {
+    setIsEditing(false)
+    setEditedMinutes(currentMinutes)
+    setEditSaveMessage('')
+  }
+
+  async function handleSaveEdit() {
+    try {
+      setSaving(true)
+      setEditSaveMessage('')
+
+      const response = await fetch(`/api/ai-minutes/records/${recordId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildPatchBody({ minutes: editedMinutes })),
+      })
+
+      const data = (await response.json()) as PatchResponse
+
+      if (!response.ok) {
+        throw new Error(data.error || '保存に失敗しました。')
+      }
+
+      setCurrentMinutes(editedMinutes)
+      setIsEditing(false)
+      setEditSaveMessage('上書き保存しました。')
+    } catch (error) {
+      console.error(error)
+      alert(error instanceof Error ? error.message : '保存に失敗しました。')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleChangeStatus(newStatus: string) {
+    if (newStatus === 'finalized' && currentStatus === 'finalized') {
+      const ok = window.confirm('すでに確定済みです。再度確定しますか？')
+      if (!ok) return
+    }
+
+    try {
+      setStatusChanging(true)
+      setEditSaveMessage('')
+
+      const response = await fetch(`/api/ai-minutes/records/${recordId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildPatchBody({ status: newStatus })),
+      })
+
+      const data = (await response.json()) as PatchResponse
+
+      if (!response.ok) {
+        throw new Error(data.error || 'ステータスの変更に失敗しました。')
+      }
+
+      setCurrentStatus(newStatus)
+      setEditSaveMessage(
+        newStatus === 'finalized'
+          ? '議事録を確定しました。'
+          : newStatus === 'sent'
+            ? '送付済みに変更しました。'
+            : newStatus === 'reviewing'
+              ? '確認中に変更しました。'
+              : '下書きに戻しました。',
+      )
+    } catch (error) {
+      console.error(error)
+      alert(error instanceof Error ? error.message : 'ステータスの変更に失敗しました。')
+    } finally {
+      setStatusChanging(false)
+    }
+  }
 
   const printableText = useMemo(() => {
     if (minutesLayoutType === 'board_formal') {
@@ -888,7 +1044,7 @@ export default function SavedAiMinutesDetailClient({
         '',
         openLine,
         '',
-        minutes || '議事録本文はありません。',
+        currentMinutes || '議事録本文はありません。',
         '',
         buildBoardFormalCloseText({
           meetingTerm: safeMeetingTerm,
@@ -917,7 +1073,7 @@ export default function SavedAiMinutesDetailClient({
       termLabel ? `期別: ${termLabel}` : '',
       `作成日時: ${formatDateTime(createdAt)}`,
       '',
-      minutes || '議事録本文はありません。',
+      currentMinutes || '議事録本文はありません。',
     ]
       .filter(Boolean)
       .join('\n')
@@ -931,7 +1087,7 @@ export default function SavedAiMinutesDetailClient({
     safeAttendeesText,
     safeManagementCompanyDisplay,
     safeChairpersonName,
-    minutes,
+    currentMinutes,
     safeBylawsArticle,
     signatureDate,
     meetingType,
@@ -973,7 +1129,7 @@ export default function SavedAiMinutesDetailClient({
           chairpersonName: safeChairpersonName,
           bylawsArticle: safeBylawsArticle,
           signatureDate,
-          minutes,
+          minutes: currentMinutes,
         })
       } else {
         const { jsPDF } = await import('jspdf')
@@ -1018,7 +1174,7 @@ export default function SavedAiMinutesDetailClient({
               chairpersonName: safeChairpersonName,
               bylawsArticle: safeBylawsArticle,
               signatureDate,
-              minutes,
+              minutes: currentMinutes,
             })
           : createStandardWordBlob({
               propertyName,
@@ -1029,7 +1185,7 @@ export default function SavedAiMinutesDetailClient({
               meetingNumber,
               termLabel,
               createdAt,
-              minutes,
+              minutes: currentMinutes,
             })
 
       downloadBlob(blob, `${fileNameBase}.doc`)
@@ -1104,7 +1260,7 @@ export default function SavedAiMinutesDetailClient({
         cache: 'no-store',
       })
 
-      const refreshData = (await response.json()) as
+      const refreshData = (await refreshResponse.json()) as
         | DetailResponse
         | { error: string }
 
@@ -1244,7 +1400,9 @@ export default function SavedAiMinutesDetailClient({
 
       <div className="space-y-6">
         <div className="minutes-screen-only space-y-6">
+          {/* アクションバー */}
           <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
+            {/* 出力・印刷ボタン行 */}
             <div className="flex flex-wrap gap-3">
               <button
                 type="button"
@@ -1278,8 +1436,130 @@ export default function SavedAiMinutesDetailClient({
               >
                 再編集
               </Link>
+
+              <div className="ml-auto flex flex-wrap gap-2">
+                {isEditing ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleSaveEdit}
+                      disabled={saving}
+                      className="inline-flex items-center rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold !text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {saving ? '保存中...' : '上書き保存'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancelEdit}
+                      disabled={saving}
+                      className="inline-flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+                    >
+                      キャンセル
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleStartEdit}
+                    className="inline-flex items-center rounded-xl border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-100"
+                  >
+                    本文を編集
+                  </button>
+                )}
+              </div>
             </div>
 
+            {/* ステータス管理行 */}
+            <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-gray-100 pt-4">
+              <span className="text-sm font-semibold text-gray-600">ステータス:</span>
+              <span
+                className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${getStatusBadgeClass(currentStatus)}`}
+              >
+                {getStatusLabel(currentStatus)}
+              </span>
+
+              <div className="flex flex-wrap gap-2">
+                {currentStatus === 'draft' && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleChangeStatus('reviewing')}
+                      disabled={statusChanging}
+                      className="inline-flex items-center rounded-xl border border-amber-300 bg-white px-3 py-2 text-sm font-medium text-amber-700 hover:bg-amber-50 disabled:opacity-60"
+                    >
+                      確認中にする
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleChangeStatus('finalized')}
+                      disabled={statusChanging}
+                      className="inline-flex items-center rounded-xl bg-emerald-700 px-3 py-2 text-sm font-semibold !text-white hover:bg-emerald-800 disabled:opacity-60"
+                    >
+                      確定する
+                    </button>
+                  </>
+                )}
+                {currentStatus === 'reviewing' && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleChangeStatus('finalized')}
+                      disabled={statusChanging}
+                      className="inline-flex items-center rounded-xl bg-emerald-700 px-3 py-2 text-sm font-semibold !text-white hover:bg-emerald-800 disabled:opacity-60"
+                    >
+                      確定する
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleChangeStatus('draft')}
+                      disabled={statusChanging}
+                      className="inline-flex items-center rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+                    >
+                      下書きに戻す
+                    </button>
+                  </>
+                )}
+                {currentStatus === 'finalized' && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleChangeStatus('sent')}
+                      disabled={statusChanging}
+                      className="inline-flex items-center rounded-xl border border-sky-300 bg-white px-3 py-2 text-sm font-medium text-sky-700 hover:bg-sky-50 disabled:opacity-60"
+                    >
+                      送付済みにする
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleChangeStatus('draft')}
+                      disabled={statusChanging}
+                      className="inline-flex items-center rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+                    >
+                      下書きに戻す
+                    </button>
+                  </>
+                )}
+                {currentStatus === 'sent' && (
+                  <button
+                    type="button"
+                    onClick={() => handleChangeStatus('finalized')}
+                    disabled={statusChanging}
+                    className="inline-flex items-center rounded-xl border border-emerald-300 bg-white px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50 disabled:opacity-60"
+                  >
+                    確定済みに戻す
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* 保存・ステータス変更後メッセージ */}
+            {editSaveMessage ? (
+              <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
+                {editSaveMessage}
+              </div>
+            ) : null}
+
+            {/* セカンダリボタン行 */}
             <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-gray-100 pt-3">
               <button
                 type="button"
@@ -1316,9 +1596,17 @@ export default function SavedAiMinutesDetailClient({
             </div>
           </div>
 
+          {/* 詳細・本文セクション */}
           <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
             <div className="border-b border-gray-200 pb-4">
-              <p className="text-sm font-semibold text-emerald-700">保存済み議事録</p>
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="text-sm font-semibold text-emerald-700">保存済み議事録</p>
+                <span
+                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${getStatusBadgeClass(currentStatus)}`}
+                >
+                  {getStatusLabel(currentStatus)}
+                </span>
+              </div>
               <h2 className="mt-1 text-2xl font-bold text-gray-900">
                 {minutesLayoutType === 'board_formal'
                   ? boardFormalTitle
@@ -1415,9 +1703,18 @@ export default function SavedAiMinutesDetailClient({
                       {boardFormalOpenText}
                     </p>
 
-                    <div className="mt-6 whitespace-pre-wrap text-sm leading-8 text-slate-800">
-                      {minutes || '議事録本文はありません。'}
-                    </div>
+                    {isEditing ? (
+                      <textarea
+                        value={editedMinutes}
+                        onChange={(e) => setEditedMinutes(e.target.value)}
+                        className="mt-6 w-full rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-8 text-slate-800 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+                        rows={20}
+                      />
+                    ) : (
+                      <div className="mt-6 whitespace-pre-wrap text-sm leading-8 text-slate-800">
+                        {currentMinutes || '議事録本文はありません。'}
+                      </div>
+                    )}
 
                     <div className="mt-8 space-y-4 text-sm leading-8 text-slate-800">
                       <p>{boardFormalCloseText}</p>
@@ -1437,9 +1734,18 @@ export default function SavedAiMinutesDetailClient({
                 <>
                   <section>
                     <h3 className="text-lg font-bold text-gray-900">議事録本文</h3>
-                    <div className="mt-3 whitespace-pre-wrap rounded-2xl bg-gray-50 p-5 text-sm leading-7 text-gray-800">
-                      {minutes || '議事録本文はありません。'}
-                    </div>
+                    {isEditing ? (
+                      <textarea
+                        value={editedMinutes}
+                        onChange={(e) => setEditedMinutes(e.target.value)}
+                        className="mt-3 w-full rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm leading-7 text-gray-800 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+                        rows={24}
+                      />
+                    ) : (
+                      <div className="mt-3 whitespace-pre-wrap rounded-2xl bg-gray-50 p-5 text-sm leading-7 text-gray-800">
+                        {currentMinutes || '議事録本文はありません。'}
+                      </div>
+                    )}
                   </section>
 
                   {agendas.length > 0 ? (
@@ -1626,6 +1932,7 @@ export default function SavedAiMinutesDetailClient({
           </div>
         </div>
 
+        {/* 印刷専用エリア（管理UIなし、議事録本文のみ） */}
         <div className="minutes-print-only">
           {minutesLayoutType === 'board_formal' ? (
             <>
@@ -1664,7 +1971,7 @@ export default function SavedAiMinutesDetailClient({
                 </p>
 
                 <div className="mt-6 whitespace-pre-wrap text-sm leading-8">
-                  {minutes || '議事録本文はありません。'}
+                  {currentMinutes || '議事録本文はありません。'}
                 </div>
 
                 <div className="print-avoid-break">
@@ -1686,7 +1993,6 @@ export default function SavedAiMinutesDetailClient({
           ) : (
             <div className="bg-white text-gray-900">
               <div className="border-b border-gray-300 pb-4">
-                <p className="text-sm font-semibold text-emerald-700">保存済み議事録</p>
                 <h1 className="mt-2 text-2xl font-bold">
                   {propertyName} {formatMeetingType(meetingType)} 議事録
                 </h1>
@@ -1703,7 +2009,7 @@ export default function SavedAiMinutesDetailClient({
               <section className="mt-6">
                 <h2 className="text-lg font-bold text-gray-900">議事録本文</h2>
                 <div className="mt-3 whitespace-pre-wrap text-sm leading-7 text-gray-900">
-                  {minutes || '議事録本文はありません。'}
+                  {currentMinutes || '議事録本文はありません。'}
                 </div>
               </section>
             </div>

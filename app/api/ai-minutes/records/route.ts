@@ -56,6 +56,7 @@ type RecordListRow = {
   management_company_display: string | null
   minutes_layout_type: string | null
   minutes: string | null
+  status: string | null
   created_at: string | null
   source_record_id: string | null
 }
@@ -133,6 +134,7 @@ export async function GET(request: NextRequest) {
         management_company_display,
         minutes_layout_type,
         minutes,
+        status,
         created_at,
         source_record_id
       `)
@@ -199,6 +201,7 @@ export async function GET(request: NextRequest) {
       managementCompanyDisplay: row.management_company_display ?? '',
       minutesLayoutType: row.minutes_layout_type ?? 'standard',
       minutes: row.minutes ?? '',
+      status: row.status ?? 'draft',
       createdAt: row.created_at,
       versionType: row.source_record_id ? 'derived' : 'original',
       sourceRecordId: row.source_record_id,
@@ -342,6 +345,7 @@ export async function POST(request: NextRequest) {
       minutes,
       agendas: normalizeAgendas(agendas),
       action_items: normalizeActionItems(actionItems),
+      status: 'draft',
       created_by: user.id,
       source_record_id: sourceRecordId || null,
     }

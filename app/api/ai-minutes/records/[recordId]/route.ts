@@ -27,6 +27,7 @@ type UpdatePayload = {
   minutesLayoutType?: string
   transcript?: string
   minutes: string
+  status?: string
   agendas?: Array<{
     title?: string
     body?: string
@@ -66,6 +67,7 @@ type RecordDetailRow = {
   created_at: string | null
   updated_at: string | null
   source_record_id: string | null
+  status: string | null
 }
 
 type PropertyRow = {
@@ -140,6 +142,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
         minutes,
         agendas,
         action_items,
+        status,
         created_at,
         updated_at,
         source_record_id
@@ -245,6 +248,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
         minutes: row.minutes ?? '',
         agendas: Array.isArray(row.agendas) ? row.agendas : [],
         actionItems: Array.isArray(row.action_items) ? row.action_items : [],
+        status: row.status ?? 'draft',
         createdAt: row.created_at,
         updatedAt: row.updated_at,
         sourceRecordId: row.source_record_id,
@@ -289,6 +293,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       minutesLayoutType,
       transcript,
       minutes,
+      status,
       agendas,
       actionItems,
     } = (await request.json()) as UpdatePayload
@@ -296,6 +301,14 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     if (!propertyId || !meetingType || !minutes) {
       return NextResponse.json(
         { error: 'propertyId / meetingType / minutes は必須です。' },
+        { status: 400 },
+      )
+    }
+
+    const VALID_STATUSES = ['draft', 'reviewing', 'finalized', 'sent'] as const
+    if (status !== undefined && !VALID_STATUSES.includes(status as (typeof VALID_STATUSES)[number])) {
+      return NextResponse.json(
+        { error: 'status の値が不正です。draft / reviewing / finalized / sent のいずれかを指定してください。' },
         { status: 400 },
       )
     }
@@ -369,6 +382,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       minutes,
       agendas: normalizeAgendas(agendas),
       action_items: normalizeActionItems(actionItems),
+      ...(typeof status === 'string' && { status }),
     }
 
     const { data, error } = await supabase
@@ -394,6 +408,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
         signature_date,
         management_company_display,
         minutes_layout_type,
+        status,
         created_at,
         updated_at
       `)
@@ -426,6 +441,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
         signatureDate: data.signature_date,
         managementCompanyDisplay: data.management_company_display ?? '',
         minutesLayoutType: data.minutes_layout_type ?? 'standard',
+        status: typeof data.status === 'string' ? data.status : 'draft',
         createdAt: data.created_at,
         updatedAt: data.updated_at,
       },
