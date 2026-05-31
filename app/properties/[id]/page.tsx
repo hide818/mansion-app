@@ -16,6 +16,9 @@ type PropertyRow = {
   id: string
   name: string | null
   address: string | null
+}
+
+type MinutesSettingsRow = {
   bylaws_article: string | null
   owners_total_count: string | null
   voting_rights_total_count: string | null
@@ -30,11 +33,17 @@ async function updateMinutesSettingsAction(formData: FormData) {
 
   if (!propertyId) return
 
+  // companyId が null の場合は認証エラーとして扱う
+  if (!companyId) {
+    redirect(`/properties/${propertyId}?saved=error`)
+  }
+
   const bylawsArticle = String(formData.get('bylaws_article') ?? '').trim()
   const ownersTotalCount = String(formData.get('owners_total_count') ?? '').trim()
   const votingRightsTotalCount = String(formData.get('voting_rights_total_count') ?? '').trim()
 
-  await supabase
+  // .select('id') を付けて更新された行数を確認できるようにする
+  const { data: updated, error } = await supabase
     .from('properties')
     .update({
       bylaws_article: bylawsArticle || null,
@@ -43,6 +52,17 @@ async function updateMinutesSettingsAction(formData: FormData) {
     })
     .eq('id', propertyId)
     .eq('company_id', companyId)
+    .select('id')
+
+  // DB エラー（カラム未存在・権限不足など）
+  if (error) {
+    redirect(`/properties/${propertyId}?saved=error`)
+  }
+
+  // 0 行更新（company_id 不一致・対象物件なし）
+  if (!updated || updated.length === 0) {
+    redirect(`/properties/${propertyId}?saved=notfound`)
+  }
 
   redirect(`/properties/${propertyId}?saved=minutes`)
 }
@@ -50,14 +70,19 @@ async function updateMinutesSettingsAction(formData: FormData) {
 export default async function PropertyDetailPage({ params, searchParams }: Props) {
   const { id } = await params
   const resolvedSearchParams = searchParams ? await searchParams : {}
-  const minutesSaved = resolvedSearchParams?.saved === 'minutes'
+  const savedParam = resolvedSearchParams?.saved ?? ''
+
+  const minutesSaved = savedParam === 'minutes'
+  const minutesError = savedParam === 'error'
+  const minutesNotFound = savedParam === 'notfound'
 
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
 
+  // 物件の存在確認は確実に存在するカラムだけで行う
   const { data: property } = await supabase
     .from('properties')
-    .select('id, name, address, bylaws_article, owners_total_count, voting_rights_total_count')
+    .select('id, name, address')
     .eq('id', id)
     .eq('company_id', companyId)
     .maybeSingle<PropertyRow>()
@@ -65,6 +90,18 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
   if (!property) {
     return notFound()
   }
+
+  // 議事録設定は別クエリで取得（SQL migration 未実施でもエラーを無視して続行）
+  const { data: minutesSettings } = await supabase
+    .from('properties')
+    .select('bylaws_article, owners_total_count, voting_rights_total_count')
+    .eq('id', id)
+    .eq('company_id', companyId)
+    .maybeSingle<MinutesSettingsRow>()
+
+  const bylawsArticle = minutesSettings?.bylaws_article ?? null
+  const ownersTotalCount = minutesSettings?.owners_total_count ?? null
+  const votingRightsTotalCount = minutesSettings?.voting_rights_total_count ?? null
 
   const [
     { count: caseCount },
@@ -241,6 +278,26 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
           </div>
         ) : null}
 
+        {minutesError ? (
+          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            保存に失敗しました。データベースにカラムが追加されているか、権限を確認してください。
+            （Supabase で SQL migration が実行済みか確認してください）
+          </div>
+        ) : null}
+
+        {minutesNotFound ? (
+          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            更新対象が見つかりませんでした。ログイン状態を確認してください。
+          </div>
+        ) : null}
+
+        {!minutesSettings && !minutesError ? (
+          <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+            議事録設定を保存するには、先にデータベースへのカラム追加が必要です。
+            管理者に Supabase の SQL 実行を依頼してください。
+          </div>
+        ) : null}
+
         <form action={updateMinutesSettingsAction} className="mt-5 space-y-5">
           <input type="hidden" name="property_id" value={id} />
 
@@ -251,7 +308,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
             <input
               type="text"
               name="bylaws_article"
-              defaultValue={property.bylaws_article ?? ''}
+              defaultValue={bylawsArticle ?? ''}
               className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500 md:w-64"
               placeholder="例：49"
             />
@@ -260,7 +317,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
             </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 md:max-w-md">
+          <div className="grid gap-4 md:max-w-md md:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700">
                 組合員総数
@@ -269,7 +326,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
                 <input
                   type="text"
                   name="owners_total_count"
-                  defaultValue={property.owners_total_count ?? ''}
+                  defaultValue={ownersTotalCount ?? ''}
                   className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
                   placeholder="例：120"
                 />
@@ -285,7 +342,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
                 <input
                   type="text"
                   name="voting_rights_total_count"
-                  defaultValue={property.voting_rights_total_count ?? ''}
+                  defaultValue={votingRightsTotalCount ?? ''}
                   className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
                   placeholder="例：120"
                 />

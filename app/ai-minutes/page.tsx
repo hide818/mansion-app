@@ -1147,9 +1147,15 @@ function AiMinutesInner() {
           `/api/ai-minutes/setup?propertyId=${encodeURIComponent(propertyId)}`,
           { cache: 'no-store' },
         )
-        if (!response.ok || cancelled) return
+        if (!response.ok) {
+          const errBody = await response.json().catch(() => ({}))
+          console.error('[setup] API error:', response.status, errBody)
+          return
+        }
+        if (cancelled) return
         const data = (await response.json()) as PropertyMinutesSettings
         if (cancelled) return
+        console.log('[setup] settings received:', data)
         setBylawsArticle(data.bylawsArticle || '')
         setOwnersTotalCount(data.ownersTotalCount || '')
         setVotingRightsTotalCount(data.votingRightsTotalCount || '')
