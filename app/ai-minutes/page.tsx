@@ -116,6 +116,13 @@ type PropertyMinutesSettings = {
   companyName: string
   currentUserDisplayName: string
   staffMembers: Array<{ displayName: string }>
+  managementCompanyDisplayName?: string
+  defaultChairpersonName?: string
+  signaturePerson1?: string
+  signaturePerson2?: string
+
+  showSignatureSection?: boolean
+  closingRemarks?: string
 }
 
 type StaffMember = {
@@ -255,6 +262,10 @@ function buildBoardFormalPrintHtml(params: {
   bylawsArticle: string
   signatureDate: string | null
   minutes: string
+  signaturePerson1?: string
+  signaturePerson2?: string
+  showSignatureSection?: boolean
+  closingRemarks?: string
 }) {
   const {
     propertyName,
@@ -270,6 +281,10 @@ function buildBoardFormalPrintHtml(params: {
     bylawsArticle,
     signatureDate,
     minutes,
+    signaturePerson1 = '',
+    signaturePerson2 = '',
+    showSignatureSection = true,
+    closingRemarks = '',
   } = params
 
   const heldOnText = formatMeetingDateTime(heldOn, startTime, endTime)
@@ -503,10 +518,12 @@ function buildBoardFormalPrintHtml(params: {
   <section class="page signature-page">
     <div class="signature-close">　${escapeHtml(closeLine)}</div>
     <div class="signature-reg">　${escapeHtml(regulationLine)}</div>
+    ${closingRemarks ? `<div style="margin-top:12pt;white-space:pre-wrap;">${escapeHtml(closingRemarks)}</div>` : ''}
 
     <div class="signature-bottom">
       <div class="signature-date">${escapeHtml(signatureDateText)}</div>
       <div class="signature-org">${escapeHtml(propertyName)}管理組合</div>
+      ${showSignatureSection ? `
       <div class="signature-block">
         <div class="signature-row">
           <span class="signature-role">議長</span>
@@ -514,16 +531,17 @@ function buildBoardFormalPrintHtml(params: {
           <span class="signature-seal">印</span>
         </div>
         <div class="signature-row">
-          <span class="signature-role">議事録署名人</span>
+          <span class="signature-role">議事録署名人${signaturePerson1 ? `　${escapeHtml(signaturePerson1)}` : ''}</span>
           <span class="signature-line"></span>
           <span class="signature-seal">印</span>
         </div>
         <div class="signature-row">
-          <span class="signature-role">議事録署名人</span>
+          <span class="signature-role">議事録署名人${signaturePerson2 ? `　${escapeHtml(signaturePerson2)}` : ''}</span>
           <span class="signature-line"></span>
           <span class="signature-seal">印</span>
         </div>
       </div>
+      ` : ''}
     </div>
   </section>
 </body>
@@ -608,6 +626,10 @@ function buildGeneralMeetingPrintHtml(params: {
   writtenVoteRightsCount: string
   effectiveVotingRightsCount: string
   minutes: string
+  signaturePerson1?: string
+  signaturePerson2?: string
+  showSignatureSection?: boolean
+  closingRemarks?: string
 }) {
   const {
     propertyName,
@@ -630,6 +652,10 @@ function buildGeneralMeetingPrintHtml(params: {
     writtenVoteRightsCount,
     effectiveVotingRightsCount,
     minutes,
+    signaturePerson1 = '',
+    signaturePerson2 = '',
+    showSignatureSection = true,
+    closingRemarks = '',
   } = params
 
   const heldOnText = formatMeetingDateTime(heldOn, startTime, endTime)
@@ -896,10 +922,12 @@ function buildGeneralMeetingPrintHtml(params: {
   <section class="page signature-page">
     <div class="signature-close">　${escapeHtml(closeLine)}</div>
     <div class="signature-reg">　${escapeHtml(regulationLine)}</div>
+    ${closingRemarks ? `<div style="margin-top:12pt;white-space:pre-wrap;">${escapeHtml(closingRemarks)}</div>` : ''}
 
     <div class="signature-bottom">
       <div class="signature-date">${escapeHtml(signatureDateText)}</div>
       <div class="signature-org">${escapeHtml(propertyName)}管理組合</div>
+      ${showSignatureSection ? `
       <div class="signature-block">
         <div class="signature-row">
           <span class="signature-role">議長</span>
@@ -907,16 +935,17 @@ function buildGeneralMeetingPrintHtml(params: {
           <span class="signature-seal">印</span>
         </div>
         <div class="signature-row">
-          <span class="signature-role">議事録署名人</span>
+          <span class="signature-role">議事録署名人${signaturePerson1 ? `　${escapeHtml(signaturePerson1)}` : ''}</span>
           <span class="signature-line"></span>
           <span class="signature-seal">印</span>
         </div>
         <div class="signature-row">
-          <span class="signature-role">議事録署名人</span>
+          <span class="signature-role">議事録署名人${signaturePerson2 ? `　${escapeHtml(signaturePerson2)}` : ''}</span>
           <span class="signature-line"></span>
           <span class="signature-seal">印</span>
         </div>
       </div>
+      ` : ''}
     </div>
   </section>
 </body>
@@ -962,6 +991,10 @@ function AiMinutesInner() {
   const [companyNameDisplay, setCompanyNameDisplay] = useState('')
   const [staffAssignee, setStaffAssignee] = useState('')
   const [staffList, setStaffList] = useState<StaffMember[]>([])
+  const [templateSignaturePerson1, setTemplateSignaturePerson1] = useState('')
+  const [templateSignaturePerson2, setTemplateSignaturePerson2] = useState('')
+  const [templateShowSignatureSection, setTemplateShowSignatureSection] = useState(true)
+  const [templateClosingRemarks, setTemplateClosingRemarks] = useState('')
 
   const [generalMeetingCategory, setGeneralMeetingCategory] = useState<'通常総会' | '臨時総会'>('通常総会')
   const [extraordinaryMeetingCount, setExtraordinaryMeetingCount] = useState('')
@@ -1218,11 +1251,18 @@ function AiMinutesInner() {
         setBylawsArticle(data.bylawsArticle || '')
         setOwnersTotalCount(data.ownersTotalCount || '')
         setVotingRightsTotalCount(data.votingRightsTotalCount || '')
-        setCompanyNameDisplay(data.companyName || '')
+        setCompanyNameDisplay(data.managementCompanyDisplayName || data.companyName || '')
         setStaffList(data.staffMembers || [])
         if (data.currentUserDisplayName) {
           setStaffAssignee(data.currentUserDisplayName)
         }
+        if (data.defaultChairpersonName) {
+          setChairpersonName(data.defaultChairpersonName)
+        }
+        setTemplateSignaturePerson1(data.signaturePerson1 || '')
+        setTemplateSignaturePerson2(data.signaturePerson2 || '')
+        setTemplateShowSignatureSection(data.showSignatureSection !== false)
+        setTemplateClosingRemarks(data.closingRemarks || '')
       } catch (error) {
         console.error('property settings fetch error:', error)
       } finally {
@@ -1241,6 +1281,7 @@ function AiMinutesInner() {
       setExtraordinaryMeetingCount('')
     }
   }, [generalMeetingCategory])
+
 
   useEffect(() => {
     if (propertiesLoading || !reuseRecordId) return
@@ -1704,6 +1745,10 @@ function AiMinutesInner() {
             bylawsArticle: safeBylawsArticle,
             signatureDate,
             minutes: editableMinutes,
+            signaturePerson1: templateSignaturePerson1,
+            signaturePerson2: templateSignaturePerson2,
+            showSignatureSection: templateShowSignatureSection,
+            closingRemarks: templateClosingRemarks,
           })
         : buildGeneralMeetingPrintHtml({
             propertyName: selectedProperty.name,
@@ -1726,6 +1771,10 @@ function AiMinutesInner() {
             writtenVoteRightsCount,
             effectiveVotingRightsCount,
             minutes: editableMinutes,
+            signaturePerson1: templateSignaturePerson1,
+            signaturePerson2: templateSignaturePerson2,
+            showSignatureSection: templateShowSignatureSection,
+            closingRemarks: templateClosingRemarks,
           })
 
       const blob = new Blob([html], {
@@ -1777,6 +1826,10 @@ function AiMinutesInner() {
             bylawsArticle: safeBylawsArticle,
             signatureDate,
             minutes: editableMinutes,
+            signaturePerson1: templateSignaturePerson1,
+            signaturePerson2: templateSignaturePerson2,
+            showSignatureSection: templateShowSignatureSection,
+            closingRemarks: templateClosingRemarks,
           })
         : buildGeneralMeetingPrintHtml({
             propertyName: selectedProperty.name,
@@ -1799,6 +1852,10 @@ function AiMinutesInner() {
             writtenVoteRightsCount,
             effectiveVotingRightsCount,
             minutes: editableMinutes,
+            signaturePerson1: templateSignaturePerson1,
+            signaturePerson2: templateSignaturePerson2,
+            showSignatureSection: templateShowSignatureSection,
+            closingRemarks: templateClosingRemarks,
           })
 
       const blob = new Blob([html], {

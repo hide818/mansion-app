@@ -41,12 +41,32 @@ export async function GET(request: NextRequest) {
     let bylawsArticle = ''
     let ownersTotalCount = ''
     let votingRightsTotalCount = ''
+    let managementCompanyDisplayName = ''
+    let defaultChairpersonName = ''
+    let signaturePerson1 = ''
+    let signaturePerson2 = ''
+    let generalMeetingTitleFormat = ''
+    let boardMeetingTitleFormat = ''
+    let showSignatureSection = true
+    let closingRemarks = ''
 
     if (propertyId) {
       // 1st try: company_id 条件あり（通常パス）
       const { data: propertyRow } = await supabase
         .from('properties')
-        .select('bylaws_article, owners_total_count, voting_rights_total_count')
+        .select(`
+          bylaws_article,
+          owners_total_count,
+          voting_rights_total_count,
+          management_company_display_name,
+          default_chairperson_name,
+          signature_person_1,
+          signature_person_2,
+          general_meeting_title_format,
+          board_meeting_title_format,
+          show_signature_section,
+          closing_remarks
+        `)
         .eq('id', propertyId)
         .eq('company_id', companyId)
         .maybeSingle()
@@ -55,17 +75,32 @@ export async function GET(request: NextRequest) {
         bylawsArticle = propertyRow.bylaws_article ?? ''
         ownersTotalCount = propertyRow.owners_total_count ?? ''
         votingRightsTotalCount = propertyRow.voting_rights_total_count ?? ''
-        console.log(`[setup] property ${propertyId} loaded via company_id:`, {
-          bylawsArticle,
-          ownersTotalCount,
-          votingRightsTotalCount,
-        })
+        managementCompanyDisplayName = propertyRow.management_company_display_name ?? ''
+        defaultChairpersonName = propertyRow.default_chairperson_name ?? ''
+        signaturePerson1 = propertyRow.signature_person_1 ?? ''
+        signaturePerson2 = propertyRow.signature_person_2 ?? ''
+        generalMeetingTitleFormat = propertyRow.general_meeting_title_format ?? ''
+        boardMeetingTitleFormat = propertyRow.board_meeting_title_format ?? ''
+        showSignatureSection = propertyRow.show_signature_section ?? true
+        closingRemarks = propertyRow.closing_remarks ?? ''
       } else {
         // 2nd try: propertyId のみで再取得（開発時 fallback）
         console.warn(`[setup] property ${propertyId} not found with company_id, trying fallback...`)
         const { data: fallbackRow } = await supabase
           .from('properties')
-          .select('bylaws_article, owners_total_count, voting_rights_total_count')
+          .select(`
+            bylaws_article,
+            owners_total_count,
+            voting_rights_total_count,
+            management_company_display_name,
+            default_chairperson_name,
+            signature_person_1,
+            signature_person_2,
+            general_meeting_title_format,
+            board_meeting_title_format,
+            show_signature_section,
+            closing_remarks
+          `)
           .eq('id', propertyId)
           .maybeSingle()
 
@@ -73,6 +108,14 @@ export async function GET(request: NextRequest) {
           bylawsArticle = fallbackRow.bylaws_article ?? ''
           ownersTotalCount = fallbackRow.owners_total_count ?? ''
           votingRightsTotalCount = fallbackRow.voting_rights_total_count ?? ''
+          managementCompanyDisplayName = fallbackRow.management_company_display_name ?? ''
+          defaultChairpersonName = fallbackRow.default_chairperson_name ?? ''
+          signaturePerson1 = fallbackRow.signature_person_1 ?? ''
+          signaturePerson2 = fallbackRow.signature_person_2 ?? ''
+          generalMeetingTitleFormat = fallbackRow.general_meeting_title_format ?? ''
+          boardMeetingTitleFormat = fallbackRow.board_meeting_title_format ?? ''
+          showSignatureSection = fallbackRow.show_signature_section ?? true
+          closingRemarks = fallbackRow.closing_remarks ?? ''
           console.log(`[setup] property ${propertyId} loaded via fallback:`, {
             bylawsArticle,
             ownersTotalCount,
@@ -122,6 +165,14 @@ export async function GET(request: NextRequest) {
       companyName,
       currentUserDisplayName,
       staffMembers,
+      managementCompanyDisplayName,
+      defaultChairpersonName,
+      signaturePerson1,
+      signaturePerson2,
+      generalMeetingTitleFormat,
+      boardMeetingTitleFormat,
+      showSignatureSection,
+      closingRemarks,
     })
   } catch (error) {
     console.error('[setup] unexpected error:', error)

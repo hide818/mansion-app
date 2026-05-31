@@ -89,6 +89,10 @@ type SavedAiMinutesDetailClientProps = {
   status?: string
   createdAt: string | null
   updatedAt?: string | null
+  templateSignaturePerson1?: string
+  templateSignaturePerson2?: string
+  templateShowSignatureSection?: boolean
+  templateClosingRemarks?: string
 }
 
 function getStatusLabel(status: string): string {
@@ -618,6 +622,10 @@ function createBoardFormalWordBlob({
   bylawsArticle,
   signatureDate,
   minutes,
+  signaturePerson1 = '',
+  signaturePerson2 = '',
+  showSignatureSection = true,
+  closingRemarks = '',
 }: {
   propertyName: string
   meetingTerm: string
@@ -630,6 +638,10 @@ function createBoardFormalWordBlob({
   bylawsArticle: string
   signatureDate: string | null
   minutes: string
+  signaturePerson1?: string
+  signaturePerson2?: string
+  showSignatureSection?: boolean
+  closingRemarks?: string
 }) {
   const titleLine =
     meetingTerm && meetingRound
@@ -754,14 +766,17 @@ body {
 
   <p>${closeLine}</p>
   <p>${regulationLine}</p>
+  ${closingRemarks ? `<p style="white-space:pre-wrap;">${closingRemarks.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>` : ''}
   <p>${signatureDateText}</p>
   <p>${propertyName}管理組合</p>
 
+  ${showSignatureSection ? `
   <div class="signature-line">
     <div class="signature-row">議長　　　　　　　　　　　　印</div>
-    <div class="signature-row">議事録署名人　　　　　　　　印</div>
-    <div class="signature-row">議事録署名人　　　　　　　　印</div>
+    <div class="signature-row">議事録署名人${signaturePerson1 ? `　${signaturePerson1.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}` : ''}　　　　　　　　印</div>
+    <div class="signature-row">議事録署名人${signaturePerson2 ? `　${signaturePerson2.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}` : ''}　　　　　　　　印</div>
   </div>
+  ` : ''}
 </body>
 </html>
   `.trim()
@@ -808,6 +823,10 @@ export default function SavedAiMinutesDetailClient({
   actionItems,
   status = 'draft',
   createdAt,
+  templateSignaturePerson1 = '',
+  templateSignaturePerson2 = '',
+  templateShowSignatureSection = true,
+  templateClosingRemarks = '',
 }: SavedAiMinutesDetailClientProps) {
   const router = useRouter()
 
@@ -1054,11 +1073,16 @@ export default function SavedAiMinutesDetailClient({
           propertyName,
           bylawsArticle: safeBylawsArticle,
         }),
+        templateClosingRemarks || '',
         formatDateOnly(signatureDate || heldOn),
         `${propertyName}管理組合`,
-        '議長　　　　　　　　　　　　印',
-        '議事録署名人　　　　　　　　印',
-        '議事録署名人　　　　　　　　印',
+        ...(templateShowSignatureSection
+          ? [
+              '議長　　　　　　　　　　　　印',
+              `議事録署名人${templateSignaturePerson1 ? `　${templateSignaturePerson1}` : ''}　　　　　　　　印`,
+              `議事録署名人${templateSignaturePerson2 ? `　${templateSignaturePerson2}` : ''}　　　　　　　　印`,
+            ]
+          : []),
       ]
         .filter(Boolean)
         .join('\n')
@@ -1096,6 +1120,10 @@ export default function SavedAiMinutesDetailClient({
     meetingNumber,
     termLabel,
     createdAt,
+    templateSignaturePerson1,
+    templateSignaturePerson2,
+    templateShowSignatureSection,
+    templateClosingRemarks,
   ])
 
   async function handleCopy() {
@@ -1175,6 +1203,10 @@ export default function SavedAiMinutesDetailClient({
               bylawsArticle: safeBylawsArticle,
               signatureDate,
               minutes: currentMinutes,
+              signaturePerson1: templateSignaturePerson1,
+              signaturePerson2: templateSignaturePerson2,
+              showSignatureSection: templateShowSignatureSection,
+              closingRemarks: templateClosingRemarks,
             })
           : createStandardWordBlob({
               propertyName,
@@ -1723,11 +1755,13 @@ export default function SavedAiMinutesDetailClient({
                       <p>{propertyName}管理組合</p>
                     </div>
 
-                    <div className="mt-10 space-y-8 text-sm text-slate-900">
-                      <p>議長　　　　　　　　　　　　印</p>
-                      <p>議事録署名人　　　　　　　　印</p>
-                      <p>議事録署名人　　　　　　　　印</p>
-                    </div>
+                    {templateShowSignatureSection ? (
+                      <div className="mt-10 space-y-8 text-sm text-slate-900">
+                        <p>議長　　　　　　　　　　　　印</p>
+                        <p>議事録署名人{templateSignaturePerson1 ? `　${templateSignaturePerson1}` : ''}　　　　　　　　印</p>
+                        <p>議事録署名人{templateSignaturePerson2 ? `　${templateSignaturePerson2}` : ''}　　　　　　　　印</p>
+                      </div>
+                    ) : null}
                   </div>
                 </section>
               ) : (
@@ -1982,11 +2016,13 @@ export default function SavedAiMinutesDetailClient({
                     <p>{propertyName}管理組合</p>
                   </div>
 
-                  <div className="mt-10 space-y-8 text-sm">
-                    <p>議長　　　　　　　　　　　　印</p>
-                    <p>議事録署名人　　　　　　　　印</p>
-                    <p>議事録署名人　　　　　　　　印</p>
-                  </div>
+                  {templateShowSignatureSection ? (
+                    <div className="mt-10 space-y-8 text-sm">
+                      <p>議長　　　　　　　　　　　　印</p>
+                      <p>議事録署名人{templateSignaturePerson1 ? `　${templateSignaturePerson1}` : ''}　　　　　　　　印</p>
+                      <p>議事録署名人{templateSignaturePerson2 ? `　${templateSignaturePerson2}` : ''}　　　　　　　　印</p>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </>

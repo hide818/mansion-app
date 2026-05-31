@@ -43,6 +43,13 @@ type PropertyRow = {
   name: string | null
 }
 
+type PropertyTemplateRow = {
+  signature_person_1: string | null
+  signature_person_2: string | null
+  show_signature_section: boolean | null
+  closing_remarks: string | null
+}
+
 export default async function AiMinutesRecordDetailPage({ params }: PageProps) {
   const { recordId } = await params
   const supabase = await createSupabaseServerClient()
@@ -107,6 +114,18 @@ export default async function AiMinutesRecordDetailPage({ params }: PageProps) {
   const agendas = Array.isArray(row.agendas) ? row.agendas : []
   const actionItems = Array.isArray(row.action_items) ? row.action_items : []
 
+  const { data: templateData } = await supabase
+    .from('properties')
+    .select('signature_person_1, signature_person_2, show_signature_section, closing_remarks')
+    .eq('id', row.property_id)
+    .eq('company_id', companyId)
+    .maybeSingle<PropertyTemplateRow>()
+
+  const templateSignaturePerson1 = templateData?.signature_person_1 ?? ''
+  const templateSignaturePerson2 = templateData?.signature_person_2 ?? ''
+  const templateShowSignatureSection = templateData?.show_signature_section ?? true
+  const templateClosingRemarks = templateData?.closing_remarks ?? ''
+
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-6 md:px-8">
       <div className="mx-auto max-w-5xl">
@@ -164,6 +183,10 @@ export default async function AiMinutesRecordDetailPage({ params }: PageProps) {
           status={row.status ?? 'draft'}
           createdAt={row.created_at}
           updatedAt={row.updated_at}
+          templateSignaturePerson1={templateSignaturePerson1}
+          templateSignaturePerson2={templateSignaturePerson2}
+          templateShowSignatureSection={templateShowSignatureSection}
+          templateClosingRemarks={templateClosingRemarks}
         />
       </div>
     </main>

@@ -22,6 +22,14 @@ type MinutesSettingsRow = {
   bylaws_article: string | null
   owners_total_count: string | null
   voting_rights_total_count: string | null
+  management_company_display_name: string | null
+  default_chairperson_name: string | null
+  signature_person_1: string | null
+  signature_person_2: string | null
+  general_meeting_title_format: string | null
+  board_meeting_title_format: string | null
+  show_signature_section: boolean | null
+  closing_remarks: string | null
 }
 
 async function updateMinutesSettingsAction(formData: FormData) {
@@ -41,14 +49,25 @@ async function updateMinutesSettingsAction(formData: FormData) {
   const bylawsArticle = String(formData.get('bylaws_article') ?? '').trim()
   const ownersTotalCount = String(formData.get('owners_total_count') ?? '').trim()
   const votingRightsTotalCount = String(formData.get('voting_rights_total_count') ?? '').trim()
+  const managementCompanyDisplayName = String(formData.get('management_company_display_name') ?? '').trim()
+  const defaultChairpersonName = String(formData.get('default_chairperson_name') ?? '').trim()
+  const signaturePerson1 = String(formData.get('signature_person_1') ?? '').trim()
+  const signaturePerson2 = String(formData.get('signature_person_2') ?? '').trim()
+  const showSignatureSection = formData.get('show_signature_section') !== '0'
+  const closingRemarks = String(formData.get('closing_remarks') ?? '').trim()
 
-  // .select('id') を付けて更新された行数を確認できるようにする
   const { data: updated, error } = await supabase
     .from('properties')
     .update({
       bylaws_article: bylawsArticle || null,
       owners_total_count: ownersTotalCount || null,
       voting_rights_total_count: votingRightsTotalCount || null,
+      management_company_display_name: managementCompanyDisplayName || null,
+      default_chairperson_name: defaultChairpersonName || null,
+      signature_person_1: signaturePerson1 || null,
+      signature_person_2: signaturePerson2 || null,
+      show_signature_section: showSignatureSection,
+      closing_remarks: closingRemarks || null,
     })
     .eq('id', propertyId)
     .eq('company_id', companyId)
@@ -101,7 +120,19 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
   // 議事録設定は別クエリで取得（SQL migration 未実施でもエラーを無視して続行）
   const { data: minutesSettings } = await supabase
     .from('properties')
-    .select('bylaws_article, owners_total_count, voting_rights_total_count')
+    .select(`
+      bylaws_article,
+      owners_total_count,
+      voting_rights_total_count,
+      management_company_display_name,
+      default_chairperson_name,
+      signature_person_1,
+      signature_person_2,
+      general_meeting_title_format,
+      board_meeting_title_format,
+      show_signature_section,
+      closing_remarks
+    `)
     .eq('id', id)
     .eq('company_id', companyId)
     .maybeSingle<MinutesSettingsRow>()
@@ -109,6 +140,12 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
   const bylawsArticle = minutesSettings?.bylaws_article ?? null
   const ownersTotalCount = minutesSettings?.owners_total_count ?? null
   const votingRightsTotalCount = minutesSettings?.voting_rights_total_count ?? null
+  const managementCompanyDisplayName = minutesSettings?.management_company_display_name ?? null
+  const defaultChairpersonName = minutesSettings?.default_chairperson_name ?? null
+  const signaturePerson1 = minutesSettings?.signature_person_1 ?? null
+  const signaturePerson2 = minutesSettings?.signature_person_2 ?? null
+  const showSignatureSection = minutesSettings?.show_signature_section ?? true
+  const closingRemarks = minutesSettings?.closing_remarks ?? null
 
   const [
     { count: caseCount },
@@ -356,6 +393,101 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
                 <span className="shrink-0 text-sm text-slate-500">個</span>
               </div>
             </div>
+          </div>
+
+          <div className="grid gap-4 md:max-w-md md:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                管理会社表示名
+              </label>
+              <input
+                type="text"
+                name="management_company_display_name"
+                defaultValue={managementCompanyDisplayName ?? ''}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                placeholder="例：〇〇管理株式会社"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                議長名（理事長名）
+              </label>
+              <input
+                type="text"
+                name="default_chairperson_name"
+                defaultValue={defaultChairpersonName ?? ''}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                placeholder="例：山田太郎"
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:max-w-md md:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                議事録署名人1
+              </label>
+              <input
+                type="text"
+                name="signature_person_1"
+                defaultValue={signaturePerson1 ?? ''}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                placeholder="例：田中一郎"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                議事録署名人2
+              </label>
+              <input
+                type="text"
+                name="signature_person_2"
+                defaultValue={signaturePerson2 ?? ''}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                placeholder="例：鈴木花子"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700">
+              署名欄の表示
+            </label>
+            <div className="flex items-center gap-4">
+              <label className="flex cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="show_signature_section"
+                  value="1"
+                  defaultChecked={showSignatureSection !== false}
+                />
+                表示する
+              </label>
+              <label className="flex cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="show_signature_section"
+                  value="0"
+                  defaultChecked={showSignatureSection === false}
+                />
+                非表示にする
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700">
+              議事録末尾の定型文
+            </label>
+            <textarea
+              name="closing_remarks"
+              defaultValue={closingRemarks ?? ''}
+              rows={3}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+              placeholder="議事録末尾に挿入する定型文（任意）"
+            />
           </div>
 
           <div>
