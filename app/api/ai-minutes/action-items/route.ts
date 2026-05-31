@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { isValidUuid } from '@/lib/isValidUuid'
 
 type ActionItemPayload = {
   title: string
@@ -25,6 +26,13 @@ export async function POST(request: NextRequest) {
     if (!propertyId) {
       return NextResponse.json(
         { error: 'propertyId は必須です。' },
+        { status: 400 },
+      )
+    }
+
+    if (!isValidUuid(propertyId)) {
+      return NextResponse.json(
+        { error: 'propertyId の形式が不正です。' },
         { status: 400 },
       )
     }

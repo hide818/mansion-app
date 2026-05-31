@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { isValidUuid } from '@/lib/isValidUuid'
 
 type Props = {
   params: Promise<{
@@ -162,6 +163,10 @@ async function updateCaseAction(formData: FormData) {
   const status = String(formData.get('status') ?? 'todo')
   const dueDate = String(formData.get('due_date') ?? '').trim()
   const dueField = String(formData.get('due_field') ?? '').trim()
+
+  if (!isValidUuid(propertyId)) {
+    redirect('/properties')
+  }
 
   if (!propertyId || !caseId) {
     redirect(`/properties/${propertyId}/cases/${caseId}?error=案件の指定が不足しています`)

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { isValidUuid } from '@/lib/isValidUuid'
 
 type Props = {
   params: Promise<{
@@ -100,6 +101,10 @@ async function updateTaskAction(formData: FormData) {
   const status = String(formData.get('status') ?? 'todo')
   const priority = String(formData.get('priority') ?? 'medium')
   const dueDate = String(formData.get('due_date') ?? '').trim()
+
+  if (!isValidUuid(propertyId)) {
+    redirect('/properties')
+  }
 
   const { error } = await supabase
     .from('tasks')

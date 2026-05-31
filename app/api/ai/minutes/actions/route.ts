@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
+import { isValidUuid } from '@/lib/isValidUuid'
 
 export const runtime = 'nodejs'
 
@@ -62,6 +63,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'propertyId が不足しています。' },
         { status: 400 }
+      )
+    }
+
+    if (!isValidUuid(propertyId)) {
+      return NextResponse.json(
+        { error: 'propertyId の形式が不正です。' },
+        { status: 400 }
+      )
+    }
+
+    const { data: property, error: propertyError } = await supabase
+      .from('properties')
+      .select('id')
+      .eq('id', propertyId)
+      .maybeSingle()
+
+    if (propertyError || !property) {
+      return NextResponse.json(
+        { error: '対象の物件が見つかりません。' },
+        { status: 404 }
       )
     }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { isValidUuid } from '@/lib/isValidUuid'
 
 type BoardReportSetFileInput = {
   case_file_id: string
@@ -142,6 +143,13 @@ export async function POST(request: NextRequest) {
     if (!body?.property_id) {
       return NextResponse.json(
         { error: 'property_id は必須です。' },
+        { status: 400 }
+      )
+    }
+
+    if (!isValidUuid(body.property_id)) {
+      return NextResponse.json(
+        { error: 'property_id の形式が不正です。' },
         { status: 400 }
       )
     }

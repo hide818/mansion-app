@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { isValidUuid } from '@/lib/isValidUuid'
 
 export async function POST(request: Request) {
   try {
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
     const body = await request.json()
 
     const propertyId =
-      typeof body.propertyId === 'string' && body.propertyId.trim()
+      typeof body.propertyId === 'string' && isValidUuid(body.propertyId)
         ? body.propertyId
         : null
 
