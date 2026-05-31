@@ -179,12 +179,34 @@ function buildMinutesWordHtml(params: {
 <head>
   <meta charset="utf-8" />
   <title>${escapeHtml(params.title)}</title>
+  <style>
+    @page { size: A4 portrait; margin: 20mm 22mm; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+      color: #0f172a;
+      font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+      line-height: 1.85;
+    }
+    .doc-title {
+      font-size: 18pt;
+      font-weight: 700;
+      margin-bottom: 16pt;
+    }
+    .doc-body {
+      font-size: 11pt;
+    }
+    @media print {
+      html, body { background: #ffffff !important; }
+    }
+  </style>
 </head>
-<body style="font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif; color: #0f172a; line-height: 1.8; padding: 24px;">
-  <div style="font-size: 28px; font-weight: 700; margin-bottom: 20px;">
+<body>
+  <div class="doc-title">
     ${escapeHtml(params.title)}
   </div>
-  <div style="font-size: 14px;">
+  <div class="doc-body">
     ${html}
   </div>
 </body>

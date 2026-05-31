@@ -1177,8 +1177,8 @@ export default function SavedAiMinutesDetailClient({
     <>
       <style jsx global>{`
         @page {
-          size: auto;
-          margin: 14mm;
+          size: A4 portrait;
+          margin: 20mm 22mm;
         }
 
         .minutes-print-only {
@@ -1222,6 +1222,11 @@ export default function SavedAiMinutesDetailClient({
             break-after: page;
           }
 
+          .print-avoid-break {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+
           .print-board-table {
             width: 100%;
             border-collapse: collapse;
@@ -1229,8 +1234,10 @@ export default function SavedAiMinutesDetailClient({
 
           .print-board-table td {
             border: 1px solid #475569;
-            padding: 8px 10px;
+            padding: 8pt 10pt;
             vertical-align: top;
+            font-size: 10.5pt;
+            line-height: 1.8;
           }
         }
       `}</style>
@@ -1618,7 +1625,7 @@ export default function SavedAiMinutesDetailClient({
               </div>
 
               <div className="bg-white text-gray-900">
-                <h1 className="text-2xl font-bold">{boardFormalHeading}</h1>
+                <h1 className="text-center text-2xl font-bold">{boardFormalHeading}</h1>
 
                 <table className="print-board-table mt-5 text-sm">
                   <tbody>
@@ -1649,17 +1656,19 @@ export default function SavedAiMinutesDetailClient({
                   {minutes || '議事録本文はありません。'}
                 </div>
 
-                <div className="mt-8 space-y-4 text-sm leading-8">
-                  <p>{boardFormalCloseText}</p>
-                  <p>{boardFormalRegulationText}</p>
-                  <p>{boardFormalSignatureDate}</p>
-                  <p>{propertyName}管理組合</p>
-                </div>
+                <div className="print-avoid-break">
+                  <div className="mt-8 space-y-4 text-sm leading-8">
+                    <p>{boardFormalCloseText}</p>
+                    <p>{boardFormalRegulationText}</p>
+                    <p>{boardFormalSignatureDate}</p>
+                    <p>{propertyName}管理組合</p>
+                  </div>
 
-                <div className="mt-10 space-y-8 text-sm">
-                  <p>議長　　　　　　　　　　　　印</p>
-                  <p>議事録署名人　　　　　　　　印</p>
-                  <p>議事録署名人　　　　　　　　印</p>
+                  <div className="mt-10 space-y-8 text-sm">
+                    <p>議長　　　　　　　　　　　　印</p>
+                    <p>議事録署名人　　　　　　　　印</p>
+                    <p>議事録署名人　　　　　　　　印</p>
+                  </div>
                 </div>
               </div>
             </>

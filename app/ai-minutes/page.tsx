@@ -326,7 +326,7 @@ function buildBoardFormalPrintHtml(params: {
 <meta charset="utf-8" />
 <title>${escapeHtml(titleLine)}</title>
 <style>
-  @page { size: A4; margin: 12mm; }
+  @page { size: A4 portrait; margin: 20mm 22mm; }
   html, body {
     margin: 0;
     padding: 0;
@@ -337,7 +337,7 @@ function buildBoardFormalPrintHtml(params: {
   body { font-size: 11pt; line-height: 2; }
   .page {
     width: 100%;
-    min-height: 260mm;
+    min-height: 255mm;
     box-sizing: border-box;
     page-break-after: always;
     break-after: page;
@@ -426,7 +426,7 @@ function buildBoardFormalPrintHtml(params: {
     margin-top: 14pt;
     display: flex;
     flex-direction: column;
-    gap: 22pt;
+    gap: 28pt;
   }
   .signature-row {
     display: flex;
@@ -441,7 +441,7 @@ function buildBoardFormalPrintHtml(params: {
   }
   .signature-line {
     display: inline-block;
-    width: 172pt;
+    width: 160pt;
     border-bottom: 1px solid #111827;
     margin: 0 8pt;
     flex-shrink: 0;
@@ -699,7 +699,7 @@ function buildGeneralMeetingPrintHtml(params: {
 <meta charset="utf-8" />
 <title>${escapeHtml(titleLine)}</title>
 <style>
-  @page { size: A4; margin: 12mm; }
+  @page { size: A4 portrait; margin: 20mm 22mm; }
   html, body {
     margin: 0;
     padding: 0;
@@ -710,7 +710,7 @@ function buildGeneralMeetingPrintHtml(params: {
   body { font-size: 11pt; line-height: 2; }
   .page {
     width: 100%;
-    min-height: 260mm;
+    min-height: 255mm;
     box-sizing: border-box;
     page-break-after: always;
     break-after: page;
@@ -814,7 +814,7 @@ function buildGeneralMeetingPrintHtml(params: {
     margin-top: 14pt;
     display: flex;
     flex-direction: column;
-    gap: 22pt;
+    gap: 28pt;
   }
   .signature-row {
     display: flex;
@@ -829,7 +829,7 @@ function buildGeneralMeetingPrintHtml(params: {
   }
   .signature-line {
     display: inline-block;
-    width: 172pt;
+    width: 160pt;
     border-bottom: 1px solid #111827;
     margin: 0 8pt;
     flex-shrink: 0;
