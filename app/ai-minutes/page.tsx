@@ -115,7 +115,7 @@ type PropertyMinutesSettings = {
   votingRightsTotalCount: string
   companyName: string
   currentUserDisplayName: string
-  staff: Array<{ displayName: string }>
+  staffMembers: Array<{ displayName: string }>
 }
 
 type StaffMember = {
@@ -1160,7 +1160,7 @@ function AiMinutesInner() {
         setOwnersTotalCount(data.ownersTotalCount || '')
         setVotingRightsTotalCount(data.votingRightsTotalCount || '')
         setCompanyNameDisplay(data.companyName || '')
-        setStaffList(data.staff || [])
+        setStaffList(data.staffMembers || [])
         if (data.currentUserDisplayName) {
           setStaffAssignee(data.currentUserDisplayName)
         }
