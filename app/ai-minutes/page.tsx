@@ -989,6 +989,7 @@ function AiMinutesInner() {
   const [savedMinutesRecordId, setSavedMinutesRecordId] = useState('')
   const [currentEditingRecordId, setCurrentEditingRecordId] = useState('')
   const [reuseMessage, setReuseMessage] = useState('')
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false)
 
   const selectedProperty = useMemo(() => {
     return properties.find((item) => item.id === propertyId) ?? null
@@ -999,11 +1000,8 @@ function AiMinutesInner() {
   }, [selectedItems])
 
   const canSubmit = useMemo(() => {
-    const hasAgenda = agendas.some((item) => item.title.trim())
-    return Boolean(
-      propertyId && hasAgenda && audioFile && !loading && !propertiesLoading,
-    )
-  }, [propertyId, agendas, audioFile, loading, propertiesLoading])
+    return !loading && !propertiesLoading && !reusingLoading
+  }, [loading, propertiesLoading, reusingLoading])
 
   const canSaveMinutes = useMemo(() => {
     const hasAgenda = agendas.some((item) => item.title.trim())
@@ -1087,6 +1085,51 @@ function AiMinutesInner() {
   const generalRegulationText = safeBylawsArticle
     ? `${selectedProperty?.name ?? ''}管理規約第${safeBylawsArticle}条の規定に基づき、議事録を作成した議長及び本総会に出席した組合員２名が署名、捺印することとする。`
     : `${selectedProperty?.name ?? ''}管理規約の規定に基づき、議事録を作成した議長及び本総会に出席した組合員２名が署名、捺印することとする。`
+
+  const missingFields = useMemo(() => {
+    const missing: Array<{ key: string; label: string }> = []
+    if (!propertyId) missing.push({ key: 'propertyId', label: '物件名' })
+    if (!heldOn) missing.push({ key: 'heldOn', label: '開催日' })
+    if (!startTime) missing.push({ key: 'startTime', label: '開催時刻' })
+    if (!bylawsArticle.trim()) missing.push({ key: 'bylawsArticle', label: '規約条番号' })
+    if (!agendas.some((a) => a.title.trim())) missing.push({ key: 'agendas', label: '議案' })
+    if (!audioFile) missing.push({ key: 'audioFile', label: '音声ファイル' })
+    if (meetingType === '総会') {
+      if (!termNumber.trim()) missing.push({ key: 'termNumber', label: '第◯期' })
+      if (!ownersTotalCount.trim()) missing.push({ key: 'ownersTotalCount', label: '組合員総数' })
+      if (!votingRightsTotalCount.trim()) missing.push({ key: 'votingRightsTotalCount', label: '議決権総数' })
+      if (!companyNameDisplay.trim()) missing.push({ key: 'companyNameDisplay', label: '管理会社名' })
+      if (!staffAssignee.trim()) missing.push({ key: 'staffAssignee', label: '担当者名' })
+      if (!chairpersonName.trim()) missing.push({ key: 'chairpersonName', label: '議長名' })
+      if (!attendeesCount.trim()) missing.push({ key: 'attendeesCount', label: '出席組合員数' })
+      if (!attendeesVotingRightsCount.trim()) missing.push({ key: 'attendeesVotingRightsCount', label: '出席議決権数' })
+      if (!proxyCount.trim()) missing.push({ key: 'proxyCount', label: '委任状' })
+      if (!proxyVotingRightsCount.trim()) missing.push({ key: 'proxyVotingRightsCount', label: '議決権数（委任）' })
+      if (!writtenVoteCount.trim()) missing.push({ key: 'writtenVoteCount', label: '議決権行使者数' })
+      if (!writtenVoteRightsCount.trim()) missing.push({ key: 'writtenVoteRightsCount', label: '議決権数（行使）' })
+      if (!effectiveVotingRightsCount.trim()) missing.push({ key: 'effectiveVotingRightsCount', label: '有効議決権数' })
+    }
+    if (meetingType === '理事会') {
+      if (!meetingTerm.trim()) missing.push({ key: 'meetingTerm', label: '理事会期' })
+      if (!meetingRound.trim()) missing.push({ key: 'meetingRound', label: '理事会回数' })
+      if (!meetingPlace.trim()) missing.push({ key: 'meetingPlace', label: '開催場所' })
+      if (!chairpersonName.trim()) missing.push({ key: 'chairpersonName', label: '理事長名' })
+      if (!managementCompanyDisplay.trim()) missing.push({ key: 'managementCompanyDisplay', label: '管理会社表示' })
+    }
+    return missing
+  }, [
+    propertyId, heldOn, startTime, bylawsArticle, agendas, audioFile, meetingType,
+    termNumber, ownersTotalCount, votingRightsTotalCount,
+    companyNameDisplay, staffAssignee, chairpersonName,
+    attendeesCount, attendeesVotingRightsCount,
+    proxyCount, proxyVotingRightsCount,
+    writtenVoteCount, writtenVoteRightsCount, effectiveVotingRightsCount,
+    meetingTerm, meetingRound, meetingPlace, managementCompanyDisplay,
+  ])
+
+  function fieldErr(key: string) {
+    return hasAttemptedSubmit && missingFields.some((f) => f.key === key)
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -1191,6 +1234,7 @@ function AiMinutesInner() {
     async function fetchSavedRecord() {
       try {
         setReusingLoading(true)
+        setHasAttemptedSubmit(false)
         setErrorMessage('')
         setReuseMessage('')
 
@@ -1330,6 +1374,11 @@ function AiMinutesInner() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setHasAttemptedSubmit(true)
+
+    if (missingFields.length > 0) {
+      return
+    }
 
     if (!audioFile) {
       setErrorMessage('音声ファイルを選択してください。')
@@ -1805,7 +1854,7 @@ function AiMinutesInner() {
                   setStaffList([])
                 }}
                 disabled={propertiesLoading || reusingLoading}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500 disabled:bg-slate-100"
+                className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 disabled:bg-slate-100 ${fieldErr('propertyId') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
               >
                 <option value="">{propertiesLoading ? '読み込み中...' : '選択してください'}</option>
                 {properties.map((property) => (
@@ -1814,6 +1863,7 @@ function AiMinutesInner() {
                   </option>
                 ))}
               </select>
+              {fieldErr('propertyId') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
             </div>
           </div>
 
@@ -1824,8 +1874,9 @@ function AiMinutesInner() {
                 type="date"
                 value={heldOn}
                 onChange={(e) => setHeldOn(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('heldOn') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
               />
+              {fieldErr('heldOn') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
             </div>
 
             <div>
@@ -1834,8 +1885,9 @@ function AiMinutesInner() {
                 type="time"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('startTime') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
               />
+              {fieldErr('startTime') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
             </div>
 
             <div>
@@ -1874,9 +1926,10 @@ function AiMinutesInner() {
                       type="text"
                       value={bylawsArticle}
                       onChange={(e) => setBylawsArticle(e.target.value)}
-                      className="w-full rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm outline-none focus:border-sky-400 focus:bg-white"
+                      className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:bg-white ${fieldErr('bylawsArticle') ? 'border-red-400 bg-sky-50 focus:border-red-400' : 'border-sky-200 bg-sky-50 focus:border-sky-400'}`}
                       placeholder="物件選択後に自動反映"
                     />
+                    {fieldErr('bylawsArticle') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -1886,9 +1939,10 @@ function AiMinutesInner() {
                       type="text"
                       value={ownersTotalCount}
                       onChange={(e) => setOwnersTotalCount(e.target.value)}
-                      className="w-full rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm outline-none focus:border-sky-400 focus:bg-white"
+                      className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:bg-white ${fieldErr('ownersTotalCount') ? 'border-red-400 bg-sky-50 focus:border-red-400' : 'border-sky-200 bg-sky-50 focus:border-sky-400'}`}
                       placeholder="物件選択後に自動反映"
                     />
+                    {fieldErr('ownersTotalCount') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -1898,9 +1952,10 @@ function AiMinutesInner() {
                       type="text"
                       value={votingRightsTotalCount}
                       onChange={(e) => setVotingRightsTotalCount(e.target.value)}
-                      className="w-full rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm outline-none focus:border-sky-400 focus:bg-white"
+                      className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:bg-white ${fieldErr('votingRightsTotalCount') ? 'border-red-400 bg-sky-50 focus:border-red-400' : 'border-sky-200 bg-sky-50 focus:border-sky-400'}`}
                       placeholder="物件選択後に自動反映"
                     />
+                    {fieldErr('votingRightsTotalCount') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -1910,9 +1965,10 @@ function AiMinutesInner() {
                       type="text"
                       value={companyNameDisplay}
                       onChange={(e) => setCompanyNameDisplay(e.target.value)}
-                      className="w-full rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm outline-none focus:border-sky-400 focus:bg-white"
+                      className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:bg-white ${fieldErr('companyNameDisplay') ? 'border-red-400 bg-sky-50 focus:border-red-400' : 'border-sky-200 bg-sky-50 focus:border-sky-400'}`}
                       placeholder="物件選択後に自動反映"
                     />
+                    {fieldErr('companyNameDisplay') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -1922,7 +1978,7 @@ function AiMinutesInner() {
                       <select
                         value={staffAssignee}
                         onChange={(e) => setStaffAssignee(e.target.value)}
-                        className="w-full rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm outline-none focus:border-sky-400 focus:bg-white"
+                        className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:bg-white ${fieldErr('staffAssignee') ? 'border-red-400 bg-sky-50 focus:border-red-400' : 'border-sky-200 bg-sky-50 focus:border-sky-400'}`}
                       >
                         <option value="">選択してください</option>
                         {staffList.map((staff) => (
@@ -1936,10 +1992,11 @@ function AiMinutesInner() {
                         type="text"
                         value={staffAssignee}
                         onChange={(e) => setStaffAssignee(e.target.value)}
-                        className="w-full rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm outline-none focus:border-sky-400 focus:bg-white"
+                        className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:bg-white ${fieldErr('staffAssignee') ? 'border-red-400 bg-sky-50 focus:border-red-400' : 'border-sky-200 bg-sky-50 focus:border-sky-400'}`}
                         placeholder="担当者名"
                       />
                     )}
+                    {fieldErr('staffAssignee') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
                   </div>
                 </div>
               </div>
@@ -1991,9 +2048,10 @@ function AiMinutesInner() {
                       type="text"
                       value={termNumber}
                       onChange={(e) => setTermNumber(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('termNumber') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                       placeholder="例：10"
                     />
+                    {fieldErr('termNumber') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
                   </div>
                 </div>
               </div>
@@ -2012,9 +2070,10 @@ function AiMinutesInner() {
                       type="text"
                       value={attendeesCount}
                       onChange={(e) => setAttendeesCount(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('attendeesCount') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                       placeholder="例：45"
                     />
+                    {fieldErr('attendeesCount') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -2024,9 +2083,10 @@ function AiMinutesInner() {
                       type="text"
                       value={attendeesVotingRightsCount}
                       onChange={(e) => setAttendeesVotingRightsCount(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('attendeesVotingRightsCount') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                       placeholder="例：80"
                     />
+                    {fieldErr('attendeesVotingRightsCount') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -2036,9 +2096,10 @@ function AiMinutesInner() {
                       type="text"
                       value={proxyCount}
                       onChange={(e) => setProxyCount(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('proxyCount') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                       placeholder="例：20"
                     />
+                    {fieldErr('proxyCount') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -2048,9 +2109,10 @@ function AiMinutesInner() {
                       type="text"
                       value={proxyVotingRightsCount}
                       onChange={(e) => setProxyVotingRightsCount(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('proxyVotingRightsCount') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                       placeholder="例：20"
                     />
+                    {fieldErr('proxyVotingRightsCount') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -2060,9 +2122,10 @@ function AiMinutesInner() {
                       type="text"
                       value={writtenVoteCount}
                       onChange={(e) => setWrittenVoteCount(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('writtenVoteCount') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                       placeholder="例：15"
                     />
+                    {fieldErr('writtenVoteCount') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -2072,9 +2135,10 @@ function AiMinutesInner() {
                       type="text"
                       value={writtenVoteRightsCount}
                       onChange={(e) => setWrittenVoteRightsCount(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('writtenVoteRightsCount') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                       placeholder="例：15"
                     />
+                    {fieldErr('writtenVoteRightsCount') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -2084,9 +2148,10 @@ function AiMinutesInner() {
                       type="text"
                       value={effectiveVotingRightsCount}
                       onChange={(e) => setEffectiveVotingRightsCount(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('effectiveVotingRightsCount') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                       placeholder="例：115"
                     />
+                    {fieldErr('effectiveVotingRightsCount') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
                   </div>
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -2096,9 +2161,10 @@ function AiMinutesInner() {
                       type="text"
                       value={chairpersonName}
                       onChange={(e) => setChairpersonName(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                      className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('chairpersonName') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                       placeholder="例：岡本"
                     />
+                    {fieldErr('chairpersonName') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
                   </div>
                 </div>
               </div>
@@ -2113,9 +2179,10 @@ function AiMinutesInner() {
                   type="text"
                   value={meetingTerm}
                   onChange={(e) => setMeetingTerm(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                  className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('meetingTerm') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                   placeholder="例：39"
                 />
+                {fieldErr('meetingTerm') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
               </div>
 
               <div>
@@ -2124,9 +2191,10 @@ function AiMinutesInner() {
                   type="text"
                   value={meetingRound}
                   onChange={(e) => setMeetingRound(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                  className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('meetingRound') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                   placeholder="例：4"
                 />
+                {fieldErr('meetingRound') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
               </div>
 
               <div>
@@ -2135,9 +2203,10 @@ function AiMinutesInner() {
                   type="text"
                   value={meetingPlace}
                   onChange={(e) => setMeetingPlace(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                  className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('meetingPlace') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                   placeholder="例：集会室"
                 />
+                {fieldErr('meetingPlace') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
               </div>
 
               <div>
@@ -2157,9 +2226,10 @@ function AiMinutesInner() {
                   type="text"
                   value={chairpersonName}
                   onChange={(e) => setChairpersonName(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                  className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('chairpersonName') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                   placeholder="例：岡本"
                 />
+                {fieldErr('chairpersonName') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
               </div>
 
               <div>
@@ -2168,9 +2238,10 @@ function AiMinutesInner() {
                   type="text"
                   value={bylawsArticle}
                   onChange={(e) => setBylawsArticle(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                  className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('bylawsArticle') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                   placeholder="例：49"
                 />
+                {fieldErr('bylawsArticle') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
               </div>
 
               <div>
@@ -2189,9 +2260,10 @@ function AiMinutesInner() {
                   type="text"
                   value={managementCompanyDisplay}
                   onChange={(e) => setCompanyNameDisplay(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                  className={`w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-slate-500 ${fieldErr('managementCompanyDisplay') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
                   placeholder="例：総合システム管理株式会社　小松"
                 />
+                {fieldErr('managementCompanyDisplay') ? <p className="mt-1 text-xs text-red-600">必須項目です</p> : null}
               </div>
             </div>
           ) : null}
@@ -2213,16 +2285,18 @@ function AiMinutesInner() {
                 setReuseMessage('')
                 setErrorMessage('')
               }}
-              className="block w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-slate-700 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium"
+              className={`block w-full rounded-xl border px-4 py-3 text-sm text-slate-700 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium ${fieldErr('audioFile') ? 'border-red-400 bg-red-50' : 'border-slate-300'}`}
             />
+            {fieldErr('audioFile') ? <p className="mt-1 text-xs text-red-600">音声ファイルを選択してください</p> : null}
           </div>
         </section>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className={`rounded-3xl border p-6 shadow-sm ${fieldErr('agendas') ? 'border-red-200 bg-red-50/40' : 'border-slate-200 bg-white'}`}>
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-bold text-slate-900">議題</h2>
               <p className="mt-1 text-sm text-slate-600">議題名は自分で登録し、AIは本文だけを当てはめます。</p>
+              {fieldErr('agendas') ? <p className="mt-1 text-xs text-red-600">議題を1つ以上入力してください</p> : null}
             </div>
 
             <button
@@ -2322,6 +2396,18 @@ function AiMinutesInner() {
                 </Link>
               </div>
             ) : null}
+          </section>
+        ) : null}
+
+        {hasAttemptedSubmit && missingFields.length > 0 ? (
+          <section className="rounded-3xl border border-amber-200 bg-amber-50 p-6 shadow-sm">
+            <p className="text-sm font-semibold text-amber-800">未入力の必須項目があります</p>
+            <ul className="mt-3 space-y-1">
+              {missingFields.map((f) => (
+                <li key={f.key} className="text-sm text-amber-700">・{f.label}</li>
+              ))}
+            </ul>
+            <p className="mt-3 text-xs text-amber-600">すべての項目を入力してから「議事録の作成」を押してください。</p>
           </section>
         ) : null}
 
