@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { formatDate, isToday, isOverdue, getStatusLabel } from '@/lib/utils'
+import DashboardAlertsClient from '@/app/components/DashboardAlertsClient'
 
 type TaskRow = {
   id: string
@@ -123,6 +124,8 @@ export default async function DashboardPage() {
           </div>
         </div>
       </section>
+
+      <DashboardAlertsClient />
 
       <section className="grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border border-red-200 bg-red-50 p-5 shadow-sm">
