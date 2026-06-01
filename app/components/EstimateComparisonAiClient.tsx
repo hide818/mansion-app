@@ -1,6 +1,10 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import Link from 'next/link'
+import EstimateComparisonResultSections, {
+  type EstimateComparisonResultData,
+} from './EstimateComparisonResultSections'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -48,32 +52,16 @@ type EditableVendor = {
   warning?: string
 }
 
-type ComparisonRow = {
-  item: string
-  values: { vendorName: string; value: string }[]
-  note?: string
-}
-
-type VendorSummary = {
-  vendorName: string
-  totalAmount: string
-  strengths: string[]
-  concerns: string[]
-}
-
-type ComparisonResult = {
-  overview: string
-  comparisonRows: ComparisonRow[]
-  vendorSummaries: VendorSummary[]
-  cheapestVendor?: string
-  priceDifferenceSummary: string
-  missingItems: string[]
-  questionsToVendors: string[]
-  boardComment: string
-  agendaDraft: string
-}
-
 type AppStep = 'input' | 'review' | 'result'
+
+type SaveState = 'idle' | 'saving' | 'saved' | 'error'
+
+export type InitialData = {
+  projectTitle: string
+  baseEstimateText: string
+  vendors: { vendorName: string; amountText: string; editableText: string }[]
+  selectedSections: string[]
+}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -83,19 +71,13 @@ function createVendor(): VendorInput {
   return { id: `v-${counter}`, vendorName: '', amountText: '', file: null, rawText: '' }
 }
 
-function buildTableCopyText(result: ComparisonResult, vendorCols: string[]): string {
-  const header = ['比較項目', ...vendorCols, '備考'].join('\t')
-  const rows = result.comparisonRows.map((row) => {
-    const cells = vendorCols.map((name) => {
-      const found = row.values.find((v) => v.vendorName === name)
-      return found?.value ?? '見積書上では確認できません'
-    })
-    return [row.item, ...cells, row.note ?? ''].join('\t')
-  })
-  return [header, ...rows].join('\n')
+function filterSections(sections: string[]): SelectedSection[] {
+  return sections.filter((s): s is SelectedSection =>
+    ALL_SECTIONS.includes(s as SelectedSection)
+  )
 }
 
-// ─── Step Indicator ──────────────────────────────────────────────────────────
+// ─── Sub-components ──────────────────────────────────────────────────────────
 
 function StepIndicator({ current }: { current: AppStep }) {
   const steps: { key: AppStep; label: string }[] = [
@@ -142,8 +124,6 @@ function StepIndicator({ current }: { current: AppStep }) {
     </div>
   )
 }
-
-// ─── File Input ──────────────────────────────────────────────────────────────
 
 function FileInput({
   id,
@@ -196,32 +176,57 @@ function FileInput({
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export default function EstimateComparisonAiClient() {
+export default function EstimateComparisonAiClient({ initialData }: { initialData?: InitialData }) {
   // Step
-  const [step, setStep] = useState<AppStep>('input')
+  const [step, setStep] = useState<AppStep>(initialData ? 'review' : 'input')
 
   // Step 1: input state
-  const [projectTitle, setProjectTitle] = useState('')
-  const [selectedSections, setSelectedSections] = useState<SelectedSection[]>([...ALL_SECTIONS])
+  const [projectTitle, setProjectTitle] = useState(initialData?.projectTitle ?? '')
+  const [selectedSections, setSelectedSections] = useState<SelectedSection[]>(
+    initialData?.selectedSections
+      ? filterSections(initialData.selectedSections)
+      : [...ALL_SECTIONS]
+  )
   const [baseFile, setBaseFile] = useState<File | null>(null)
   const [baseInputText, setBaseInputText] = useState('')
-  const [vendors, setVendors] = useState<VendorInput[]>([createVendor(), createVendor()])
+  const [vendors, setVendors] = useState<VendorInput[]>(
+    initialData?.vendors?.length
+      ? initialData.vendors.map((v, i) => ({
+          id: `v-init-${i}`,
+          vendorName: v.vendorName,
+          amountText: v.amountText || '',
+          file: null,
+          rawText: '',
+        }))
+      : [createVendor(), createVendor()]
+  )
 
   // Step 2: review state
-  const [editableBaseText, setEditableBaseText] = useState('')
+  const [editableBaseText, setEditableBaseText] = useState(initialData?.baseEstimateText ?? '')
   const [editableBaseWarning, setEditableBaseWarning] = useState<string | null>(null)
-  const [editableVendors, setEditableVendors] = useState<EditableVendor[]>([])
+  const [editableVendors, setEditableVendors] = useState<EditableVendor[]>(
+    initialData?.vendors?.length
+      ? initialData.vendors.map((v) => ({
+          vendorName: v.vendorName,
+          amountText: v.amountText || '',
+          editableText: v.editableText || '',
+        }))
+      : []
+  )
   const [extractWarnings, setExtractWarnings] = useState<string[]>([])
 
   // Step 3: result state
-  const [result, setResult] = useState<ComparisonResult | null>(null)
+  const [result, setResult] = useState<EstimateComparisonResultData | null>(null)
   const [appliedSections, setAppliedSections] = useState<SelectedSection[]>([])
+
+  // Save state
+  const [saveState, setSaveState] = useState<SaveState>('idle')
+  const [savedId, setSavedId] = useState<string | null>(null)
 
   // UI
   const [isLoading, setIsLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [copiedId, setCopiedId] = useState<string | null>(null)
 
   // ── Vendor input handlers ──
 
@@ -247,16 +252,6 @@ export default function EstimateComparisonAiClient() {
     setSelectedSections((prev) =>
       prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
     )
-  }
-
-  async function copyText(text: string, id: string) {
-    try {
-      await navigator.clipboard.writeText(text)
-      setCopiedId(id)
-      setTimeout(() => setCopiedId((prev) => (prev === id ? null : prev)), 2000)
-    } catch {
-      // clipboard API unavailable
-    }
   }
 
   // ── Step 1 → Step 2: extract ──
@@ -326,7 +321,6 @@ export default function EstimateComparisonAiClient() {
       const resp = data as ExtractResponse
       const allWarnings = Array.isArray(resp.warnings) ? resp.warnings : []
 
-      // Base warning: if file was provided but extracted text is empty
       if (baseFile && !resp.baseEstimateText.trim()) {
         setEditableBaseWarning(
           allWarnings.find((w) => w.startsWith('基準見積：')) ??
@@ -412,8 +406,10 @@ export default function EstimateComparisonAiClient() {
         'result' in data &&
         typeof (data as Record<string, unknown>).result === 'object'
       ) {
-        setResult((data as { result: ComparisonResult }).result)
+        setResult((data as { result: EstimateComparisonResultData }).result)
         setAppliedSections([...selectedSections])
+        setSaveState('idle')
+        setSavedId(null)
         setStep('result')
       }
     } catch {
@@ -424,34 +420,51 @@ export default function EstimateComparisonAiClient() {
     }
   }
 
+  // ── Save ──
+
+  async function handleSave() {
+    if (!result) return
+    setSaveState('saving')
+    try {
+      const res = await fetch('/api/estimate-comparison/records', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectTitle: projectTitle.trim() || '工事見積比較',
+          baseEstimateText: editableBaseText.trim(),
+          vendors: editableVendors.map((v) => ({
+            vendorName: v.vendorName,
+            amountText: v.amountText,
+            editableText: v.editableText,
+          })),
+          selectedSections: appliedSections,
+          result,
+        }),
+      })
+      const data: unknown = await res.json()
+      if (!res.ok) {
+        setSaveState('error')
+        return
+      }
+      const savedRecord = (data as { record: { id: string } }).record
+      setSavedId(savedRecord.id)
+      setSaveState('saved')
+    } catch {
+      setSaveState('error')
+    }
+  }
+
   function resetToInput() {
     setStep('input')
     setResult(null)
     setError(null)
     setEditableBaseText('')
+    setEditableBaseWarning(null)
     setEditableVendors([])
     setExtractWarnings([])
+    setSaveState('idle')
+    setSavedId(null)
   }
-
-  // ── Computed ──
-
-  const vendorCols = result
-    ? (() => {
-        const fromRows = [
-          ...new Set(
-            result.comparisonRows
-              .flatMap((row) => row.values.map((v) => v.vendorName))
-              .filter(Boolean)
-          ),
-        ]
-        if (fromRows.length > 0) return fromRows
-        if (result.vendorSummaries.length > 0)
-          return ['基準見積', ...result.vendorSummaries.map((vs) => vs.vendorName)]
-        return ['基準見積', ...vendors.map((v) => v.vendorName).filter(Boolean)]
-      })()
-    : []
-
-  const has = (s: SelectedSection) => appliedSections.includes(s)
 
   // ═══════════════════════════════════════════════════════════════════════════
   // RENDER
@@ -467,7 +480,6 @@ export default function EstimateComparisonAiClient() {
           <h1 className="mt-3 text-3xl font-bold text-slate-900">見積比較表AI</h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
             基準見積を軸に複数業者の見積を比較し、理事会・総会向けの比較表とコメントを作成します。
-            Excel・PDF・CSVのアップロード、またはテキスト貼り付けに対応しています。
           </p>
           <div className="mt-6">
             <StepIndicator current={step} />
@@ -612,7 +624,7 @@ export default function EstimateComparisonAiClient() {
                       <textarea
                         value={vendor.rawText}
                         onChange={(e) => updateVendor(vendor.id, 'rawText', e.target.value)}
-                        placeholder={`見積書の内容をここに貼り付けてください。`}
+                        placeholder="見積書の内容をここに貼り付けてください。"
                         rows={4}
                         className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                       />
@@ -620,7 +632,6 @@ export default function EstimateComparisonAiClient() {
                   </div>
                 ))}
               </div>
-
               {vendors.length < 4 && (
                 <div className="mt-4">
                   <button
@@ -639,7 +650,7 @@ export default function EstimateComparisonAiClient() {
             <div className="mt-8 border-t border-slate-100 pt-7">
               <div className="text-sm font-bold text-slate-700">作成する内容を選択</div>
               <p className="mt-1 text-xs text-slate-500">
-                初期状態では全項目が選択されています。不要な項目はチェックを外してください。
+                初期状態では全項目が選択されています。
               </p>
               <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 {ALL_SECTIONS.map((sectionId) => {
@@ -712,19 +723,15 @@ export default function EstimateComparisonAiClient() {
               </button>
             </div>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              ファイルから読み取った内容を確認し、必要に応じて修正してください。
-              修正後のテキストをもとにAIが比較表を作成します。
+              読み取った内容を確認し、必要に応じて修正してください。修正後の内容でAIが比較表を作成します。
             </p>
 
-            {/* 警告表示 */}
             {extractWarnings.length > 0 && (
               <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4">
                 <div className="text-xs font-bold text-amber-700">読み取り時の注意</div>
                 <ul className="mt-2 space-y-1">
                   {extractWarnings.map((w, i) => (
-                    <li key={i} className="text-xs leading-5 text-amber-800">
-                      ・{w}
-                    </li>
+                    <li key={i} className="text-xs leading-5 text-amber-800">・{w}</li>
                   ))}
                 </ul>
               </div>
@@ -735,7 +742,7 @@ export default function EstimateComparisonAiClient() {
               <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
                 <div className="text-sm font-bold text-emerald-800">基準見積（編集可）</div>
                 <p className="mt-1 text-xs text-emerald-700">
-                  この内容を比較の軸として使用します。必要に応じて修正してください。
+                  この内容を比較の軸として使用します。
                 </p>
                 {editableBaseWarning && (
                   <div className="mt-2 rounded-xl border border-amber-200 bg-white px-4 py-2.5">
@@ -773,7 +780,9 @@ export default function EstimateComparisonAiClient() {
                     value={ev.editableText}
                     onChange={(e) =>
                       setEditableVendors((prev) =>
-                        prev.map((v, j) => (j === i ? { ...v, editableText: e.target.value } : v))
+                        prev.map((v, j) =>
+                          j === i ? { ...v, editableText: e.target.value } : v
+                        )
                       )
                     }
                     rows={7}
@@ -813,7 +822,9 @@ export default function EstimateComparisonAiClient() {
         {/* ─── Step 3: AI出力結果 ─── */}
         {step === 'result' && result && (
           <div className="space-y-5">
-            <div className="flex justify-end">
+
+            {/* アクションバー */}
+            <div className="flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-slate-200 bg-white px-6 py-4 shadow-sm">
               <button
                 type="button"
                 onClick={resetToInput}
@@ -821,233 +832,65 @@ export default function EstimateComparisonAiClient() {
               >
                 ← 最初からやり直す
               </button>
-            </div>
 
-            {/* 1. 総評（常に表示） */}
-            <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
-              <div className="text-xs font-semibold tracking-[0.18em] text-slate-400">01</div>
-              <h2 className="mt-2 text-xl font-bold text-slate-900">総評</h2>
-              <p className="mt-4 text-sm leading-7 text-slate-700">{result.overview}</p>
-            </section>
-
-            {/* 2. 比較表 */}
-            {has('comparisonTable') && result.comparisonRows.length > 0 && (
-              <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="text-xs font-semibold tracking-[0.18em] text-slate-400">02</div>
-                    <h2 className="mt-2 text-xl font-bold text-slate-900">比較表</h2>
-                    <p className="mt-1 text-xs text-slate-500">
-                      基準見積を軸に各社の内容を比較しています
-                    </p>
-                  </div>
+              <div className="flex flex-wrap items-center gap-3">
+                {saveState === 'idle' && (
                   <button
                     type="button"
-                    onClick={() => copyText(buildTableCopyText(result, vendorCols), 'table')}
-                    className="shrink-0 rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
+                    onClick={handleSave}
+                    className="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
                   >
-                    {copiedId === 'table' ? 'コピーしました' : '比較表をコピー'}
+                    保存する
                   </button>
-                </div>
-                <div className="mt-5 overflow-x-auto">
-                  <table className="min-w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-slate-200">
-                        <th className="py-3 pr-4 text-left text-xs font-bold text-slate-500 whitespace-nowrap">
-                          比較項目
-                        </th>
-                        {vendorCols.map((name) => (
-                          <th
-                            key={name}
-                            className={`px-4 py-3 text-left text-xs font-bold whitespace-nowrap ${
-                              name === '基準見積'
-                                ? 'text-emerald-700'
-                                : 'text-slate-500'
-                            }`}
-                          >
-                            {name}
-                          </th>
-                        ))}
-                        <th className="pl-4 py-3 text-left text-xs font-bold text-slate-500 whitespace-nowrap">
-                          備考
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {result.comparisonRows.map((row, rowIdx) => (
-                        <tr key={rowIdx} className="border-b border-slate-100 last:border-0">
-                          <td className="py-3 pr-4 text-sm font-semibold text-slate-700 whitespace-nowrap align-top">
-                            {row.item}
-                          </td>
-                          {vendorCols.map((name) => {
-                            const found = row.values.find((v) => v.vendorName === name)
-                            const val = found?.value ?? '見積書上では確認できません'
-                            return (
-                              <td
-                                key={name}
-                                className={`px-4 py-3 text-sm leading-6 align-top ${
-                                  name === '基準見積'
-                                    ? 'bg-emerald-50 text-slate-700'
-                                    : val === '項目なし'
-                                    ? 'text-rose-600'
-                                    : 'text-slate-700'
-                                }`}
-                              >
-                                {val}
-                              </td>
-                            )
-                          })}
-                          <td className="pl-4 py-3 text-xs leading-6 text-slate-500 align-top">
-                            {row.note ?? ''}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            )}
-
-            {/* 3. 各社の特徴 */}
-            {has('vendorSummaries') && result.vendorSummaries.length > 0 && (
-              <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
-                <div className="text-xs font-semibold tracking-[0.18em] text-slate-400">03</div>
-                <h2 className="mt-2 text-xl font-bold text-slate-900">各社の特徴</h2>
-                <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  {result.vendorSummaries.map((vs) => (
-                    <div
-                      key={vs.vendorName}
-                      className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+                )}
+                {saveState === 'saving' && (
+                  <button
+                    type="button"
+                    disabled
+                    className="inline-flex items-center justify-center rounded-2xl bg-slate-400 px-5 py-2.5 text-sm font-semibold text-white"
+                  >
+                    <span className="mr-2 inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    保存中...
+                  </button>
+                )}
+                {saveState === 'saved' && savedId && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-emerald-700">保存しました</span>
+                    <Link
+                      href={`/estimate-comparison/history/${savedId}`}
+                      className="text-sm font-semibold text-slate-600 underline hover:text-slate-900"
                     >
-                      <div className="text-base font-bold text-slate-900">{vs.vendorName}</div>
-                      <div className="mt-2 text-sm font-semibold text-slate-600">
-                        見積総額：{vs.totalAmount}
-                      </div>
-                      {vs.strengths.length > 0 && (
-                        <div className="mt-3">
-                          <div className="text-xs font-bold text-emerald-700">基準見積との比較・特長</div>
-                          <ul className="mt-1 space-y-1">
-                            {vs.strengths.map((s, i) => (
-                              <li key={i} className="text-sm leading-6 text-slate-700">・{s}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      {vs.concerns.length > 0 && (
-                        <div className="mt-3">
-                          <div className="text-xs font-bold text-amber-700">基準見積との差異・懸念点</div>
-                          <ul className="mt-1 space-y-1">
-                            {vs.concerns.map((c, i) => (
-                              <li key={i} className="text-sm leading-6 text-slate-700">・{c}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* 4. 金額差・注意点 */}
-            {has('priceDifference') && result.priceDifferenceSummary && (
-              <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
-                <div className="text-xs font-semibold tracking-[0.18em] text-slate-400">04</div>
-                <h2 className="mt-2 text-xl font-bold text-slate-900">金額差・注意点</h2>
-                {result.cheapestVendor && (
-                  <div className="mt-4 inline-flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2.5">
-                    <span className="text-xs font-semibold text-amber-700">最安値</span>
-                    <span className="text-sm font-bold text-amber-900">{result.cheapestVendor}</span>
-                    <span className="text-xs text-amber-700">※ 金額のみの判断は禁物です</span>
+                      保存した結果を確認
+                    </Link>
+                    <Link
+                      href="/estimate-comparison/history"
+                      className="text-sm font-semibold text-slate-600 underline hover:text-slate-900"
+                    >
+                      履歴一覧
+                    </Link>
                   </div>
                 )}
-                <p className="mt-4 text-sm leading-7 text-slate-700">
-                  {result.priceDifferenceSummary}
-                </p>
-              </section>
-            )}
-
-            {/* 5. 不足している項目 */}
-            {has('missingItems') && result.missingItems.length > 0 && (
-              <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
-                <div className="text-xs font-semibold tracking-[0.18em] text-slate-400">05</div>
-                <h2 className="mt-2 text-xl font-bold text-slate-900">不足している項目</h2>
-                <ul className="mt-4 space-y-2">
-                  {result.missingItems.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm leading-6 text-slate-700">
-                      <span className="mt-0.5 shrink-0 text-rose-500">▲</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            {/* 6. 業者へ確認すべき質問 */}
-            {has('questionsToVendors') && result.questionsToVendors.length > 0 && (
-              <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
-                <div className="text-xs font-semibold tracking-[0.18em] text-slate-400">06</div>
-                <h2 className="mt-2 text-xl font-bold text-slate-900">業者へ確認すべき質問</h2>
-                <ul className="mt-4 space-y-2">
-                  {result.questionsToVendors.map((q, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm leading-6 text-slate-700">
-                      <span className="mt-0.5 shrink-0 font-bold text-sky-600">Q{i + 1}</span>
-                      {q}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            {/* 7. 理事会向けコメント */}
-            {has('boardComment') && result.boardComment && (
-              <section className="rounded-[28px] border border-emerald-100 bg-white p-8 shadow-sm">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="text-xs font-semibold tracking-[0.18em] text-emerald-600">07</div>
-                    <h2 className="mt-2 text-xl font-bold text-slate-900">理事会向けコメント</h2>
-                    <p className="mt-1 text-xs text-slate-500">資料にそのまま貼り付けて使えます</p>
+                {saveState === 'error' && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-rose-600">保存に失敗しました</span>
+                    <button
+                      type="button"
+                      onClick={handleSave}
+                      className="text-sm font-semibold text-slate-600 underline"
+                    >
+                      再試行
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => copyText(result.boardComment, 'board')}
-                    className="shrink-0 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
-                  >
-                    {copiedId === 'board' ? 'コピーしました' : '理事会コメントをコピー'}
-                  </button>
-                </div>
-                <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
-                  <p className="whitespace-pre-wrap text-sm leading-7 text-slate-800">
-                    {result.boardComment}
-                  </p>
-                </div>
-              </section>
-            )}
+                )}
+              </div>
+            </div>
 
-            {/* 8. 総会議案文 */}
-            {has('agendaDraft') && result.agendaDraft && (
-              <section className="rounded-[28px] border border-violet-100 bg-white p-8 shadow-sm">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="text-xs font-semibold tracking-[0.18em] text-violet-600">08</div>
-                    <h2 className="mt-2 text-xl font-bold text-slate-900">総会議案文</h2>
-                    <p className="mt-1 text-xs text-slate-500">総会議案書の説明文として使えます</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => copyText(result.agendaDraft, 'agenda')}
-                    className="shrink-0 rounded-xl border border-violet-200 bg-violet-50 px-4 py-2 text-xs font-semibold text-violet-700 transition hover:bg-violet-100"
-                  >
-                    {copiedId === 'agenda' ? 'コピーしました' : '総会議案文をコピー'}
-                  </button>
-                </div>
-                <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
-                  <p className="whitespace-pre-wrap text-sm leading-7 text-slate-800">
-                    {result.agendaDraft}
-                  </p>
-                </div>
-              </section>
-            )}
+            {/* 比較結果セクション */}
+            <EstimateComparisonResultSections
+              result={result}
+              appliedSections={appliedSections}
+            />
+
           </div>
         )}
 

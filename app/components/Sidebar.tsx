@@ -82,6 +82,11 @@ export default function Sidebar() {
           href: '/estimate-comparison',
           description: '複数業者の見積をテキストで比較・分析',
         },
+        {
+          label: '見積比較表履歴',
+          href: '/estimate-comparison/history',
+          description: '保存した見積比較表を確認・再編集',
+        },
       ],
     },
     {
