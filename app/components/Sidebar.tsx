@@ -77,6 +77,11 @@ export default function Sidebar() {
           href: '/analytics/case-risk',
           description: '停滞・期限切れ・担当未設定を一覧確認',
         },
+        {
+          label: '見積比較表AI',
+          href: '/estimate-comparison',
+          description: '複数業者の見積をテキストで比較・分析',
+        },
       ],
     },
     {
