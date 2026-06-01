@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import PropertyTimelineClient from '@/app/components/PropertyTimelineClient'
 
 type Props = {
   params: Promise<{
@@ -308,6 +309,10 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
             </Link>
           </div>
         </div>
+      </section>
+
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <PropertyTimelineClient propertyId={id} />
       </section>
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
