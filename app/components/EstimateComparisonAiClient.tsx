@@ -520,7 +520,7 @@ export default function EstimateComparisonAiClient({ initialData }: { initialDat
       <div className="mx-auto max-w-5xl space-y-6">
 
         {/* ヘッダー */}
-        <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="text-sm font-semibold tracking-[0.18em] text-emerald-600">AIツール</div>
           <h1 className="mt-3 text-3xl font-bold text-slate-900">見積比較表AI</h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
@@ -533,7 +533,7 @@ export default function EstimateComparisonAiClient({ initialData }: { initialDat
 
         {/* ─── Step 1: 入力フォーム ─── */}
         {step === 'input' && (
-          <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+          <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-xl font-bold text-slate-900">見積内容を入力</h2>
 
             {/* 工事項目名 */}
@@ -756,7 +756,7 @@ export default function EstimateComparisonAiClient({ initialData }: { initialDat
 
         {/* ─── Step 2: 読み取り結果の確認・修正 ─── */}
         {step === 'review' && (
-          <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+          <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex items-center justify-between gap-4">
               <h2 className="text-xl font-bold text-slate-900">読み取り結果を確認・修正</h2>
               <button
@@ -869,7 +869,7 @@ export default function EstimateComparisonAiClient({ initialData }: { initialDat
           <div className="space-y-5">
 
             {/* アクションバー */}
-            <div className="flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-slate-200 bg-white px-6 py-4 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white px-6 py-4 shadow-sm">
               <button
                 type="button"
                 onClick={resetToInput}
@@ -931,7 +931,7 @@ export default function EstimateComparisonAiClient({ initialData }: { initialDat
             </div>
 
             {/* エクスポートバー */}
-            <div className="flex flex-wrap items-center gap-3 rounded-[28px] border border-slate-200 bg-white px-6 py-4 shadow-sm">
+            <div className="flex flex-wrap items-center gap-3 rounded-lg border border-slate-200 bg-white px-6 py-4 shadow-sm">
               <span className="text-xs font-semibold text-slate-500">出力：</span>
               <button
                 type="button"

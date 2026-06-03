@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import PrintHandoverButton from '@/app/components/PrintHandoverButton'
+import { secondaryButtonClass } from '@/app/components/ui/buttonStyles'
 
 type Props = {
   params: Promise<{
@@ -168,7 +169,7 @@ export default async function HandoverDocumentDetailPage({
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm print:hidden">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-semibold text-emerald-600">引き継ぎDX</p>
+            <p className="text-sm font-semibold text-slate-500">引き継ぎDX</p>
             <h1 className="mt-1 text-3xl font-bold text-slate-900">
               {propertyName || '引き継ぎ書詳細'}
             </h1>
@@ -184,14 +185,14 @@ export default async function HandoverDocumentDetailPage({
                   ? `/handover-documents?propertyId=${doc.property_id}`
                   : '/handover-documents'
               }
-              className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className={secondaryButtonClass}
             >
               引き継ぎ一覧へ戻る
             </Link>
 
             <Link
               href={`/handover-documents/${doc.id}/edit`}
-              className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className={secondaryButtonClass}
             >
               編集する
             </Link>
@@ -202,9 +203,9 @@ export default async function HandoverDocumentDetailPage({
       </section>
 
       {updated ? (
-        <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm print:hidden">
-          <p className="text-sm font-semibold text-emerald-700">更新完了</p>
-          <p className="mt-2 text-sm text-emerald-700">
+        <section className="rounded-lg border border-blue-200 bg-blue-50 p-4 shadow-sm print:hidden">
+          <p className="text-sm font-semibold text-blue-700">更新完了</p>
+          <p className="mt-2 text-sm text-blue-700">
             引き継ぎ書を更新しました。
           </p>
         </section>
@@ -237,8 +238,8 @@ export default async function HandoverDocumentDetailPage({
         </div>
       </section>
 
-      <section className="rounded-3xl border border-red-200 bg-white p-6 shadow-sm print:hidden">
-        <h2 className="text-xl font-bold text-red-700">削除</h2>
+      <section className="rounded-lg border border-rose-200 bg-white p-6 shadow-sm print:hidden">
+        <h2 className="text-xl font-bold text-rose-700">削除</h2>
         <p className="mt-2 text-sm text-slate-600">
           間違って作成した引き継ぎ書を削除できます。
         </p>
@@ -248,7 +249,7 @@ export default async function HandoverDocumentDetailPage({
 
           <button
             type="submit"
-            className="rounded-xl bg-red-600 px-5 py-3 text-sm font-medium text-white hover:bg-red-700"
+            className="inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md bg-rose-600 px-4 text-sm font-semibold text-white transition hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-1"
           >
             この引き継ぎ書を削除
           </button>

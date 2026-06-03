@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { formatDate, isToday, isOverdue, getStatusLabel } from '@/lib/utils'
 import DashboardAlertsClient from '@/app/components/DashboardAlertsClient'
+import { primaryButtonClass, secondaryButtonClass } from '@/app/components/ui/buttonStyles'
 
 type TaskRow = {
   id: string
@@ -54,7 +55,7 @@ export default async function DashboardPage() {
   if (taskError || propertyError) {
     return (
       <div className="space-y-6 p-6">
-        <div className="rounded-3xl border border-red-200 bg-red-50 p-6 shadow-sm">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
           <p className="text-sm font-semibold text-red-600">ダッシュボード</p>
           <h1 className="mt-1 text-3xl font-bold text-red-700">データの取得に失敗しました</h1>
           <div className="mt-4 space-y-2 text-sm text-red-600">
@@ -94,10 +95,10 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-semibold text-emerald-600">ホーム</p>
+            <p className="text-sm font-semibold text-slate-500">ホーム</p>
             <h1 className="mt-1 text-3xl font-bold text-slate-900">今日の仕事画面</h1>
             <p className="mt-2 text-sm text-slate-600">
               期限が近いタスクから順番に確認できます。
@@ -105,34 +106,19 @@ export default async function DashboardPage() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Link
-              href="/ai-minutes"
-              className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-emerald-700 px-4 py-2 text-sm font-medium !text-white hover:bg-emerald-600"
-            >
-              AI議事録を作成
-            </Link>
-            <Link
-              href="/ai-minutes/records"
-              className="rounded-xl border border-emerald-300 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50"
-            >
-              保存済み議事録
-            </Link>
-            <Link
-              href="/today-tasks"
-              className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium !text-white hover:bg-slate-800"
-            >
+            <Link href="/today-tasks" className={primaryButtonClass}>
               今日やることを見る
             </Link>
-            <Link
-              href="/tasks"
-              className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-            >
+            <Link href="/ai-minutes" className={secondaryButtonClass}>
+              AI議事録を作成
+            </Link>
+            <Link href="/ai-minutes/records" className={secondaryButtonClass}>
+              保存済み議事録
+            </Link>
+            <Link href="/tasks" className={secondaryButtonClass}>
               タスク一覧へ
             </Link>
-            <Link
-              href="/cases"
-              className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-            >
+            <Link href="/cases" className={secondaryButtonClass}>
               案件一覧へ
             </Link>
           </div>
@@ -142,17 +128,17 @@ export default async function DashboardPage() {
       <DashboardAlertsClient />
 
       <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-5 shadow-sm">
-          <p className="text-sm font-medium text-red-600">期限切れ</p>
-          <p className="mt-2 text-3xl font-bold text-red-700">{overdueTasks.length}</p>
+        <div className="rounded-md border border-rose-200 bg-rose-50 p-5 shadow-sm">
+          <p className="text-sm font-medium text-rose-700">期限切れ</p>
+          <p className="mt-2 text-3xl font-bold text-rose-800">{overdueTasks.length}</p>
         </div>
 
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-5 shadow-sm">
           <p className="text-sm font-medium text-amber-600">今日期限</p>
           <p className="mt-2 text-3xl font-bold text-amber-700">{todayTasks.length}</p>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-md border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm font-medium text-slate-500">未完了タスク</p>
           <p className="mt-2 text-3xl font-bold text-slate-900">{tasks.length}</p>
         </div>
@@ -160,7 +146,7 @@ export default async function DashboardPage() {
 
       <section className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
         <div className="space-y-6">
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">先にやること</h2>
@@ -174,7 +160,7 @@ export default async function DashboardPage() {
             </div>
 
             {urgentList.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
+              <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
                 先にやるタスクはありません。
               </div>
             ) : (
@@ -185,9 +171,9 @@ export default async function DashboardPage() {
                   return (
                     <div
                       key={task.id}
-                      className={`rounded-2xl border p-4 ${
+                      className={`rounded-md border p-4 ${
                         overdue
-                          ? 'border-red-200 bg-red-50'
+                          ? 'border-rose-200 bg-rose-50'
                           : 'border-amber-200 bg-amber-50'
                       }`}
                     >
@@ -202,7 +188,7 @@ export default async function DashboardPage() {
                             </span>
                             <span
                               className={`rounded-full bg-white px-2 py-1 ${
-                                overdue ? 'text-red-700' : 'text-amber-700'
+                                overdue ? 'text-rose-700' : 'text-amber-700'
                               }`}
                             >
                               期限: {formatDate(task.due_date)}
@@ -213,7 +199,7 @@ export default async function DashboardPage() {
                         {task.property_id && validPropertyIdSet.has(task.property_id) ? (
                           <Link
                             href={`/properties/${task.property_id}/tasks`}
-                            className="text-sm font-medium text-emerald-700 hover:underline"
+                            className="text-sm font-medium text-slate-600 hover:underline"
                           >
                             物件タスクを見る
                           </Link>
@@ -226,7 +212,7 @@ export default async function DashboardPage() {
             )}
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">このあとやること</h2>
@@ -240,7 +226,7 @@ export default async function DashboardPage() {
             </div>
 
             {nextList.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
+              <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
                 今後のタスクはありません。
               </div>
             ) : (
@@ -248,7 +234,7 @@ export default async function DashboardPage() {
                 {nextList.map((task) => (
                   <div
                     key={task.id}
-                    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                    className="rounded-md border border-slate-200 bg-slate-50 p-4"
                   >
                     <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                       <div>
@@ -268,7 +254,7 @@ export default async function DashboardPage() {
                       {task.property_id ? (
                         <Link
                           href={`/properties/${task.property_id}/tasks`}
-                          className="text-sm font-medium text-emerald-700 hover:underline"
+                          className="text-sm font-medium text-slate-600 hover:underline"
                         >
                           物件タスクを見る
                         </Link>
@@ -282,12 +268,12 @@ export default async function DashboardPage() {
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-slate-900">最近の物件</h2>
               <Link
                 href="/properties"
-                className="text-sm font-medium text-emerald-700 hover:underline"
+                className="text-sm font-medium text-slate-600 hover:underline"
               >
                 物件一覧へ
               </Link>
@@ -295,7 +281,7 @@ export default async function DashboardPage() {
 
             <div className="mt-4 space-y-3">
               {properties.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
+                <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
                   物件データはまだありません。
                 </div>
               ) : (
@@ -303,7 +289,7 @@ export default async function DashboardPage() {
                   <Link
                     key={property.id}
                     href={`/properties/${property.id}`}
-                    className="block rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:bg-slate-100"
+                    className="block rounded-md border border-slate-200 bg-slate-50 p-4 hover:bg-slate-100"
                   >
                     <p className="text-sm font-semibold text-slate-900">
                       {property.name || '無題物件'}

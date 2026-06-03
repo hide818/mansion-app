@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { primaryButtonClass, secondaryButtonClass, smallButtonClass } from '@/app/components/ui/buttonStyles'
 
 type SearchParams = Promise<{
   q?: string
@@ -65,7 +66,7 @@ function getDecisionStatusClass(status: string | null) {
   if (status === '継続審議') return 'bg-purple-50 border-purple-200 text-purple-700'
   if (status === '否決') return 'bg-red-50 border-red-200 text-red-700'
   if (status === '報告のみ') return 'bg-slate-50 border-slate-200 text-slate-700'
-  return 'bg-gray-50 border-gray-200 text-gray-700'
+  return 'bg-slate-50 border-gray-200 text-slate-700'
 }
 
 export default async function BoardCasesPage({ searchParams }: PageProps) {
@@ -85,7 +86,7 @@ export default async function BoardCasesPage({ searchParams }: PageProps) {
   if (propertyError || !properties) {
     return (
       <div className="p-6">
-        <div className="rounded-2xl border bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <h1 className="text-2xl font-bold">理事会予定案件一覧</h1>
           <p className="mt-3 text-sm text-red-600">
             物件データの取得に失敗しました。
@@ -149,37 +150,37 @@ export default async function BoardCasesPage({ searchParams }: PageProps) {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="rounded-2xl border bg-white p-6 shadow-sm">
+      <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-bold">理事会予定案件一覧</h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <p className="mt-2 text-sm text-slate-600">
           理事会に出す予定の案件を、日付順でまとめて確認できます。
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
-          <p className="text-xs font-semibold text-gray-500">登録件数</p>
+        <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-semibold text-slate-500">登録件数</p>
           <p className="mt-2 text-2xl font-bold">{totalCount}</p>
         </div>
 
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
-          <p className="text-xs font-semibold text-gray-500">上程準備中</p>
+        <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-semibold text-slate-500">上程準備中</p>
           <p className="mt-2 text-2xl font-bold">{preparedCount}</p>
         </div>
 
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
-          <p className="text-xs font-semibold text-gray-500">理事会提出予定</p>
+        <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-semibold text-slate-500">理事会提出予定</p>
           <p className="mt-2 text-2xl font-bold">{scheduledCount}</p>
         </div>
 
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
-          <p className="text-xs font-semibold text-gray-500">継続審議</p>
+        <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-semibold text-slate-500">継続審議</p>
           <p className="mt-2 text-2xl font-bold">{continuedCount}</p>
         </div>
       </div>
 
-      <div className="rounded-2xl border bg-white p-6 shadow-sm">
-        <form className="grid gap-4 md:grid-cols-[1fr_220px_160px]">
+      <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+        <form className="grid gap-4 md:grid-cols-[minmax(0,1fr)_220px_auto]">
           <div>
             <label htmlFor="q" className="mb-2 block text-sm font-medium">
               検索
@@ -189,7 +190,7 @@ export default async function BoardCasesPage({ searchParams }: PageProps) {
               name="q"
               defaultValue={keyword}
               placeholder="案件名 / 議案タイトル / 担当者 / 次回対応"
-              className="w-full rounded-lg border px-3 py-2 outline-none focus:border-black"
+              className="w-full rounded-lg border px-3 py-2 outline-none focus:border-slate-500"
             />
           </div>
 
@@ -201,7 +202,7 @@ export default async function BoardCasesPage({ searchParams }: PageProps) {
               id="status"
               name="status"
               defaultValue={boardStatusFilter}
-              className="w-full rounded-lg border px-3 py-2 outline-none focus:border-black"
+              className="w-full rounded-lg border px-3 py-2 outline-none focus:border-slate-500"
             >
               <option value="">すべて</option>
               {boardStatusOptions.map((option) => (
@@ -212,17 +213,17 @@ export default async function BoardCasesPage({ searchParams }: PageProps) {
             </select>
           </div>
 
-          <div className="flex items-end gap-3">
+          <div className="flex min-w-max items-end justify-end gap-3">
             <button
               type="submit"
-              className="inline-flex min-w-[64px] h-10 items-center justify-center rounded-lg bg-black px-4 text-sm font-medium !text-white hover:opacity-90"
+              className={primaryButtonClass}
             >
               絞り込む
             </button>
 
             <Link
               href="/board-cases"
-              className="inline-flex h-10 items-center rounded-lg border px-4 text-sm font-medium hover:bg-gray-50"
+              className={secondaryButtonClass}
             >
               リセット
             </Link>
@@ -230,11 +231,11 @@ export default async function BoardCasesPage({ searchParams }: PageProps) {
         </form>
       </div>
 
-      <div className="rounded-2xl border bg-white p-6 shadow-sm">
+      <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-bold">一覧</h2>
 
         {caseRows.length === 0 ? (
-          <div className="mt-6 rounded-xl bg-gray-50 p-6 text-sm text-gray-600">
+          <div className="mt-6 rounded-xl bg-slate-50 p-6 text-sm text-slate-600">
             該当する理事会予定案件はありません。
           </div>
         ) : (
@@ -245,19 +246,19 @@ export default async function BoardCasesPage({ searchParams }: PageProps) {
                 : '名称未設定'
 
               return (
-                <div key={item.id} className="rounded-2xl border p-5">
+                <div key={item.id} className="rounded-md border border-slate-200 p-5">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900">
+                      <h3 className="text-lg font-bold text-slate-900">
                         {item.title ?? '無題案件'}
                       </h3>
 
                       <div className="mt-2 flex flex-wrap gap-2">
-                        <span className="rounded-full border px-3 py-1 text-sm text-gray-700">
+                        <span className="rounded-full border px-3 py-1 text-sm text-slate-700">
                           理事会予定日：{formatDate(item.board_scheduled_for)}
                         </span>
 
-                        <span className="rounded-full border px-3 py-1 text-sm text-gray-700">
+                        <span className="rounded-full border px-3 py-1 text-sm text-slate-700">
                           議案ステータス：{item.board_status ?? '未設定'}
                         </span>
 
@@ -274,14 +275,14 @@ export default async function BoardCasesPage({ searchParams }: PageProps) {
                     <div className="flex flex-wrap gap-2">
                       <Link
                         href={`/properties/${item.property_id}/cases/${item.id}`}
-                        className="inline-flex items-center rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-gray-50"
+                        className={smallButtonClass}
                       >
                         案件詳細
                       </Link>
 
                       <Link
                         href={`/properties/${item.property_id}/cases/${item.id}/board-settings`}
-                        className="inline-flex min-w-[64px] items-center justify-center rounded-lg bg-black px-3 py-1.5 text-xs font-medium !text-white hover:opacity-90"
+                        className="inline-flex h-8 shrink-0 items-center justify-center whitespace-nowrap rounded-md bg-slate-900 px-3 text-sm font-medium text-white transition hover:bg-slate-700"
                       >
                         理事会予定設定
                       </Link>
@@ -289,54 +290,54 @@ export default async function BoardCasesPage({ searchParams }: PageProps) {
                   </div>
 
                   <div className="mt-4 grid gap-3 md:grid-cols-3">
-                    <div className="rounded-xl bg-gray-50 p-4">
-                      <p className="text-sm text-gray-500">議案タイトル</p>
-                      <p className="mt-1 text-gray-900">
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-sm text-slate-500">議案タイトル</p>
+                      <p className="mt-1 text-slate-900">
                         {item.board_agenda_title ?? '未設定'}
                       </p>
                     </div>
 
-                    <div className="rounded-xl bg-gray-50 p-4">
-                      <p className="text-sm text-gray-500">物件名</p>
-                      <p className="mt-1 text-gray-900">{propertyName}</p>
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-sm text-slate-500">物件名</p>
+                      <p className="mt-1 text-slate-900">{propertyName}</p>
                     </div>
 
-                    <div className="rounded-xl bg-gray-50 p-4">
-                      <p className="text-sm text-gray-500">担当者</p>
-                      <p className="mt-1 text-gray-900">{item.assignee ?? '未設定'}</p>
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-sm text-slate-500">担当者</p>
+                      <p className="mt-1 text-slate-900">{item.assignee ?? '未設定'}</p>
                     </div>
                   </div>
 
                   <div className="mt-3 grid gap-3 md:grid-cols-3">
-                    <div className="rounded-xl bg-gray-50 p-4">
-                      <p className="text-sm text-gray-500">決定日</p>
-                      <p className="mt-1 text-gray-900">
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-sm text-slate-500">決定日</p>
+                      <p className="mt-1 text-slate-900">
                         {formatDate(item.board_decision_date)}
                       </p>
                     </div>
 
-                    <div className="rounded-xl bg-gray-50 p-4">
-                      <p className="text-sm text-gray-500">案件ステータス</p>
-                      <p className="mt-1 text-gray-900">{item.status ?? '未設定'}</p>
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-sm text-slate-500">案件ステータス</p>
+                      <p className="mt-1 text-slate-900">{item.status ?? '未設定'}</p>
                     </div>
 
-                    <div className="rounded-xl bg-gray-50 p-4">
-                      <p className="text-sm text-gray-500">作成日時</p>
-                      <p className="mt-1 text-gray-900">{formatDateTime(item.created_at)}</p>
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-sm text-slate-500">作成日時</p>
+                      <p className="mt-1 text-slate-900">{formatDateTime(item.created_at)}</p>
                     </div>
                   </div>
 
                   <div className="mt-3 grid gap-3 md:grid-cols-2">
-                    <div className="rounded-xl bg-gray-50 p-4">
-                      <p className="text-sm text-gray-500">次回対応方針</p>
-                      <p className="mt-1 whitespace-pre-wrap text-gray-900">
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-sm text-slate-500">次回対応方針</p>
+                      <p className="mt-1 whitespace-pre-wrap text-slate-900">
                         {item.board_next_action ?? '未設定'}
                       </p>
                     </div>
 
-                    <div className="rounded-xl bg-gray-50 p-4">
-                      <p className="text-sm text-gray-500">決定事項の有無</p>
-                      <p className="mt-1 text-gray-900">
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <p className="text-sm text-slate-500">決定事項の有無</p>
+                      <p className="mt-1 text-slate-900">
                         {item.board_decision_status ? '登録済み' : '未登録'}
                       </p>
                     </div>

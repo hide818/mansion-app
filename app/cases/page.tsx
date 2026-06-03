@@ -78,8 +78,8 @@ function sortCases(rows: CaseRow[], sort: SortKey) {
 
 function sortButtonClass(active: boolean) {
   return active
-    ? 'inline-flex min-w-[64px] items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium !text-white hover:bg-slate-800'
-    : 'inline-flex min-w-[64px] items-center justify-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50'
+    ? 'inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-slate-700'
+    : 'inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'
 }
 
 function getCardClass(level: DueLevel) {
@@ -181,7 +181,7 @@ export default async function CasesPage({
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-semibold text-emerald-600">案件・タスク管理</p>
+            <p className="text-sm font-semibold text-slate-500">案件・タスク管理</p>
             <h1 className="mt-1 text-3xl font-bold text-slate-900">案件一覧</h1>
             <p className="mt-2 text-sm text-slate-600">
               期限順・新しい順・古い順で並び替えできます。
@@ -249,7 +249,7 @@ export default async function CasesPage({
                     {item.propertyId ? (
                       <Link
                         href={`/properties/${item.propertyId}/cases/${item.id}`}
-                        className="text-sm font-medium text-emerald-700 hover:underline"
+                        className="text-sm font-medium text-slate-600 hover:underline"
                       >
                         案件詳細を見る
                       </Link>

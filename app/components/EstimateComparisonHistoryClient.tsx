@@ -75,7 +75,7 @@ export default function EstimateComparisonHistoryClient({ initialRecords }: Prop
       <div className="mx-auto max-w-5xl space-y-6">
 
         {/* ヘッダー */}
-        <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <div className="text-sm font-semibold tracking-[0.18em] text-emerald-600">AIツール</div>
@@ -94,7 +94,7 @@ export default function EstimateComparisonHistoryClient({ initialRecords }: Prop
         </section>
 
         {/* 検索・一覧 */}
-        <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
 
           {/* 検索 */}
           <div className="flex items-center gap-4">
@@ -195,7 +195,7 @@ export default function EstimateComparisonHistoryClient({ initialRecords }: Prop
       {/* 削除確認ダイアログ */}
       {confirmDeleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-[28px] border border-slate-200 bg-white p-8 shadow-xl">
+          <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-xl">
             <h2 className="text-xl font-bold text-slate-900">この見積比較表を削除しますか？</h2>
             <p className="mt-3 text-sm leading-6 text-slate-600">
               削除すると元に戻せません。保存済みの比較表・コメント・議案文がすべて削除されます。

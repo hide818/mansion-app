@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { primaryButtonClass, smallButtonClass } from '@/app/components/ui/buttonStyles'
 
 type StaffMember = {
   id: string
@@ -102,7 +103,7 @@ export default function MinutesStaffPage() {
   return (
     <div className="space-y-6 p-6">
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-sm font-semibold text-emerald-600">設定</p>
+        <p className="text-sm font-semibold text-slate-500">設定</p>
         <h1 className="mt-1 text-3xl font-bold text-slate-900">議事録担当者設定</h1>
         <p className="mt-2 text-sm text-slate-600">
           AI議事録作成画面で選択できる担当者を登録・管理します。
@@ -116,7 +117,7 @@ export default function MinutesStaffPage() {
       ) : null}
 
       {successMessage ? (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+        <div className="rounded-md border border-blue-200 bg-blue-50 p-4 text-sm text-blue-700">
           {successMessage}
         </div>
       ) : null}
@@ -135,7 +136,7 @@ export default function MinutesStaffPage() {
           <button
             type="submit"
             disabled={adding || !newName.trim()}
-            className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-medium text-white hover:bg-emerald-700 disabled:bg-slate-300 disabled:text-white"
+            className={primaryButtonClass}
           >
             {adding ? '追加中...' : '追加'}
           </button>
@@ -160,7 +161,7 @@ export default function MinutesStaffPage() {
                   type="button"
                   onClick={() => void handleDeactivate(member.id, member.name)}
                   disabled={deactivatingId === member.id}
-                  className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-600 hover:border-red-400 hover:text-red-600 disabled:opacity-50"
+                  className={smallButtonClass}
                 >
                   {deactivatingId === member.id ? '処理中...' : '無効化'}
                 </button>
@@ -171,7 +172,7 @@ export default function MinutesStaffPage() {
       </section>
 
       <div className="text-sm">
-        <Link href="/ai-minutes" className="text-emerald-600 hover:underline">
+        <Link href="/ai-minutes" className="text-slate-600 hover:underline">
           AI議事録作成画面へ戻る
         </Link>
       </div>

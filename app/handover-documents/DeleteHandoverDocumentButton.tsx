@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { dangerButtonClass } from '@/app/components/ui/buttonStyles'
 
 type DeleteHandoverDocumentButtonProps = {
   documentId: string
@@ -45,7 +46,7 @@ export default function DeleteHandoverDocumentButton({
       type="button"
       onClick={handleDelete}
       disabled={isDeleting}
-      className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+      className={dangerButtonClass}
     >
       {isDeleting ? '削除中...' : '削除する'}
     </button>

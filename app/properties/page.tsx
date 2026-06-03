@@ -51,7 +51,7 @@ export default async function PropertiesPage() {
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-semibold text-emerald-600">案件・タスク管理</p>
+            <p className="text-sm font-semibold text-slate-500">案件・タスク管理</p>
             <h1 className="mt-1 text-3xl font-bold text-slate-900">物件一覧</h1>
             <p className="mt-2 text-sm text-slate-600">
               物件を選んで、案件・タスク管理へ進みます。
@@ -89,7 +89,7 @@ export default async function PropertiesPage() {
                 <p className="mt-3 text-xs text-slate-500">
                   登録日: {formatDate(property.created_at)}
                 </p>
-                <p className="mt-4 text-sm font-medium text-emerald-700">
+                <p className="mt-4 text-sm font-medium text-slate-500">
                   物件詳細へ →
                 </p>
               </Link>

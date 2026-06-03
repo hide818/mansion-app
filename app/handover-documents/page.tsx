@@ -54,18 +54,10 @@ function displayPropertyName(name: string | null) {
 
 function filterButtonClass(active: boolean) {
   if (active) {
-    return 'inline-flex items-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 shadow-sm'
+    return 'inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-slate-900 bg-slate-900 px-4 text-sm font-semibold text-white transition'
   }
 
-  return 'inline-flex items-center rounded-xl border border-slate-300 bg-white px-4 py-2 hover:bg-slate-50'
-}
-
-function filterButtonTextClass(active: boolean) {
-  if (active) {
-    return 'text-sm font-semibold text-emerald-800'
-  }
-
-  return 'text-sm font-medium text-slate-700'
+  return 'inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'
 }
 
 export default async function HandoverDocumentsPage({
@@ -125,7 +117,7 @@ export default async function HandoverDocumentsPage({
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <p className="text-sm font-semibold text-emerald-600">引き継ぎDX</p>
+            <p className="text-sm font-semibold text-slate-500">引き継ぎDX</p>
             <h1 className="mt-1 text-3xl font-bold text-slate-900">引き継ぎ一覧</h1>
             <p className="mt-2 text-sm text-slate-600">
               保存済みの引き継ぎ書を一覧で確認できます。
@@ -135,29 +127,27 @@ export default async function HandoverDocumentsPage({
           <div className="flex flex-wrap gap-3">
             <Link
               href="/handover-documents/new"
-              className="inline-flex items-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 shadow-sm hover:bg-emerald-100"
+              className="inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-slate-700"
             >
-              <span className="text-sm font-semibold text-emerald-800">
-                引き継ぎ書を新規作成
-              </span>
+              引き継ぎ書を新規作成
             </Link>
           </div>
         </div>
       </section>
 
       {created ? (
-        <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
-          <p className="text-sm font-semibold text-emerald-700">保存完了</p>
-          <p className="mt-2 text-sm text-emerald-700">
+        <section className="rounded-lg border border-blue-200 bg-blue-50 p-4 shadow-sm">
+          <p className="text-sm font-semibold text-blue-700">保存完了</p>
+          <p className="mt-2 text-sm text-blue-700">
             引き継ぎ書を保存しました。
           </p>
         </section>
       ) : null}
 
       {deleted ? (
-        <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
-          <p className="text-sm font-semibold text-emerald-700">削除完了</p>
-          <p className="mt-2 text-sm text-emerald-700">
+        <section className="rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-sm">
+          <p className="text-sm font-semibold text-slate-600">削除完了</p>
+          <p className="mt-2 text-sm text-slate-600">
             引き継ぎ書を削除しました。
           </p>
         </section>
@@ -177,7 +167,7 @@ export default async function HandoverDocumentsPage({
               href="/handover-documents"
               className={filterButtonClass(!propertyId)}
             >
-              <span className={filterButtonTextClass(!propertyId)}>すべて</span>
+              すべて
             </Link>
 
             {properties.map((property) => (
@@ -186,9 +176,7 @@ export default async function HandoverDocumentsPage({
                 href={`/handover-documents?propertyId=${property.id}`}
                 className={filterButtonClass(propertyId === property.id)}
               >
-                <span className={filterButtonTextClass(propertyId === property.id)}>
-                  {displayPropertyName(property.name)}
-                </span>
+                {displayPropertyName(property.name)}
               </Link>
             ))}
           </div>
@@ -235,7 +223,7 @@ export default async function HandoverDocumentsPage({
 
                   <Link
                     href={`/handover-documents/${doc.id}`}
-                    className="text-sm font-medium text-emerald-700 hover:underline"
+                    className="text-sm font-medium text-slate-600 hover:underline"
                   >
                     詳細を見る
                   </Link>

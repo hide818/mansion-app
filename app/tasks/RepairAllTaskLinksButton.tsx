@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { secondaryButtonClass } from '@/app/components/ui/buttonStyles'
 
 type RepairResponse = {
   success?: boolean
@@ -77,7 +78,7 @@ export default function RepairAllTaskLinksButton() {
       type="button"
       onClick={handleRepair}
       disabled={isLoading}
-      className="inline-flex items-center justify-center rounded-2xl border border-emerald-300 bg-emerald-50 px-5 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+      className={secondaryButtonClass}
     >
       {isLoading ? '補正中...' : 'タスク紐づけ補正'}
     </button>

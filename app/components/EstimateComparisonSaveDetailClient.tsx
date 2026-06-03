@@ -118,7 +118,7 @@ export default function EstimateComparisonSaveDetailClient({ record }: Props) {
       <div className="mx-auto max-w-5xl space-y-6">
 
         {/* ヘッダー */}
-        <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="mb-4">
             <Link
               href="/estimate-comparison/history"
@@ -183,7 +183,7 @@ export default function EstimateComparisonSaveDetailClient({ record }: Props) {
         </section>
 
         {/* 基準見積・各社見積テキスト（折りたたみ） */}
-        <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="text-sm font-bold text-slate-700">入力テキスト（保存時の内容）</div>
             <div className="flex gap-3">
@@ -243,7 +243,7 @@ export default function EstimateComparisonSaveDetailClient({ record }: Props) {
       {/* 削除確認ダイアログ */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-[28px] border border-slate-200 bg-white p-8 shadow-xl">
+          <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-xl">
             <h2 className="text-xl font-bold text-slate-900">この見積比較表を削除しますか？</h2>
             <p className="mt-3 text-sm leading-6 text-slate-600">
               削除すると元に戻せません。保存済みの比較表・コメント・議案文がすべて削除されます。

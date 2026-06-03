@@ -75,7 +75,7 @@ export default function EstimateComparisonResultSections({ result, appliedSectio
     <div className="space-y-5">
 
       {/* 01. 総評（常に表示） */}
-      <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+      <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
         <div className="text-xs font-semibold tracking-[0.18em] text-slate-400">01</div>
         <h2 className="mt-2 text-xl font-bold text-slate-900">総評</h2>
         <p className="mt-4 text-sm leading-7 text-slate-700">{result.overview}</p>
@@ -83,7 +83,7 @@ export default function EstimateComparisonResultSections({ result, appliedSectio
 
       {/* 02. 比較表 */}
       {has('comparisonTable') && result.comparisonRows.length > 0 && (
-        <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="text-xs font-semibold tracking-[0.18em] text-slate-400">02</div>
@@ -157,7 +157,7 @@ export default function EstimateComparisonResultSections({ result, appliedSectio
 
       {/* 03. 各社の特徴 */}
       {has('vendorSummaries') && result.vendorSummaries.length > 0 && (
-        <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="text-xs font-semibold tracking-[0.18em] text-slate-400">03</div>
           <h2 className="mt-2 text-xl font-bold text-slate-900">各社の特徴</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -198,7 +198,7 @@ export default function EstimateComparisonResultSections({ result, appliedSectio
 
       {/* 04. 金額差・注意点 */}
       {has('priceDifference') && result.priceDifferenceSummary && (
-        <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="text-xs font-semibold tracking-[0.18em] text-slate-400">04</div>
           <h2 className="mt-2 text-xl font-bold text-slate-900">金額差・注意点</h2>
           {result.cheapestVendor && (
@@ -214,7 +214,7 @@ export default function EstimateComparisonResultSections({ result, appliedSectio
 
       {/* 05. 不足している項目 */}
       {has('missingItems') && result.missingItems.length > 0 && (
-        <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="text-xs font-semibold tracking-[0.18em] text-slate-400">05</div>
           <h2 className="mt-2 text-xl font-bold text-slate-900">不足している項目</h2>
           <ul className="mt-4 space-y-2">
@@ -230,7 +230,7 @@ export default function EstimateComparisonResultSections({ result, appliedSectio
 
       {/* 06. 業者へ確認すべき質問 */}
       {has('questionsToVendors') && result.questionsToVendors.length > 0 && (
-        <section className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="text-xs font-semibold tracking-[0.18em] text-slate-400">06</div>
           <h2 className="mt-2 text-xl font-bold text-slate-900">業者へ確認すべき質問</h2>
           <ul className="mt-4 space-y-2">
@@ -246,7 +246,7 @@ export default function EstimateComparisonResultSections({ result, appliedSectio
 
       {/* 07. 理事会向けコメント */}
       {has('boardComment') && result.boardComment && (
-        <section className="rounded-[28px] border border-emerald-100 bg-white p-8 shadow-sm">
+        <section className="rounded-lg border border-emerald-100 bg-white p-5 shadow-sm">
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="text-xs font-semibold tracking-[0.18em] text-emerald-600">07</div>
@@ -271,7 +271,7 @@ export default function EstimateComparisonResultSections({ result, appliedSectio
 
       {/* 08. 総会議案文 */}
       {has('agendaDraft') && result.agendaDraft && (
-        <section className="rounded-[28px] border border-violet-100 bg-white p-8 shadow-sm">
+        <section className="rounded-lg border border-violet-100 bg-white p-5 shadow-sm">
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="text-xs font-semibold tracking-[0.18em] text-violet-600">08</div>
