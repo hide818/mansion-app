@@ -6,6 +6,10 @@ import { useRouter } from 'next/navigation'
 import EstimateComparisonResultSections, {
   type EstimateComparisonResultData,
 } from './EstimateComparisonResultSections'
+import {
+  exportEstimateComparisonToExcel,
+  exportEstimateComparisonToPdf,
+} from '../../lib/estimateComparisonExport'
 
 type VendorItem = {
   vendorName: string
@@ -47,6 +51,43 @@ export default function EstimateComparisonSaveDetailClient({ record }: Props) {
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [showBaseText, setShowBaseText] = useState(false)
   const [showVendorTexts, setShowVendorTexts] = useState(false)
+  const [isExportingExcel, setIsExportingExcel] = useState(false)
+  const [isExportingPdf, setIsExportingPdf] = useState(false)
+  const [exportMessage, setExportMessage] = useState('')
+
+  async function handleExportExcel() {
+    setIsExportingExcel(true)
+    setExportMessage('')
+    try {
+      await exportEstimateComparisonToExcel(
+        record.result,
+        record.selected_sections,
+        record.project_title
+      )
+      setExportMessage('Excelをダウンロードしました')
+    } catch {
+      setExportMessage('Excel出力に失敗しました')
+    } finally {
+      setIsExportingExcel(false)
+    }
+  }
+
+  async function handleExportPdf() {
+    setIsExportingPdf(true)
+    setExportMessage('PDFを作成中...')
+    try {
+      await exportEstimateComparisonToPdf(
+        record.result,
+        record.selected_sections,
+        record.project_title
+      )
+      setExportMessage('PDFをダウンロードしました')
+    } catch {
+      setExportMessage('PDF出力に失敗しました')
+    } finally {
+      setIsExportingPdf(false)
+    }
+  }
 
   async function handleDelete() {
     setIsDeleting(true)
@@ -105,6 +146,22 @@ export default function EstimateComparisonSaveDetailClient({ record }: Props) {
             </Link>
             <button
               type="button"
+              onClick={handleExportExcel}
+              disabled={isExportingExcel}
+              className="inline-flex items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isExportingExcel ? 'Excel作成中...' : 'Excelで出力'}
+            </button>
+            <button
+              type="button"
+              onClick={handleExportPdf}
+              disabled={isExportingPdf}
+              className="inline-flex items-center justify-center rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isExportingPdf ? 'PDF作成中...' : 'PDFで出力'}
+            </button>
+            <button
+              type="button"
               onClick={() => {
                 setShowDeleteConfirm(true)
                 setDeleteError(null)
@@ -114,6 +171,9 @@ export default function EstimateComparisonSaveDetailClient({ record }: Props) {
               削除する
             </button>
           </div>
+          {exportMessage && (
+            <div className="mt-3 text-sm text-slate-600">{exportMessage}</div>
+          )}
 
           {deleteError && (
             <div className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-3">

@@ -5,6 +5,10 @@ import Link from 'next/link'
 import EstimateComparisonResultSections, {
   type EstimateComparisonResultData,
 } from './EstimateComparisonResultSections'
+import {
+  exportEstimateComparisonToExcel,
+  exportEstimateComparisonToPdf,
+} from '../../lib/estimateComparisonExport'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -222,6 +226,11 @@ export default function EstimateComparisonAiClient({ initialData }: { initialDat
   // Save state
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [savedId, setSavedId] = useState<string | null>(null)
+
+  // Export state
+  const [isExportingExcel, setIsExportingExcel] = useState(false)
+  const [isExportingPdf, setIsExportingPdf] = useState(false)
+  const [exportMessage, setExportMessage] = useState('')
 
   // UI
   const [isLoading, setIsLoading] = useState(false)
@@ -451,6 +460,42 @@ export default function EstimateComparisonAiClient({ initialData }: { initialDat
       setSaveState('saved')
     } catch {
       setSaveState('error')
+    }
+  }
+
+  async function handleExportExcel() {
+    if (!result) return
+    setIsExportingExcel(true)
+    setExportMessage('')
+    try {
+      await exportEstimateComparisonToExcel(
+        result,
+        appliedSections,
+        projectTitle.trim() || '工事見積比較'
+      )
+      setExportMessage('Excelをダウンロードしました')
+    } catch {
+      setExportMessage('Excel出力に失敗しました')
+    } finally {
+      setIsExportingExcel(false)
+    }
+  }
+
+  async function handleExportPdf() {
+    if (!result) return
+    setIsExportingPdf(true)
+    setExportMessage('PDFを作成中...')
+    try {
+      await exportEstimateComparisonToPdf(
+        result,
+        appliedSections,
+        projectTitle.trim() || '工事見積比較'
+      )
+      setExportMessage('PDFをダウンロードしました')
+    } catch {
+      setExportMessage('PDF出力に失敗しました')
+    } finally {
+      setIsExportingPdf(false)
     }
   }
 
@@ -883,6 +928,30 @@ export default function EstimateComparisonAiClient({ initialData }: { initialDat
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* エクスポートバー */}
+            <div className="flex flex-wrap items-center gap-3 rounded-[28px] border border-slate-200 bg-white px-6 py-4 shadow-sm">
+              <span className="text-xs font-semibold text-slate-500">出力：</span>
+              <button
+                type="button"
+                onClick={handleExportExcel}
+                disabled={isExportingExcel}
+                className="inline-flex items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isExportingExcel ? 'Excel作成中...' : 'Excelで出力'}
+              </button>
+              <button
+                type="button"
+                onClick={handleExportPdf}
+                disabled={isExportingPdf}
+                className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isExportingPdf ? 'PDF作成中...' : 'PDFで出力'}
+              </button>
+              {exportMessage && (
+                <span className="text-xs text-slate-600">{exportMessage}</span>
+              )}
             </div>
 
             {/* 比較結果セクション */}
