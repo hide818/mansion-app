@@ -50,11 +50,16 @@ export default function SidebarClient({ menuGroups }: SidebarClientProps) {
     setOpenMap((prev) => ({ ...prev, [label]: !prev[label] }))
   }
 
-  // ── デスクトップ用ホバーフライアウト state ──────────────────────
+  // ── デスクトップ用フライアウト state ────────────────────────────
+  // hoveredLabel / hoverY : マウスオーバー中のグループ（離れたらクリア）
+  // pinnedLabel / pinnedY : クリック固定中のグループ（クリックするまで維持）
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
-  const [flyoutY, setFlyoutY] = useState(0)
+  const [hoverY, setHoverY] = useState(0)
+  const [pinnedLabel, setPinnedLabel] = useState<string | null>(null)
+  const [pinnedY, setPinnedY] = useState(0)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // scheduleClose は hoveredLabel だけをクリア。pinnedLabel は維持する。
   function scheduleClose() {
     closeTimer.current = setTimeout(() => setHoveredLabel(null), 150)
   }
@@ -69,12 +74,35 @@ export default function SidebarClient({ menuGroups }: SidebarClientProps) {
   function handleGroupEnter(label: string, el: HTMLDivElement) {
     cancelClose()
     const rect = el.getBoundingClientRect()
-    setFlyoutY(rect.top)
+    setHoverY(rect.top)
     setHoveredLabel(label)
   }
 
-  const activeGroup = menuGroups.find((g) => g.label === hoveredLabel) ?? null
-  const flyoutVisible = Boolean(hoveredLabel && activeGroup?.children?.length)
+  function handleGroupClick(label: string, el: HTMLButtonElement) {
+    if (pinnedLabel === label) {
+      // 同じグループを再クリック → 固定解除
+      setPinnedLabel(null)
+      setPinnedY(0)
+    } else {
+      // 別グループ or 未固定 → 固定
+      const rect = el.getBoundingClientRect()
+      setPinnedLabel(label)
+      setPinnedY(rect.top)
+    }
+  }
+
+  // フライアウトに表示する内容と位置
+  // ホバーが優先。ホバーが外れたら固定グループに戻る。
+  const displayLabel = hoveredLabel ?? pinnedLabel
+  const displayY = hoveredLabel !== null ? hoverY : pinnedY
+  const activeGroup = menuGroups.find((g) => g.label === displayLabel) ?? null
+  const flyoutVisible = Boolean(displayLabel && activeGroup?.children?.length)
+
+  function handleFlyoutLinkClick() {
+    setHoveredLabel(null)
+    setPinnedLabel(null)
+    setPinnedY(0)
+  }
 
   return (
     <>
@@ -98,6 +126,7 @@ export default function SidebarClient({ menuGroups }: SidebarClientProps) {
             const hasChildren = Boolean(group.children?.length)
             const isOpen = openMap[group.label]
             const isHovered = hoveredLabel === group.label
+            const isPinned = pinnedLabel === group.label
 
             return (
               <div
@@ -112,21 +141,35 @@ export default function SidebarClient({ menuGroups }: SidebarClientProps) {
               >
                 <button
                   type="button"
-                  onClick={() => hasChildren && toggleGroup(group.label)}
+                  onClick={(e) => {
+                    if (!hasChildren) return
+                    toggleGroup(group.label)          // モバイルアコーディオン
+                    handleGroupClick(group.label, e.currentTarget) // デスクトップ固定
+                  }}
                   className={`flex min-h-10 w-full items-center justify-between rounded-md px-3 py-2 text-left transition-colors duration-100 ${
-                    isHovered ? 'bg-slate-100' : 'hover:bg-slate-50'
+                    isPinned
+                      ? 'bg-slate-100'
+                      : isHovered
+                      ? 'bg-slate-50'
+                      : 'hover:bg-slate-50'
                   }`}
                 >
                   <span
-                    className={`text-[15px] font-medium uppercase tracking-wider transition-colors duration-100 ${
-                      isHovered ? 'text-slate-700' : 'text-gray-400'
+                    className={`text-[15px] font-medium transition-colors duration-100 ${
+                      isPinned || isHovered ? 'text-slate-800' : 'text-slate-400'
                     }`}
                   >
                     {group.label}
                   </span>
-                  {/* アコーディオン矢印：デスクトップ(lg)では非表示 */}
-                  {hasChildren && (
-                    <span className="text-[9px] text-gray-400 lg:hidden">
+
+                  {/* 固定中インジケーター（デスクトップのみ） */}
+                  {isPinned && (
+                    <span className="hidden text-[10px] text-slate-400 lg:block">›</span>
+                  )}
+
+                  {/* アコーディオン矢印（モバイルのみ） */}
+                  {hasChildren && !isPinned && (
+                    <span className="text-[9px] text-slate-300 lg:hidden">
                       {isOpen ? '▲' : '▼'}
                     </span>
                   )}
@@ -159,33 +202,40 @@ export default function SidebarClient({ menuGroups }: SidebarClientProps) {
         </nav>
       </div>
 
-      {/* ── デスクトップ用ホバーフライアウト（lg以上で表示） ── */}
+      {/* ── デスクトップ用フライアウト（lg以上で表示） ── */}
       {/*
         position: fixed で親の overflow-y-auto に影響されず viewport 基準で配置。
-        常に DOM にマウントし opacity/translate で show/hide することで
-        exit アニメーションも自然に動作する。
+        transition-opacity のみ使用することで、pinnedY → hoverY 間のポジション
+        変化がアニメーションせず自然に切り替わる。
       */}
       <div
         style={{
-          top: flyoutY,
+          top: displayY,
           left: SIDEBAR_WIDTH,
-          maxHeight: `calc(100vh - ${flyoutY}px - 12px)`,
+          maxHeight: `calc(100vh - ${displayY}px - 12px)`,
         }}
-        className={`fixed z-50 hidden w-56 overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-xl transition-all duration-150 ease-out lg:block ${
+        className={`fixed z-50 hidden w-56 overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-xl transition-opacity duration-150 ease-out lg:block ${
           flyoutVisible
-            ? 'translate-x-0 opacity-100'
-            : 'pointer-events-none translate-x-2 opacity-0'
+            ? 'opacity-100'
+            : 'pointer-events-none opacity-0'
         }`}
         onMouseEnter={cancelClose}
         onMouseLeave={scheduleClose}
       >
+        {/* 固定中はグループ名をヘッダーとして表示 */}
+        {pinnedLabel && pinnedLabel === displayLabel && (
+          <div className="border-b border-slate-100 px-4 py-1.5">
+            <span className="text-[11px] font-semibold text-slate-400">{pinnedLabel}</span>
+          </div>
+        )}
+
         {activeGroup?.children?.map((child) => {
           const active = isChildActive(pathname, child.href)
           return (
             <Link
               key={child.href}
               href={child.href}
-              onClick={() => setHoveredLabel(null)}
+              onClick={handleFlyoutLinkClick}
               className={`flex min-h-9 w-full items-center whitespace-nowrap rounded-md border-l-2 px-4 py-1.5 text-sm font-medium leading-snug transition-colors ${
                 active
                   ? 'border-blue-600 bg-blue-50 text-blue-700'
