@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 
@@ -68,13 +67,46 @@ function getPriorityLabel(priority: string | null) {
   }
 }
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+function PropertyNotFound({ id }: { id?: string }) {
+  return (
+    <div className="space-y-6 p-6">
+      <section className="rounded-3xl border border-amber-200 bg-amber-50 p-8 shadow-sm">
+        <p className="text-sm font-semibold text-amber-700">物件タスク一覧</p>
+        <h1 className="mt-2 text-2xl font-bold text-slate-900">
+          物件情報を取得できませんでした
+        </h1>
+        {id && (
+          <p className="mt-3 text-sm text-slate-600">
+            指定された物件ID：<span className="font-mono font-semibold">{id}</span>
+          </p>
+        )}
+        <p className="mt-2 text-sm text-slate-500">
+          この物件が存在しないか、アクセス権限がない可能性があります。
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link
+            href="/properties"
+            className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+          >
+            物件一覧へ戻る
+          </Link>
+          <Link
+            href="/tasks"
+            className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          >
+            全体タスク一覧
+          </Link>
+        </div>
+      </section>
+    </div>
+  )
+}
 
 export default async function PropertyTasksPage({ params, searchParams }: Props) {
   const { id } = await params
 
-  if (!UUID_RE.test(id)) {
-    return notFound()
+  if (!id) {
+    return <PropertyNotFound />
   }
 
   const resolvedSearchParams = searchParams ? await searchParams : {}
@@ -91,7 +123,7 @@ export default async function PropertyTasksPage({ params, searchParams }: Props)
     .maybeSingle()
 
   if (!property) {
-    return notFound()
+    return <PropertyNotFound id={id} />
   }
 
   const { data: tasksData, error: tasksError } = await supabase

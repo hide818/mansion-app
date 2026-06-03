@@ -78,6 +78,20 @@ export default async function DashboardPage() {
   const urgentList = [...overdueTasks, ...todayTasks].slice(0, 5)
   const nextList = upcomingTasks.slice(0, 5)
 
+  // 有効な property_id のみリンクを表示するため、DBに存在するものだけ取得
+  const taskPropertyIds = Array.from(
+    new Set(tasks.map((t) => t.property_id).filter((v): v is string => typeof v === 'string' && v.length > 0))
+  )
+  const validPropertyIdSet = new Set<string>()
+  if (taskPropertyIds.length > 0) {
+    const { data: validProps } = await supabase
+      .from('properties')
+      .select('id')
+      .eq('company_id', companyId)
+      .in('id', taskPropertyIds)
+    ;((validProps ?? []) as { id: string }[]).forEach((p) => validPropertyIdSet.add(p.id))
+  }
+
   return (
     <div className="space-y-6 p-6">
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -196,7 +210,7 @@ export default async function DashboardPage() {
                           </div>
                         </div>
 
-                        {task.property_id ? (
+                        {task.property_id && validPropertyIdSet.has(task.property_id) ? (
                           <Link
                             href={`/properties/${task.property_id}/tasks`}
                             className="text-sm font-medium text-emerald-700 hover:underline"

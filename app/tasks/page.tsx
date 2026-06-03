@@ -296,7 +296,7 @@ export default async function TasksPage({
                   </div>
 
                   <div className="flex flex-wrap gap-3">
-                    {item.property_id ? (
+                    {item.property_id && propertyNameMap.has(item.property_id) ? (
                       <Link
                         href={`/properties/${item.property_id}/tasks/${item.id}`}
                         className="text-sm font-medium text-emerald-700 hover:underline"
@@ -305,7 +305,7 @@ export default async function TasksPage({
                       </Link>
                     ) : null}
 
-                    {item.property_id && item.case_id ? (
+                    {item.property_id && propertyNameMap.has(item.property_id) && item.case_id ? (
                       <Link
                         href={`/properties/${item.property_id}/cases/${item.case_id}`}
                         className="text-sm font-medium text-emerald-700 hover:underline"

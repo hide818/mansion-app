@@ -202,14 +202,14 @@ export default async function DeadlineRankingPage() {
                         {item.case_id ? caseMap.get(item.case_id) ?? '-' : '-'}
                       </td>
                       <td className="px-4 py-3">
-                        {item.case_id && item.property_id ? (
+                        {item.case_id && item.property_id && propertyMap.has(item.property_id) ? (
                           <Link
                             href={`/properties/${item.property_id}/cases/${item.case_id}`}
                             className="rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-800 hover:bg-gray-50"
                           >
                             案件詳細へ
                           </Link>
-                        ) : item.property_id ? (
+                        ) : item.property_id && propertyMap.has(item.property_id) ? (
                           <Link
                             href={`/properties/${item.property_id}/tasks`}
                             className="rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-800 hover:bg-gray-50"
