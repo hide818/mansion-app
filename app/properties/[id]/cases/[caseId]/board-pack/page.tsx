@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import BoardPackCenterClient from '@/app/components/BoardPackCenterClient'
+import BoardFlowNav from '@/app/components/BoardFlowNav'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 
@@ -59,6 +60,8 @@ export default async function BoardPackPage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <BoardFlowNav currentStep="prep" propertyId={id} caseId={caseId} />
+
         <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">{propertyName}</p>
           <h1 className="mt-1 text-2xl font-bold text-gray-900">

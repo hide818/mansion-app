@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import AiMinutesStudioClient from '@/app/components/AiMinutesStudioClient'
+import BoardFlowNav from '@/app/components/BoardFlowNav'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 
@@ -59,23 +60,28 @@ export default async function AiBoardMinutesProPage({ params }: PageProps) {
   }
 
   return (
-    <AiMinutesStudioClient
-      properties={[
-        {
-          id: typedProperty.id,
-          name: typedProperty.name ?? '物件名未設定',
-        },
-      ]}
-      cases={cases.map((caseItem) => ({
-        id: caseItem.id,
-        propertyId: caseItem.property_id,
-        title: caseItem.title ?? '案件名未設定',
-        status: caseItem.status ?? '',
-      }))}
-      lockedPropertyId={typedProperty.id}
-      lockedCaseId={targetCase.id}
-      lockedPropertyName={typedProperty.name ?? '物件名未設定'}
-      lockedCaseTitle={targetCase.title ?? '案件名未設定'}
-    />
+    <div>
+      <div className="px-4 pt-6 sm:px-6 lg:px-8 mx-auto max-w-7xl">
+        <BoardFlowNav currentStep="minutes" propertyId={propertyId} caseId={caseId} />
+      </div>
+      <AiMinutesStudioClient
+        properties={[
+          {
+            id: typedProperty.id,
+            name: typedProperty.name ?? '物件名未設定',
+          },
+        ]}
+        cases={cases.map((caseItem) => ({
+          id: caseItem.id,
+          propertyId: caseItem.property_id,
+          title: caseItem.title ?? '案件名未設定',
+          status: caseItem.status ?? '',
+        }))}
+        lockedPropertyId={typedProperty.id}
+        lockedCaseId={targetCase.id}
+        lockedPropertyName={typedProperty.name ?? '物件名未設定'}
+        lockedCaseTitle={targetCase.title ?? '案件名未設定'}
+      />
+    </div>
   )
 }
