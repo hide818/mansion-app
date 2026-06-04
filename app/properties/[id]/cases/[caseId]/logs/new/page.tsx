@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { getUserProfile } from '@/lib/getUserProfile'
+import { canEdit } from '@/lib/permissions'
 
 type Props = {
   params: Promise<{ id: string; caseId: string }>
@@ -11,20 +12,19 @@ type Props = {
 async function createLogAction(formData: FormData) {
   'use server'
 
+  const currentProfile = await getUserProfile()
+  if (!currentProfile || !canEdit(currentProfile.role)) {
+    const propertyId = String(formData.get('property_id') ?? '')
+    const caseId = String(formData.get('case_id') ?? '')
+    redirect(`/properties/${propertyId}/cases/${caseId}?error=${encodeURIComponent('権限がありません')}`)
+  }
+
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
-  const currentProfile = await getUserProfile()
-  const canViewAll =
-    currentProfile?.role === 'admin' || currentProfile?.can_view_all_data === true
 
   const propertyId = String(formData.get('property_id') ?? '')
   const caseId = String(formData.get('case_id') ?? '')
   const message = String(formData.get('message') ?? '').trim()
-
-  // canViewAll=false かつ currentProfile がない場合は操作不可
-  if (!canViewAll && !currentProfile?.id) {
-    redirect(`/properties/${propertyId}/cases?error=${encodeURIComponent('権限がありません')}`)
-  }
 
   // 全ユーザー共通：targetCase の存在確認（company_id / property_id / case_id 整合確認）
   const { data: targetCase } = await supabase
@@ -39,8 +39,9 @@ async function createLogAction(formData: FormData) {
     redirect(`/properties/${propertyId}/cases?error=${encodeURIComponent('案件が見つかりません')}`)
   }
 
-  // canViewAll=false の場合のみ、自分担当かを追加確認
-  if (!canViewAll && targetCase.assigned_to !== currentProfile?.id) {
+  // admin以外は自分担当案件のみログ追加可
+  const isAdminUser = currentProfile.role === 'admin'
+  if (!isAdminUser && targetCase.assigned_to !== currentProfile.id) {
     redirect(`/properties/${propertyId}/cases?error=${encodeURIComponent('権限がありません')}`)
   }
 

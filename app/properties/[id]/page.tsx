@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { getUserProfile } from '@/lib/getUserProfile'
+import { canEdit } from '@/lib/permissions'
 import PropertyTimelineClient from '@/app/components/PropertyTimelineClient'
 import PropertyMemoryAiClient from '@/app/components/PropertyMemoryAiClient'
 
@@ -36,6 +38,12 @@ type MinutesSettingsRow = {
 
 async function updateMinutesSettingsAction(formData: FormData) {
   'use server'
+
+  const currentProfile = await getUserProfile()
+  if (!currentProfile || !canEdit(currentProfile.role)) {
+    const propertyId = String(formData.get('property_id') ?? '').trim()
+    redirect(`/properties/${propertyId}?error=` + encodeURIComponent('権限がありません'))
+  }
 
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()

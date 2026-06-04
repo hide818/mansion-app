@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { getUserProfile } from '@/lib/getUserProfile'
+import { canEdit } from '@/lib/permissions'
 import { isValidUuid } from '@/lib/isValidUuid'
 
 type Props = {
@@ -22,6 +23,12 @@ type ProfileOption = {
 
 async function createCaseAction(formData: FormData) {
   'use server'
+
+  const currentProfile = await getUserProfile()
+  if (!currentProfile || !canEdit(currentProfile.role)) {
+    const propertyId = String(formData.get('property_id') ?? '')
+    redirect(`/properties/${propertyId}/cases?error=` + encodeURIComponent('権限がありません'))
+  }
 
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()

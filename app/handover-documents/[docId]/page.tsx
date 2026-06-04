@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { getUserProfile } from '@/lib/getUserProfile'
+import { canEdit } from '@/lib/permissions'
 import PrintHandoverButton from '@/app/components/PrintHandoverButton'
 import { secondaryButtonClass } from '@/app/components/ui/buttonStyles'
 
@@ -75,6 +77,11 @@ function Section({
 
 async function deleteHandoverAction(formData: FormData) {
   'use server'
+
+  const currentProfile = await getUserProfile()
+  if (!currentProfile || !canEdit(currentProfile.role)) {
+    redirect('/handover-documents?error=' + encodeURIComponent('権限がありません'))
+  }
 
   const docId = String(formData.get('doc_id') ?? '').trim()
 

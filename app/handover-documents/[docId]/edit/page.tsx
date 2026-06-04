@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { getUserProfile } from '@/lib/getUserProfile'
+import { canEdit } from '@/lib/permissions'
 
 type Props = {
   params: Promise<{
@@ -102,6 +104,11 @@ function withFallback(value: string | null | undefined, template: string) {
 
 async function updateHandoverAction(formData: FormData) {
   'use server'
+
+  const currentProfile = await getUserProfile()
+  if (!currentProfile || !canEdit(currentProfile.role)) {
+    redirect('/handover-documents?error=' + encodeURIComponent('権限がありません'))
+  }
 
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
