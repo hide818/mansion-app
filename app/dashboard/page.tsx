@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { getUserProfile } from '@/lib/getUserProfile'
 import { formatDate, isToday, isOverdue, getStatusLabel } from '@/lib/utils'
 import DashboardAlertsClient from '@/app/components/DashboardAlertsClient'
 import { primaryButtonClass, secondaryButtonClass } from '@/app/components/ui/buttonStyles'
@@ -36,14 +37,38 @@ function sortByDueDate(tasks: TaskRow[]) {
 export default async function DashboardPage() {
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
+  const currentProfile = await getUserProfile()
+
+  // 表示名を1回だけ取得（company_id で絞る）
+  let userName = 'あなた'
+  if (currentProfile?.id) {
+    const { data: nameData } = await supabase
+      .from('profiles')
+      .select('display_name, email')
+      .eq('id', currentProfile.id)
+      .eq('company_id', companyId)
+      .maybeSingle()
+    if (nameData) {
+      userName = (nameData.display_name as string | null) || (nameData.email as string | null) || 'あなた'
+    }
+  }
+
+  // タスクを自分担当に絞る
+  let taskQuery = supabase
+    .from('tasks')
+    .select('id, title, status, due_date, property_id, created_at')
+    .eq('company_id', companyId)
+    .neq('status', 'done')
+
+  if (currentProfile?.id) {
+    taskQuery = taskQuery.eq('assigned_to', currentProfile.id)
+  } else {
+    taskQuery = taskQuery.is('assigned_to', null)
+  }
 
   const [{ data: taskData, error: taskError }, { data: propertyData, error: propertyError }] =
     await Promise.all([
-      supabase
-        .from('tasks')
-        .select('id, title, status, due_date, property_id, created_at')
-        .eq('company_id', companyId)
-        .neq('status', 'done'),
+      taskQuery,
       supabase
         .from('properties')
         .select('id, name, created_at')
@@ -99,9 +124,9 @@ export default async function DashboardPage() {
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm font-semibold text-slate-500">ホーム</p>
-            <h1 className="mt-1 text-3xl font-bold text-slate-900">今日の仕事画面</h1>
+            <h1 className="mt-1 text-3xl font-bold text-slate-900">{userName} の仕事画面</h1>
             <p className="mt-2 text-sm text-slate-600">
-              期限が近いタスクから順番に確認できます。
+              自分担当の期限が近いタスクから順番に確認できます。
             </p>
           </div>
 

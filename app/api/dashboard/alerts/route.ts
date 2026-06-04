@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { getUserProfile } from '@/lib/getUserProfile'
 
 export type DashboardAlert = {
   id: string
@@ -33,6 +34,7 @@ export async function GET() {
   try {
     const supabase = await createSupabaseServerClient()
     const companyId = await getUserCompanyId()
+    const currentProfile = await getUserProfile()
 
     const today = toDateOnly(new Date())
     const sevenDaysLater = new Date(today)
@@ -42,22 +44,35 @@ export async function GET() {
     const fourteenDaysAgo = new Date(today)
     fourteenDaysAgo.setDate(today.getDate() - 14)
 
+    // タスク・案件は自分担当に絞る。プロフィール取得不能時は安全側に倒す
+    let taskQuery = supabase
+      .from('tasks')
+      .select('id, title, status, due_date, priority, case_id, property_id')
+      .eq('company_id', companyId)
+      .not('due_date', 'is', null)
+      .limit(200)
+
+    let caseQuery = supabase
+      .from('cases')
+      .select('id, title, status, updated_at, board_next_action, property_id')
+      .eq('company_id', companyId)
+      .limit(200)
+
+    if (currentProfile?.id) {
+      taskQuery = taskQuery.eq('assigned_to', currentProfile.id)
+      caseQuery = caseQuery.eq('assigned_to', currentProfile.id)
+    } else {
+      taskQuery = taskQuery.is('assigned_to', null)
+      caseQuery = caseQuery.is('assigned_to', null)
+    }
+
     const [propRes, taskRes, caseRes, complaintRes] = await Promise.all([
       supabase
         .from('properties')
         .select('id, name')
         .eq('company_id', companyId),
-      supabase
-        .from('tasks')
-        .select('id, title, status, due_date, priority, case_id, property_id')
-        .eq('company_id', companyId)
-        .not('due_date', 'is', null)
-        .limit(200),
-      supabase
-        .from('cases')
-        .select('id, title, status, updated_at, assignee, board_next_action, property_id')
-        .eq('company_id', companyId)
-        .limit(200),
+      taskQuery,
+      caseQuery,
       supabase
         .from('complaints')
         .select('id, title, status, category, created_at, property_id')
@@ -144,7 +159,6 @@ export async function GET() {
       title: string | null
       status: string | null
       updated_at: string | null
-      assignee: string | null
       board_next_action: string | null
       property_id: string | null
     }
@@ -217,8 +231,8 @@ export async function GET() {
         propertyName,
         title: c.title ?? '（件名なし）',
         reason: isLongOpen
-          ? `${days}日以上未解決のクレームです。`
-          : 'クレームが未解決です。',
+          ? `【全社】${days}日以上未解決のクレームです。`
+          : '【全社】クレームが未解決です。',
         dateLabel: c.created_at ? `受付: ${c.created_at.split('T')[0]}` : '受付日不明',
         daysLabel: isLongOpen && days !== null ? `${days}日経過` : undefined,
         href,
