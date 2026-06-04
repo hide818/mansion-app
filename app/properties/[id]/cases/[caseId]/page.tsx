@@ -190,15 +190,39 @@ async function updateCaseAction(formData: FormData) {
     )
   }
 
-  let assignedTo: string | null = null
-  if (assignedToCandidate && isValidUuid(assignedToCandidate)) {
-    const { data: assigneeProfile } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('id', assignedToCandidate)
+  const currentProfile = await getUserProfile()
+  const canViewAll =
+    currentProfile?.role === 'admin' || currentProfile?.can_view_all_data === true
+
+  if (!canViewAll) {
+    if (!currentProfile?.id) {
+      redirect(`/properties/${propertyId}/cases?error=${encodeURIComponent('権限がありません')}`)
+    }
+    const { data: existingCase } = await supabase
+      .from('cases')
+      .select('id, assigned_to')
+      .eq('id', caseId)
+      .eq('property_id', propertyId)
       .eq('company_id', companyId)
       .maybeSingle()
-    if (assigneeProfile) assignedTo = assignedToCandidate
+    if (!existingCase || existingCase.assigned_to !== currentProfile.id) {
+      redirect(`/properties/${propertyId}/cases?error=${encodeURIComponent('権限がありません')}`)
+    }
+  }
+
+  let assignedTo: string | null = null
+  if (!canViewAll) {
+    assignedTo = currentProfile?.id ?? null
+  } else {
+    if (assignedToCandidate && isValidUuid(assignedToCandidate)) {
+      const { data: assigneeProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', assignedToCandidate)
+        .eq('company_id', companyId)
+        .maybeSingle()
+      if (assigneeProfile) assignedTo = assignedToCandidate
+    }
   }
 
   const payload: Record<string, string | null> = {
@@ -233,6 +257,26 @@ async function deleteCaseAction(formData: FormData) {
 
   const propertyId = String(formData.get('property_id') ?? '')
   const caseId = String(formData.get('case_id') ?? '')
+
+  const currentProfile = await getUserProfile()
+  const canViewAll =
+    currentProfile?.role === 'admin' || currentProfile?.can_view_all_data === true
+
+  if (!canViewAll) {
+    if (!currentProfile?.id) {
+      redirect(`/properties/${propertyId}/cases?error=${encodeURIComponent('権限がありません')}`)
+    }
+    const { data: existingCase } = await supabase
+      .from('cases')
+      .select('id, assigned_to')
+      .eq('id', caseId)
+      .eq('property_id', propertyId)
+      .eq('company_id', companyId)
+      .maybeSingle()
+    if (!existingCase || existingCase.assigned_to !== currentProfile.id) {
+      redirect(`/properties/${propertyId}/cases?error=${encodeURIComponent('権限がありません')}`)
+    }
+  }
 
   await supabase
     .from('tasks')

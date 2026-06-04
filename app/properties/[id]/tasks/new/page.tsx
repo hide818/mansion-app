@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { getUserProfile } from '@/lib/getUserProfile'
 import { isValidUuid } from '@/lib/isValidUuid'
 
 type Props = {
@@ -45,18 +46,45 @@ async function createTaskAction(formData: FormData) {
     )
   }
 
-  // assigned_to 検証: UUID形式かつ同一会社のプロフィールのみ許可
+  const currentProfile = await getUserProfile()
+  const canViewAll =
+    currentProfile?.role === 'admin' || currentProfile?.can_view_all_data === true
+
+  if (!canViewAll && !currentProfile?.id) {
+    redirect(`/properties/${propertyId}/tasks?error=${encodeURIComponent('権限がありません')}`)
+  }
+
+  if (caseId) {
+    const { data: targetCase } = await supabase
+      .from('cases')
+      .select('id, assigned_to')
+      .eq('id', caseId)
+      .eq('property_id', propertyId)
+      .eq('company_id', companyId)
+      .maybeSingle()
+    if (!targetCase) {
+      redirect(`/properties/${propertyId}/tasks?error=${encodeURIComponent('指定された案件が見つかりません')}`)
+    }
+    if (!canViewAll && targetCase.assigned_to !== currentProfile?.id) {
+      redirect(`/properties/${propertyId}/tasks?error=${encodeURIComponent('権限がありません')}`)
+    }
+  }
+
   let assignedTo: string | null = null
-  if (assignedToCandidate) {
-    if (isValidUuid(assignedToCandidate)) {
-      const { data: assigneeProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', assignedToCandidate)
-        .eq('company_id', companyId)
-        .maybeSingle()
-      if (assigneeProfile) {
-        assignedTo = assignedToCandidate
+  if (!canViewAll) {
+    assignedTo = currentProfile?.id ?? null
+  } else {
+    if (assignedToCandidate) {
+      if (isValidUuid(assignedToCandidate)) {
+        const { data: assigneeProfile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', assignedToCandidate)
+          .eq('company_id', companyId)
+          .maybeSingle()
+        if (assigneeProfile) {
+          assignedTo = assignedToCandidate
+        }
       }
     }
   }
