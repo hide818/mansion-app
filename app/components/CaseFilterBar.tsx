@@ -12,6 +12,7 @@ type Props = {
   currentSort?: string
   profiles: Profile[]
   extraParams?: Record<string, string>
+  canViewAll?: boolean
 }
 
 const FILTERS = [
@@ -27,6 +28,7 @@ export default function CaseFilterBar({
   currentSort,
   profiles,
   extraParams,
+  canViewAll = true,
 }: Props) {
   const router = useRouter()
 
@@ -45,7 +47,7 @@ export default function CaseFilterBar({
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      {FILTERS.map((f) => (
+      {FILTERS.filter((f) => canViewAll || f.key === 'mine').map((f) => (
         <Link
           key={f.key}
           href={buildHref(f.key)}
@@ -59,7 +61,7 @@ export default function CaseFilterBar({
         </Link>
       ))}
 
-      {profiles.length > 0 && (
+      {canViewAll && profiles.length > 0 && (
         <select
           value={currentFilter === 'assignee' ? currentAssigneeId : ''}
           onChange={(e) => {

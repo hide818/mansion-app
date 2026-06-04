@@ -131,6 +131,8 @@ export default async function CasesPage({
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
   const currentProfile = await getUserProfile()
+  const canViewAll =
+    currentProfile?.role === 'admin' || currentProfile?.can_view_all_data === true
 
   // 全社プロフィール取得（フィルターバー用 + 担当者名解決用）
   const { data: allProfilesData } = await supabase
@@ -149,18 +151,18 @@ export default async function CasesPage({
     allProfiles.map((p) => [p.id, p.display_name || p.email || p.id]),
   )
 
-  // assigneeId は同一会社プロフィールに存在する場合のみ有効
+  // assigneeId は canViewAll かつ同一会社プロフィールに存在する場合のみ有効
   const validAssigneeId =
-    filter === 'assignee' && isValidUuid(assigneeIdParam) && profileNameMap.has(assigneeIdParam)
+    canViewAll && filter === 'assignee' && isValidUuid(assigneeIdParam) && profileNameMap.has(assigneeIdParam)
       ? assigneeIdParam
       : ''
 
-  // 実際に適用するフィルターを決定
-  // - filter=assignee かつ validAssigneeId がない → mine にフォールバック
-  // - all は明示した場合のみ全社表示
+  // canViewAll=false は常に mine（URL直打ち含め強制）
   type EffectiveFilter = 'mine' | 'all' | 'unassigned' | 'assignee'
   let effectiveFilter: EffectiveFilter
-  if (filter === 'all') {
+  if (!canViewAll) {
+    effectiveFilter = 'mine'
+  } else if (filter === 'all') {
     effectiveFilter = 'all'
   } else if (filter === 'unassigned') {
     effectiveFilter = 'unassigned'
@@ -177,8 +179,8 @@ export default async function CasesPage({
     if (currentProfile?.id) {
       query = query.eq('assigned_to', currentProfile.id)
     } else {
-      // プロフィール取得不能時は全社表示にせず未設定のみ
-      query = query.is('assigned_to', null)
+      // プロフィール不明時は空結果（安全側のフォールバック）
+      query = query.eq('id', '00000000-0000-0000-0000-000000000000')
     }
   } else if (effectiveFilter === 'unassigned') {
     query = query.is('assigned_to', null)
@@ -284,6 +286,7 @@ export default async function CasesPage({
             currentAssigneeId={validAssigneeId}
             currentSort={sort}
             profiles={filterBarProfiles}
+            canViewAll={canViewAll}
           />
         </div>
       </section>

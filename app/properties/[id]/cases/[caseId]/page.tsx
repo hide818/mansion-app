@@ -323,6 +323,15 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
     return notFound()
   }
 
+  const canViewAll =
+    currentProfile?.role === 'admin' || currentProfile?.can_view_all_data === true
+
+  if (!canViewAll) {
+    if (!currentProfile?.id || targetCase.assigned_to !== currentProfile.id) {
+      return notFound()
+    }
+  }
+
   const { data: taskData, error: taskError } = await supabase
     .from('tasks')
     .select('*')

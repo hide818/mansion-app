@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { getUserProfile } from '@/lib/getUserProfile'
 import { isValidUuid } from '@/lib/isValidUuid'
 
 type Props = {
@@ -196,6 +197,9 @@ export default async function TaskDetailPage({ params, searchParams }: Props) {
 
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
+  const currentProfile = await getUserProfile()
+  const canViewAll =
+    currentProfile?.role === 'admin' || currentProfile?.can_view_all_data === true
 
   const { data: property } = await supabase
     .from('properties')
@@ -235,6 +239,12 @@ export default async function TaskDetailPage({ params, searchParams }: Props) {
 
   if (task.property_id && task.property_id !== id) {
     return notFound()
+  }
+
+  if (!canViewAll) {
+    if (!currentProfile?.id || task.assigned_to !== currentProfile.id) {
+      return notFound()
+    }
   }
 
   let caseTitle = ''

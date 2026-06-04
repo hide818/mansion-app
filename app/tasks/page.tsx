@@ -150,6 +150,8 @@ export default async function TasksPage({
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
   const currentProfile = await getUserProfile()
+  const canViewAll =
+    currentProfile?.role === 'admin' || currentProfile?.can_view_all_data === true
 
   // 全社プロフィール取得（フィルターバー用 + 担当者名解決用）
   const { data: allProfilesData } = await supabase
@@ -168,17 +170,18 @@ export default async function TasksPage({
     allProfiles.map((p) => [p.id, p.display_name || p.email || p.id]),
   )
 
-  // assigneeId は同一会社プロフィールに存在する場合のみ有効
+  // assigneeId は canViewAll かつ同一会社プロフィールに存在する場合のみ有効
   const validAssigneeId =
-    filter === 'assignee' && isValidUuid(assigneeIdParam) && profileNameMap.has(assigneeIdParam)
+    canViewAll && filter === 'assignee' && isValidUuid(assigneeIdParam) && profileNameMap.has(assigneeIdParam)
       ? assigneeIdParam
       : ''
 
-  // filter=assignee かつ validAssigneeId がない → mine にフォールバック
-  // all は明示した場合のみ全社表示
+  // canViewAll=false は常に mine（URL直打ち含め強制）
   type EffectiveFilter = 'mine' | 'all' | 'unassigned' | 'assignee'
   let effectiveFilter: EffectiveFilter
-  if (filter === 'all') {
+  if (!canViewAll) {
+    effectiveFilter = 'mine'
+  } else if (filter === 'all') {
     effectiveFilter = 'all'
   } else if (filter === 'unassigned') {
     effectiveFilter = 'unassigned'
@@ -204,8 +207,8 @@ export default async function TasksPage({
     if (currentProfile?.id) {
       taskQuery = taskQuery.eq('assigned_to', currentProfile.id)
     } else {
-      // プロフィール取得不能時は全社表示にせず未設定のみ
-      taskQuery = taskQuery.is('assigned_to', null)
+      // プロフィール不明時は空結果（安全側のフォールバック）
+      taskQuery = taskQuery.eq('id', '00000000-0000-0000-0000-000000000000')
     }
   } else if (effectiveFilter === 'unassigned') {
     taskQuery = taskQuery.is('assigned_to', null)
@@ -359,6 +362,7 @@ export default async function TasksPage({
             currentSort={sort}
             profiles={filterBarProfiles}
             extraParams={{ statusFilter }}
+            canViewAll={canViewAll}
           />
 
           <div className="flex flex-wrap gap-3">

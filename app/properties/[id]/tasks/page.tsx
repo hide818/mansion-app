@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { getUserProfile } from '@/lib/getUserProfile'
 
 type Props = {
   params: Promise<{
@@ -115,6 +116,9 @@ export default async function PropertyTasksPage({ params, searchParams }: Props)
 
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
+  const currentProfile = await getUserProfile()
+  const canViewAll =
+    currentProfile?.role === 'admin' || currentProfile?.can_view_all_data === true
 
   const { data: property } = await supabase
     .from('properties')
@@ -127,13 +131,24 @@ export default async function PropertyTasksPage({ params, searchParams }: Props)
     return <PropertyNotFound id={id} />
   }
 
-  const { data: tasksData, error: tasksError } = await supabase
+  let tasksQuery = supabase
     .from('tasks')
     .select('id, title, status, priority, due_date, created_at, case_id, property_id, assigned_to')
     .eq('company_id', companyId)
     .eq('property_id', id)
     .neq('status', 'done')
     .order('created_at', { ascending: false })
+
+  if (!canViewAll) {
+    if (currentProfile?.id) {
+      tasksQuery = tasksQuery.eq('assigned_to', currentProfile.id)
+    } else {
+      // プロフィール不明時は空結果（安全側のフォールバック）
+      tasksQuery = tasksQuery.eq('id', '00000000-0000-0000-0000-000000000000')
+    }
+  }
+
+  const { data: tasksData, error: tasksError } = await tasksQuery
 
   if (tasksError) {
     return (
