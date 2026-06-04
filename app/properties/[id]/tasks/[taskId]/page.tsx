@@ -24,12 +24,18 @@ type RawTaskRow = {
   created_at?: string | null
   property_id?: string | null
   case_id?: string | null
+  assigned_to?: string | null
 }
 
 type RawCaseRow = {
   id?: string
   title?: string | null
   name?: string | null
+}
+
+type ProfileOption = {
+  id: string
+  display_name: string | null
 }
 
 function formatDate(value: string | null) {
@@ -101,9 +107,26 @@ async function updateTaskAction(formData: FormData) {
   const status = String(formData.get('status') ?? 'todo')
   const priority = String(formData.get('priority') ?? 'medium')
   const dueDate = String(formData.get('due_date') ?? '').trim()
+  const assignedToCandidate = String(formData.get('assigned_to') ?? '').trim()
 
   if (!isValidUuid(propertyId)) {
     redirect('/properties')
+  }
+
+  // assigned_to 検証: UUID形式かつ同一会社のプロフィールのみ許可
+  let assignedTo: string | null = null
+  if (assignedToCandidate) {
+    if (isValidUuid(assignedToCandidate)) {
+      const { data: assigneeProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', assignedToCandidate)
+        .eq('company_id', companyId)
+        .maybeSingle()
+      if (assigneeProfile) {
+        assignedTo = assignedToCandidate
+      }
+    }
   }
 
   const { error } = await supabase
@@ -112,6 +135,7 @@ async function updateTaskAction(formData: FormData) {
       status,
       priority,
       due_date: dueDate || null,
+      assigned_to: assignedTo,
     })
     .eq('id', taskId)
     .eq('company_id', companyId)
@@ -186,7 +210,7 @@ export default async function TaskDetailPage({ params, searchParams }: Props) {
 
   const { data: taskData, error: taskError } = await supabase
     .from('tasks')
-    .select('id, title, status, priority, due_date, created_at, property_id, case_id')
+    .select('id, title, status, priority, due_date, created_at, property_id, case_id, assigned_to')
     .eq('id', taskId)
     .eq('company_id', companyId)
     .maybeSingle()
@@ -225,6 +249,17 @@ export default async function TaskDetailPage({ params, searchParams }: Props) {
     const targetCase = caseData as RawCaseRow | null
     caseTitle = targetCase ? targetCase.title ?? targetCase.name ?? '' : ''
   }
+
+  const { data: profilesData } = await supabase
+    .from('profiles')
+    .select('id, display_name')
+    .eq('company_id', companyId)
+    .order('display_name', { ascending: true })
+
+  const profiles = (profilesData ?? []) as ProfileOption[]
+  const assigneeName = task.assigned_to
+    ? (profiles.find((p) => p.id === task.assigned_to)?.display_name ?? '未設定')
+    : '未設定'
 
   return (
     <div className="space-y-6 p-6">
@@ -276,7 +311,7 @@ export default async function TaskDetailPage({ params, searchParams }: Props) {
         </section>
       ) : null}
 
-      <section className="grid gap-4 md:grid-cols-4">
+      <section className="grid gap-4 md:grid-cols-5">
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">状況</p>
           <p className="mt-2 text-2xl font-bold text-slate-900">
@@ -304,12 +339,19 @@ export default async function TaskDetailPage({ params, searchParams }: Props) {
             {task.case_id ? (caseTitle || '案件あり') : '物件直下'}
           </p>
         </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-sm text-slate-500">担当者</p>
+          <p className="mt-2 text-lg font-bold text-slate-900">
+            {assigneeName}
+          </p>
+        </div>
       </section>
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-bold text-slate-900">タスク情報を更新</h2>
         <p className="mt-2 text-sm text-slate-600">
-          状況・優先度・期限・完了をこの画面で変更できます。
+          状況・優先度・期限・担当者をこの画面で変更できます。
         </p>
 
         <form action={updateTaskAction} className="mt-5 space-y-5">
@@ -358,6 +400,24 @@ export default async function TaskDetailPage({ params, searchParams }: Props) {
               defaultValue={toDateInputValue(task.due_date ?? null)}
               className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
             />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              担当者
+            </label>
+            <select
+              name="assigned_to"
+              defaultValue={task.assigned_to ?? ''}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+            >
+              <option value="">（未設定）</option>
+              {profiles.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.display_name ?? 'ユーザー'}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="flex flex-wrap gap-3">

@@ -17,6 +17,7 @@ type TaskRow = {
   case_id: string | null
   property_name: string | null
   case_title: string | null
+  assigned_to: string | null
 }
 
 const SORT_OPTIONS = [
@@ -122,7 +123,7 @@ export default async function TasksPage({
 
   const { data, error } = await supabase
     .from('tasks')
-    .select('id, title, status, priority, due_date, created_at, property_id, case_id')
+    .select('id, title, status, priority, due_date, created_at, property_id, case_id, assigned_to')
     .eq('company_id', companyId)
     .neq('status', 'done')
 
@@ -147,6 +148,7 @@ export default async function TasksPage({
     created_at: string | null
     property_id: string | null
     case_id: string | null
+    assigned_to: string | null
   }>
 
   const propertyIds = Array.from(
@@ -206,6 +208,25 @@ export default async function TasksPage({
     }
   }
 
+  const assignedToIds = Array.from(
+    new Set(
+      rawTasks
+        .map((item) => item.assigned_to)
+        .filter((v): v is string => typeof v === 'string' && v.length > 0),
+    ),
+  )
+  const assigneeNameMap = new Map<string, string>()
+  if (assignedToIds.length > 0) {
+    const { data: assigneeProfiles } = await supabase
+      .from('profiles')
+      .select('id, display_name')
+      .in('id', assignedToIds)
+      .eq('company_id', companyId)
+    ;((assigneeProfiles ?? []) as Array<{ id: string; display_name: string | null }>).forEach(
+      (p) => { assigneeNameMap.set(p.id, p.display_name ?? '名前未設定') },
+    )
+  }
+
   const tasks: TaskRow[] = sortTasks(
     rawTasks.map((item) => ({
       id: item.id,
@@ -218,6 +239,7 @@ export default async function TasksPage({
       case_id: item.case_id,
       property_name: item.property_id ? (propertyNameMap.get(item.property_id) ?? null) : null,
       case_title: item.case_id ? (caseTitleMap.get(item.case_id) ?? null) : null,
+      assigned_to: item.assigned_to,
     })),
     sort,
   )
@@ -291,6 +313,9 @@ export default async function TasksPage({
                       </span>
                       <span className="rounded-full bg-white px-2 py-1 text-slate-600">
                         案件: {item.case_title || '物件直下'}
+                      </span>
+                      <span className="rounded-full bg-white px-2 py-1 text-slate-600">
+                        担当者: {item.assigned_to ? (assigneeNameMap.get(item.assigned_to) ?? '未設定') : '未設定'}
                       </span>
                     </div>
                   </div>

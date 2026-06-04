@@ -11,6 +11,7 @@ type TaskRow = {
   property_id: string | null
   case_id: string | null
   created_at: string | null
+  assigned_to: string | null
 }
 
 function formatDate(value: string | null) {
@@ -107,7 +108,7 @@ export default async function TodayTasksPage() {
 
   const { data, error } = await supabase
     .from('tasks')
-    .select('id, title, status, priority, due_date, property_id, case_id, created_at')
+    .select('id, title, status, priority, due_date, property_id, case_id, created_at, assigned_to')
     .eq('company_id', companyId)
     .neq('status', 'done')
 
@@ -144,6 +145,23 @@ export default async function TodayTasksPage() {
       .eq('company_id', companyId)
       .in('id', taskPropertyIds)
     ;((validProps ?? []) as { id: string }[]).forEach((p) => validPropertyIdSet.add(p.id))
+  }
+
+  const assignedToIds = Array.from(
+    new Set(
+      tasks.map((t) => t.assigned_to).filter((v): v is string => typeof v === 'string' && v.length > 0),
+    ),
+  )
+  const assigneeNameMap = new Map<string, string>()
+  if (assignedToIds.length > 0) {
+    const { data: assigneeProfiles } = await supabase
+      .from('profiles')
+      .select('id, display_name')
+      .in('id', assignedToIds)
+      .eq('company_id', companyId)
+    ;((assigneeProfiles ?? []) as Array<{ id: string; display_name: string | null }>).forEach(
+      (p) => { assigneeNameMap.set(p.id, p.display_name ?? '名前未設定') },
+    )
   }
 
   return (
@@ -231,6 +249,9 @@ export default async function TodayTasksPage() {
                       <span className="rounded-full bg-white px-2 py-1 text-red-700">
                         期限: {formatDate(task.due_date)}
                       </span>
+                      <span className="rounded-full bg-white px-2 py-1 text-slate-600">
+                        担当者: {task.assigned_to ? (assigneeNameMap.get(task.assigned_to) ?? '未設定') : '未設定'}
+                      </span>
                     </div>
                   </div>
 
@@ -288,6 +309,9 @@ export default async function TodayTasksPage() {
                       <span className="rounded-full bg-white px-2 py-1 text-amber-700">
                         期限: {formatDate(task.due_date)}
                       </span>
+                      <span className="rounded-full bg-white px-2 py-1 text-slate-600">
+                        担当者: {task.assigned_to ? (assigneeNameMap.get(task.assigned_to) ?? '未設定') : '未設定'}
+                      </span>
                     </div>
                   </div>
 
@@ -344,6 +368,9 @@ export default async function TodayTasksPage() {
                       </span>
                       <span className="rounded-full bg-white px-2 py-1 text-slate-600">
                         期限: {formatDate(task.due_date)}
+                      </span>
+                      <span className="rounded-full bg-white px-2 py-1 text-slate-600">
+                        担当者: {task.assigned_to ? (assigneeNameMap.get(task.assigned_to) ?? '未設定') : '未設定'}
                       </span>
                     </div>
                   </div>

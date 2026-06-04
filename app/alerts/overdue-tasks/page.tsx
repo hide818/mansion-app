@@ -11,6 +11,7 @@ type TaskRow = {
   property_id: string | null
   case_id: string | null
   priority: string | null
+  assigned_to: string | null
 }
 
 type PropertyRow = {
@@ -86,7 +87,7 @@ export default async function OverdueTasksPage() {
 
   const { data: tasks, error } = await supabase
     .from('tasks')
-    .select('id, title, status, due_date, property_id, case_id, priority')
+    .select('id, title, status, due_date, property_id, case_id, priority, assigned_to')
     .eq('company_id', companyId)
     .neq('status', '完了')
     .not('due_date', 'is', null)
@@ -133,6 +134,21 @@ export default async function OverdueTasksPage() {
     caseMap.set(item.id, item.title ?? '案件名未設定')
   })
 
+  const assignedToIds = Array.from(
+    new Set(safeTasks.map((t) => t.assigned_to).filter((v): v is string => typeof v === 'string' && v.length > 0)),
+  )
+  const assigneeNameMap = new Map<string, string>()
+  if (assignedToIds.length > 0) {
+    const { data: assigneeProfiles } = await supabase
+      .from('profiles')
+      .select('id, display_name')
+      .in('id', assignedToIds)
+      .eq('company_id', companyId)
+    ;((assigneeProfiles ?? []) as Array<{ id: string; display_name: string | null }>).forEach(
+      (p) => { assigneeNameMap.set(p.id, p.display_name ?? '名前未設定') },
+    )
+  }
+
   return (
     <div className="p-6">
       <div className="mb-6">
@@ -175,6 +191,7 @@ export default async function OverdueTasksPage() {
                   <th className="px-4 py-3 font-medium">期限</th>
                   <th className="px-4 py-3 font-medium">超過日数</th>
                   <th className="px-4 py-3 font-medium">優先度</th>
+                  <th className="px-4 py-3 font-medium">担当者</th>
                   <th className="px-4 py-3 font-medium">物件</th>
                   <th className="px-4 py-3 font-medium">案件</th>
                   <th className="px-4 py-3 font-medium">移動</th>
@@ -189,6 +206,9 @@ export default async function OverdueTasksPage() {
                       {getDaysOverdue(item.due_date) ? `${getDaysOverdue(item.due_date)}日` : '-'}
                     </td>
                     <td className="px-4 py-3 text-gray-700">{item.priority || '-'}</td>
+                    <td className="px-4 py-3 text-gray-700">
+                      {item.assigned_to ? (assigneeNameMap.get(item.assigned_to) ?? '未設定') : '未設定'}
+                    </td>
                     <td className="px-4 py-3 text-gray-700">
                       {item.property_id ? propertyMap.get(item.property_id) ?? '-' : '-'}
                     </td>

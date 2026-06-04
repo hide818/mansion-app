@@ -20,6 +20,7 @@ type RawTaskRow = {
   created_at?: string | null
   case_id?: string | null
   property_id?: string | null
+  assigned_to?: string | null
 }
 
 function formatDate(value: string | null) {
@@ -128,7 +129,7 @@ export default async function PropertyTasksPage({ params, searchParams }: Props)
 
   const { data: tasksData, error: tasksError } = await supabase
     .from('tasks')
-    .select('id, title, status, priority, due_date, created_at, case_id, property_id')
+    .select('id, title, status, priority, due_date, created_at, case_id, property_id, assigned_to')
     .eq('company_id', companyId)
     .eq('property_id', id)
     .neq('status', 'done')
@@ -177,6 +178,25 @@ export default async function PropertyTasksPage({ params, searchParams }: Props)
     for (const item of cases) {
       caseTitleMap.set(item.id, item.title ?? item.name ?? null)
     }
+  }
+
+  const assignedToIds = Array.from(
+    new Set(
+      rawTasks
+        .map((item) => item.assigned_to)
+        .filter((v): v is string => typeof v === 'string' && v.length > 0),
+    ),
+  )
+  const assigneeNameMap = new Map<string, string>()
+  if (assignedToIds.length > 0) {
+    const { data: assigneeProfiles } = await supabase
+      .from('profiles')
+      .select('id, display_name')
+      .in('id', assignedToIds)
+      .eq('company_id', companyId)
+    ;((assigneeProfiles ?? []) as Array<{ id: string; display_name: string | null }>).forEach(
+      (p) => { assigneeNameMap.set(p.id, p.display_name ?? '名前未設定') },
+    )
   }
 
   return (
@@ -257,6 +277,9 @@ export default async function PropertyTasksPage({ params, searchParams }: Props)
                       </span>
                       <span className="rounded-full bg-white px-2 py-1 text-slate-600">
                         案件: {item.case_id ? (caseTitleMap.get(item.case_id) ?? '未設定') : '物件直下'}
+                      </span>
+                      <span className="rounded-full bg-white px-2 py-1 text-slate-600">
+                        担当者: {item.assigned_to ? (assigneeNameMap.get(item.assigned_to) ?? '未設定') : '未設定'}
                       </span>
                     </div>
                   </div>
