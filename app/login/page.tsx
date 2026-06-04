@@ -189,6 +189,11 @@ export default function LoginPage() {
         <p className="mt-4 text-center text-xs text-gray-400">
           分譲マンション管理会社向け業務支援システム
         </p>
+        <p className="mt-2 text-center text-xs text-gray-400">
+          <a href="/privacy" className="hover:text-gray-600 underline">プライバシーポリシー</a>
+          <span className="mx-1">·</span>
+          <a href="/terms" className="hover:text-gray-600 underline">利用規約</a>
+        </p>
       </div>
     </div>
   )
