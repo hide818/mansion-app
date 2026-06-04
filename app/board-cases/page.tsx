@@ -342,6 +342,30 @@ export default async function BoardCasesPage({ searchParams }: PageProps) {
                       </p>
                     </div>
                   </div>
+
+                  <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-4">
+                    <span className="text-xs font-semibold text-slate-400">理事会フロー</span>
+                    <Link
+                      href={`/properties/${item.property_id}/cases/${item.id}/board-pack`}
+                      className="inline-flex h-8 items-center gap-1 rounded-lg border border-emerald-300 bg-emerald-50 px-3 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
+                    >
+                      ① AI準備
+                    </Link>
+                    <span className="text-slate-300">›</span>
+                    <Link
+                      href={`/properties/${item.property_id}/cases/${item.id}/ai-board-minutes-pro`}
+                      className="inline-flex h-8 items-center gap-1 rounded-lg border border-blue-300 bg-blue-50 px-3 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
+                    >
+                      ② 議事録作成
+                    </Link>
+                    <span className="text-slate-300">›</span>
+                    <Link
+                      href={`/properties/${item.property_id}/cases/${item.id}/board-minutes-records`}
+                      className="inline-flex h-8 items-center gap-1 rounded-lg border border-slate-300 bg-slate-50 px-3 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
+                    >
+                      ③ 保存議事録
+                    </Link>
+                  </div>
                 </div>
               )
             })}
