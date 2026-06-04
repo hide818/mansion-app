@@ -1,9 +1,14 @@
 import Link from 'next/link'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { getUserProfile } from '@/lib/getUserProfile'
+import { isValidUuid } from '@/lib/isValidUuid'
+import CaseFilterBar from '@/app/components/CaseFilterBar'
 
 type SearchParams = Promise<{
   sort?: string
+  filter?: string
+  assigneeId?: string
 }>
 
 type TaskRow = {
@@ -27,6 +32,13 @@ const SORT_OPTIONS = [
 ] as const
 
 type SortKey = (typeof SORT_OPTIONS)[number]['key']
+
+type FilterKey = 'mine' | 'all' | 'unassigned' | 'assignee'
+
+function normalizeFilter(value?: string): FilterKey {
+  if (value === 'all' || value === 'unassigned' || value === 'assignee') return value
+  return 'mine'
+}
 
 function formatDate(value: string | null) {
   if (!value) return '未設定'
@@ -117,15 +129,71 @@ export default async function TasksPage({
 }) {
   const params = await searchParams
   const sort = normalizeSort(params?.sort)
+  const filter = normalizeFilter(params?.filter)
+  const assigneeIdParam = params?.assigneeId ?? ''
 
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
+  const currentProfile = await getUserProfile()
 
-  const { data, error } = await supabase
+  // 全社プロフィール取得（フィルターバー用 + 担当者名解決用）
+  const { data: allProfilesData } = await supabase
+    .from('profiles')
+    .select('id, display_name, email')
+    .eq('company_id', companyId)
+    .order('display_name')
+
+  const allProfiles = (allProfilesData ?? []) as Array<{
+    id: string
+    display_name: string | null
+    email: string | null
+  }>
+
+  const profileNameMap = new Map<string, string>(
+    allProfiles.map((p) => [p.id, p.display_name || p.email || p.id]),
+  )
+
+  // assigneeId は同一会社プロフィールに存在する場合のみ有効
+  const validAssigneeId =
+    filter === 'assignee' && isValidUuid(assigneeIdParam) && profileNameMap.has(assigneeIdParam)
+      ? assigneeIdParam
+      : ''
+
+  // filter=assignee かつ validAssigneeId がない → mine にフォールバック
+  // all は明示した場合のみ全社表示
+  type EffectiveFilter = 'mine' | 'all' | 'unassigned' | 'assignee'
+  let effectiveFilter: EffectiveFilter
+  if (filter === 'all') {
+    effectiveFilter = 'all'
+  } else if (filter === 'unassigned') {
+    effectiveFilter = 'unassigned'
+  } else if (filter === 'assignee') {
+    effectiveFilter = validAssigneeId ? 'assignee' : 'mine'
+  } else {
+    effectiveFilter = 'mine'
+  }
+
+  let taskQuery = supabase
     .from('tasks')
     .select('id, title, status, priority, due_date, created_at, property_id, case_id, assigned_to')
     .eq('company_id', companyId)
     .neq('status', 'done')
+
+  if (effectiveFilter === 'mine') {
+    if (currentProfile?.id) {
+      taskQuery = taskQuery.eq('assigned_to', currentProfile.id)
+    } else {
+      // プロフィール取得不能時は全社表示にせず未設定のみ
+      taskQuery = taskQuery.is('assigned_to', null)
+    }
+  } else if (effectiveFilter === 'unassigned') {
+    taskQuery = taskQuery.is('assigned_to', null)
+  } else if (effectiveFilter === 'assignee') {
+    taskQuery = taskQuery.eq('assigned_to', validAssigneeId)
+  }
+  // effectiveFilter === 'all' のみ追加条件なし
+
+  const { data, error } = await taskQuery
 
   if (error) {
     return (
@@ -208,25 +276,6 @@ export default async function TasksPage({
     }
   }
 
-  const assignedToIds = Array.from(
-    new Set(
-      rawTasks
-        .map((item) => item.assigned_to)
-        .filter((v): v is string => typeof v === 'string' && v.length > 0),
-    ),
-  )
-  const assigneeNameMap = new Map<string, string>()
-  if (assignedToIds.length > 0) {
-    const { data: assigneeProfiles } = await supabase
-      .from('profiles')
-      .select('id, display_name')
-      .in('id', assignedToIds)
-      .eq('company_id', companyId)
-    ;((assigneeProfiles ?? []) as Array<{ id: string; display_name: string | null }>).forEach(
-      (p) => { assigneeNameMap.set(p.id, p.display_name ?? '名前未設定') },
-    )
-  }
-
   const tasks: TaskRow[] = sortTasks(
     rawTasks.map((item) => ({
       id: item.id,
@@ -244,6 +293,11 @@ export default async function TasksPage({
     sort,
   )
 
+  const filterBarProfiles = allProfiles.map((p) => ({
+    id: p.id,
+    displayName: p.display_name || p.email || p.id,
+  }))
+
   return (
     <div className="space-y-6 p-6">
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -252,21 +306,37 @@ export default async function TasksPage({
             <p className="text-sm font-semibold text-slate-500">案件・タスク管理</p>
             <h1 className="mt-1 text-3xl font-bold text-slate-900">タスク一覧</h1>
             <p className="mt-2 text-sm text-slate-600">
-              期限順・新しい順・古い順で並び替えできます。
+              担当者・並び順で絞り込みできます。
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
-            {SORT_OPTIONS.map((option) => (
-              <Link
-                key={option.key}
-                href={`/tasks?sort=${option.key}`}
-                className={sortButtonClass(sort === option.key)}
-              >
-                {option.label}
-              </Link>
-            ))}
+            {SORT_OPTIONS.map((option) => {
+              const sp = new URLSearchParams()
+              sp.set('sort', option.key)
+              sp.set('filter', effectiveFilter)
+              if (validAssigneeId) sp.set('assigneeId', validAssigneeId)
+              return (
+                <Link
+                  key={option.key}
+                  href={`/tasks?${sp.toString()}`}
+                  className={sortButtonClass(sort === option.key)}
+                >
+                  {option.label}
+                </Link>
+              )
+            })}
           </div>
+        </div>
+
+        <div className="mt-4 border-t border-slate-100 pt-4">
+          <CaseFilterBar
+            basePath="/tasks"
+            currentFilter={effectiveFilter}
+            currentAssigneeId={validAssigneeId}
+            currentSort={sort}
+            profiles={filterBarProfiles}
+          />
         </div>
       </section>
 
@@ -315,7 +385,7 @@ export default async function TasksPage({
                         案件: {item.case_title || '物件直下'}
                       </span>
                       <span className="rounded-full bg-white px-2 py-1 text-slate-600">
-                        担当者: {item.assigned_to ? (assigneeNameMap.get(item.assigned_to) ?? '未設定') : '未設定'}
+                        担当者: {item.assigned_to ? (profileNameMap.get(item.assigned_to) ?? '未設定') : '未設定'}
                       </span>
                     </div>
                   </div>
