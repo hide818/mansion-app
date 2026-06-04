@@ -56,6 +56,7 @@ type RawTaskRow = {
   due_at?: string | null
   limit_date?: string | null
   created_at?: string | null
+  assigned_to?: string | null
   [key: string]: unknown
 }
 
@@ -280,6 +281,10 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
     .order('display_name')
 
   const profiles = (profilesData ?? []) as ProfileOption[]
+
+  const profileNameMap = new Map<string, string>(
+    profiles.map((p) => [p.id, p.display_name || p.email || p.id]),
+  )
 
   const { data: property } = await supabase
     .from('properties')
@@ -643,6 +648,9 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
                       </span>
                       <span className="rounded-full bg-white px-2 py-1 text-slate-600">
                         期限: {formatDate(pickTaskDueDate(item))}
+                      </span>
+                      <span className="rounded-full bg-white px-2 py-1 text-slate-600">
+                        担当者: {item.assigned_to ? (profileNameMap.get(item.assigned_to) ?? '未設定') : '未設定'}
                       </span>
                     </div>
                   </div>
