@@ -2,9 +2,9 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
-import type { RiskSummaryResponse } from '@/app/api/manager/risk-summary/route'
+import { getRiskSummary, type AssigneeRisk } from '@/lib/managerRiskSummary'
 
-function RiskBadge({ level }: { level: 'critical' | 'warning' | 'ok' }) {
+function RiskBadge({ level }: { level: AssigneeRisk['riskLevel'] }) {
   if (level === 'critical') {
     return (
       <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">
@@ -49,59 +49,7 @@ export default async function ManagerPage() {
     )
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-
-  let summary: RiskSummaryResponse | null = null
-  try {
-    const res = await fetch(`${baseUrl}/api/manager/risk-summary`, {
-      headers: { Cookie: '' },
-      cache: 'no-store',
-    })
-    if (res.ok) {
-      summary = (await res.json()) as RiskSummaryResponse
-    }
-  } catch {
-    // フォールバック：直接DBを叩く
-  }
-
-  // APIが失敗した場合は直接DB取得
-  if (!summary) {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const todayStr = today.toISOString().split('T')[0]
-
-    const [{ count: overdueCount }, { count: staleCaseCount }, { count: complaintCount }] =
-      await Promise.all([
-        supabase
-          .from('tasks')
-          .select('*', { count: 'exact', head: true })
-          .eq('company_id', companyId)
-          .lt('due_date', todayStr)
-          .neq('status', 'done')
-          .neq('status', '完了'),
-        supabase
-          .from('cases')
-          .select('*', { count: 'exact', head: true })
-          .eq('company_id', companyId)
-          .neq('status', 'done')
-          .neq('status', '完了'),
-        supabase
-          .from('complaints')
-          .select('*', { count: 'exact', head: true })
-          .eq('company_id', companyId)
-          .not('status', 'in', '("解決","完了","対応完了","closed","done","completed")'),
-      ])
-
-    summary = {
-      overdueTaskTotal: overdueCount ?? 0,
-      staleCaseTotal: staleCaseCount ?? 0,
-      openComplaintTotal: complaintCount ?? 0,
-      handoverMissingCount: 0,
-      assigneeRisks: [],
-      staleCaseRanking: [],
-      handoverMissingProperties: [],
-    }
-  }
+  const summary = await getRiskSummary(companyId)
 
   const today = new Date()
   const dateLabel = new Intl.DateTimeFormat('ja-JP', {
@@ -142,45 +90,37 @@ export default async function ManagerPage() {
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Link
           href="/alerts/overdue-tasks"
-          className="group rounded-2xl border border-red-200 bg-red-50 p-5 shadow-sm transition hover:border-red-400 hover:shadow-md"
+          className="rounded-2xl border border-red-200 bg-red-50 p-5 shadow-sm transition hover:border-red-400 hover:shadow-md"
         >
           <p className="text-sm font-medium text-red-600">期限切れタスク</p>
-          <p className="mt-2 text-4xl font-bold text-red-700">
-            {summary.overdueTaskTotal}
-          </p>
+          <p className="mt-2 text-4xl font-bold text-red-700">{summary.overdueTaskTotal}</p>
           <p className="mt-2 text-xs text-red-500">期限を過ぎた未完了タスク</p>
         </Link>
 
         <Link
           href="/alerts/stale-cases"
-          className="group rounded-2xl border border-yellow-200 bg-yellow-50 p-5 shadow-sm transition hover:border-yellow-400 hover:shadow-md"
+          className="rounded-2xl border border-yellow-200 bg-yellow-50 p-5 shadow-sm transition hover:border-yellow-400 hover:shadow-md"
         >
           <p className="text-sm font-medium text-yellow-700">停滞案件</p>
-          <p className="mt-2 text-4xl font-bold text-yellow-800">
-            {summary.staleCaseTotal}
-          </p>
+          <p className="mt-2 text-4xl font-bold text-yellow-800">{summary.staleCaseTotal}</p>
           <p className="mt-2 text-xs text-yellow-600">14日以上更新なし</p>
         </Link>
 
         <Link
           href="/complaints"
-          className="group rounded-2xl border border-orange-200 bg-orange-50 p-5 shadow-sm transition hover:border-orange-400 hover:shadow-md"
+          className="rounded-2xl border border-orange-200 bg-orange-50 p-5 shadow-sm transition hover:border-orange-400 hover:shadow-md"
         >
           <p className="text-sm font-medium text-orange-600">未解決クレーム</p>
-          <p className="mt-2 text-4xl font-bold text-orange-700">
-            {summary.openComplaintTotal}
-          </p>
+          <p className="mt-2 text-4xl font-bold text-orange-700">{summary.openComplaintTotal}</p>
           <p className="mt-2 text-xs text-orange-500">対応完了していないクレーム</p>
         </Link>
 
         <Link
           href="/handover-documents/new"
-          className="group rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition hover:border-blue-400 hover:shadow-md"
+          className="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition hover:border-blue-400 hover:shadow-md"
         >
           <p className="text-sm font-medium text-blue-600">引き継ぎ未整備</p>
-          <p className="mt-2 text-4xl font-bold text-blue-700">
-            {summary.handoverMissingCount}
-          </p>
+          <p className="mt-2 text-4xl font-bold text-blue-700">{summary.handoverMissingCount}</p>
           <p className="mt-2 text-xs text-blue-500">引き継ぎ書が未作成の物件</p>
         </Link>
       </section>
@@ -207,45 +147,23 @@ export default async function ManagerPage() {
                     key={ar.assigneeId ?? '__unassigned__'}
                     className="border-b border-slate-100 last:border-0"
                   >
-                    <td className="py-3 pr-4 font-medium text-slate-900">
-                      {ar.assigneeName}
-                    </td>
+                    <td className="py-3 pr-4 font-medium text-slate-900">{ar.assigneeName}</td>
                     <td className="py-3 pr-4 text-right">
-                      <span
-                        className={
-                          ar.overdueTaskCount > 0
-                            ? 'font-bold text-red-600'
-                            : 'text-slate-400'
-                        }
-                      >
+                      <span className={ar.overdueTaskCount > 0 ? 'font-bold text-red-600' : 'text-slate-400'}>
                         {ar.overdueTaskCount}
                       </span>
                     </td>
                     <td className="py-3 pr-4 text-right">
-                      <span
-                        className={
-                          ar.staleCaseCount > 0
-                            ? 'font-bold text-yellow-700'
-                            : 'text-slate-400'
-                        }
-                      >
+                      <span className={ar.staleCaseCount > 0 ? 'font-bold text-yellow-700' : 'text-slate-400'}>
                         {ar.staleCaseCount}
                       </span>
                     </td>
                     <td className="py-3 pr-4 text-right">
-                      <span
-                        className={
-                          ar.openComplaintCount > 0
-                            ? 'font-bold text-orange-600'
-                            : 'text-slate-400'
-                        }
-                      >
+                      <span className={ar.openComplaintCount > 0 ? 'font-bold text-orange-600' : 'text-slate-400'}>
                         {ar.openComplaintCount}
                       </span>
                     </td>
-                    <td className="py-3 pr-4 text-right font-bold text-slate-900">
-                      {ar.total}
-                    </td>
+                    <td className="py-3 pr-4 text-right font-bold text-slate-900">{ar.total}</td>
                     <td className="py-3">
                       <RiskBadge level={ar.riskLevel} />
                     </td>
@@ -260,10 +178,8 @@ export default async function ManagerPage() {
       {/* 放置案件ランキング */}
       {summary.staleCaseRanking.length > 0 && (
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-xl font-bold text-slate-900">
-            放置案件ランキング
-            <span className="ml-2 text-sm font-normal text-slate-500">停滞日数順</span>
-          </h2>
+          <h2 className="mb-1 text-xl font-bold text-slate-900">放置案件ランキング</h2>
+          <p className="mb-4 text-xs text-slate-500">停滞日数が多い順（最大10件）</p>
           <div className="space-y-2">
             {summary.staleCaseRanking.map((item, i) => (
               <Link
@@ -272,7 +188,7 @@ export default async function ManagerPage() {
                 className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 transition hover:border-yellow-300 hover:bg-yellow-50"
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">
                     {i + 1}
                   </span>
                   <div>
@@ -283,7 +199,7 @@ export default async function ManagerPage() {
                     </p>
                   </div>
                 </div>
-                <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-800">
+                <span className="shrink-0 rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-800">
                   {item.staleDays}日停滞
                 </span>
               </Link>
@@ -296,9 +212,7 @@ export default async function ManagerPage() {
       {summary.handoverMissingProperties.length > 0 && (
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-slate-900">
-              引き継ぎ書 未作成の物件
-            </h2>
+            <h2 className="text-xl font-bold text-slate-900">引き継ぎ書 未作成の物件</h2>
             <Link
               href="/handover-documents/new"
               className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
@@ -314,14 +228,14 @@ export default async function ManagerPage() {
                 className="flex items-center justify-between rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800 transition hover:border-blue-300 hover:bg-blue-100"
               >
                 <span className="font-medium">{prop.name}</span>
-                <span className="text-xs text-blue-500">AI生成→</span>
+                <span className="text-xs text-blue-500">AI生成 →</span>
               </Link>
             ))}
           </div>
         </section>
       )}
 
-      {/* データなし時のメッセージ */}
+      {/* 問題なし */}
       {summary.overdueTaskTotal === 0 &&
         summary.staleCaseTotal === 0 &&
         summary.openComplaintTotal === 0 && (
