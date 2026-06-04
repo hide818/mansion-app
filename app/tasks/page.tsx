@@ -9,6 +9,7 @@ type SearchParams = Promise<{
   sort?: string
   filter?: string
   assigneeId?: string
+  statusFilter?: string
 }>
 
 type TaskRow = {
@@ -32,6 +33,19 @@ const SORT_OPTIONS = [
 ] as const
 
 type SortKey = (typeof SORT_OPTIONS)[number]['key']
+
+const STATUS_FILTER_OPTIONS = [
+  { key: 'active', label: '未完了' },
+  { key: 'done', label: '完了済み' },
+  { key: 'all', label: 'すべて' },
+] as const
+
+type StatusFilterKey = (typeof STATUS_FILTER_OPTIONS)[number]['key']
+
+function normalizeStatusFilter(value?: string): StatusFilterKey {
+  if (value === 'done' || value === 'all') return value
+  return 'active'
+}
 
 type FilterKey = 'mine' | 'all' | 'unassigned' | 'assignee'
 
@@ -131,6 +145,7 @@ export default async function TasksPage({
   const sort = normalizeSort(params?.sort)
   const filter = normalizeFilter(params?.filter)
   const assigneeIdParam = params?.assigneeId ?? ''
+  const statusFilter = normalizeStatusFilter(params?.statusFilter)
 
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
@@ -177,7 +192,13 @@ export default async function TasksPage({
     .from('tasks')
     .select('id, title, status, priority, due_date, created_at, property_id, case_id, assigned_to')
     .eq('company_id', companyId)
-    .neq('status', 'done')
+
+  if (statusFilter === 'active') {
+    taskQuery = taskQuery.neq('status', 'done')
+  } else if (statusFilter === 'done') {
+    taskQuery = taskQuery.eq('status', 'done')
+  }
+  // statusFilter === 'all': ステータス条件なし
 
   if (effectiveFilter === 'mine') {
     if (currentProfile?.id) {
@@ -306,7 +327,7 @@ export default async function TasksPage({
             <p className="text-sm font-semibold text-slate-500">案件・タスク管理</p>
             <h1 className="mt-1 text-3xl font-bold text-slate-900">タスク一覧</h1>
             <p className="mt-2 text-sm text-slate-600">
-              担当者・並び順で絞り込みできます。
+              担当者・ステータス・並び順で絞り込みできます。
             </p>
           </div>
 
@@ -316,6 +337,7 @@ export default async function TasksPage({
               sp.set('sort', option.key)
               sp.set('filter', effectiveFilter)
               if (validAssigneeId) sp.set('assigneeId', validAssigneeId)
+              sp.set('statusFilter', statusFilter)
               return (
                 <Link
                   key={option.key}
@@ -329,14 +351,34 @@ export default async function TasksPage({
           </div>
         </div>
 
-        <div className="mt-4 border-t border-slate-100 pt-4">
+        <div className="mt-4 border-t border-slate-100 pt-4 space-y-3">
           <CaseFilterBar
             basePath="/tasks"
             currentFilter={effectiveFilter}
             currentAssigneeId={validAssigneeId}
             currentSort={sort}
             profiles={filterBarProfiles}
+            extraParams={{ statusFilter }}
           />
+
+          <div className="flex flex-wrap gap-3">
+            {STATUS_FILTER_OPTIONS.map((option) => {
+              const sp = new URLSearchParams()
+              sp.set('statusFilter', option.key)
+              sp.set('sort', sort)
+              sp.set('filter', effectiveFilter)
+              if (validAssigneeId) sp.set('assigneeId', validAssigneeId)
+              return (
+                <Link
+                  key={option.key}
+                  href={`/tasks?${sp.toString()}`}
+                  className={sortButtonClass(statusFilter === option.key)}
+                >
+                  {option.label}
+                </Link>
+              )
+            })}
+          </div>
         </div>
       </section>
 

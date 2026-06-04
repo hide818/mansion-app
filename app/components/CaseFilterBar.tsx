@@ -11,6 +11,7 @@ type Props = {
   currentAssigneeId: string
   currentSort?: string
   profiles: Profile[]
+  extraParams?: Record<string, string>
 }
 
 const FILTERS = [
@@ -25,6 +26,7 @@ export default function CaseFilterBar({
   currentAssigneeId,
   currentSort,
   profiles,
+  extraParams,
 }: Props) {
   const router = useRouter()
 
@@ -33,6 +35,11 @@ export default function CaseFilterBar({
     params.set('filter', filter)
     if (assigneeId) params.set('assigneeId', assigneeId)
     if (currentSort) params.set('sort', currentSort)
+    if (extraParams) {
+      for (const [k, v] of Object.entries(extraParams)) {
+        params.set(k, v)
+      }
+    }
     return `${basePath}?${params.toString()}`
   }
 
