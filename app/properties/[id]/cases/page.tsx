@@ -2,6 +2,9 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { getUserProfile } from '@/lib/getUserProfile'
+import { isValidUuid } from '@/lib/isValidUuid'
+import CaseFilterBar from '@/app/components/CaseFilterBar'
 
 type Props = {
   params: Promise<{
@@ -9,7 +12,16 @@ type Props = {
   }>
   searchParams?: Promise<{
     created?: string
+    filter?: string
+    assigneeId?: string
   }>
+}
+
+type EffectiveFilter = 'mine' | 'all' | 'unassigned' | 'assignee'
+
+function normalizeFilter(value?: string): EffectiveFilter {
+  if (value === 'all' || value === 'unassigned' || value === 'assignee') return value
+  return 'mine'
 }
 
 type RawCaseRow = {
@@ -67,9 +79,12 @@ export default async function PropertyCasesPage({ params, searchParams }: Props)
   const { id } = await params
   const resolvedSearchParams = searchParams ? await searchParams : {}
   const created = resolvedSearchParams?.created === '1'
+  const filter = normalizeFilter(resolvedSearchParams?.filter)
+  const assigneeIdParam = resolvedSearchParams?.assigneeId ?? ''
 
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
+  const currentProfile = await getUserProfile()
 
   const { data: property } = await supabase
     .from('properties')
@@ -82,11 +97,58 @@ export default async function PropertyCasesPage({ params, searchParams }: Props)
     return notFound()
   }
 
-  const { data, error } = await supabase
-    .from('cases')
-    .select('*')
-    .eq('property_id', id)
+  // 全社プロフィール取得（フィルターバー用 + 担当者名解決用）
+  const { data: allProfilesData } = await supabase
+    .from('profiles')
+    .select('id, display_name, email')
     .eq('company_id', companyId)
+    .order('display_name')
+
+  const allProfiles = (allProfilesData ?? []) as Array<{
+    id: string
+    display_name: string | null
+    email: string | null
+  }>
+
+  const profileNameMap = new Map<string, string>(
+    allProfiles.map((p) => [p.id, p.display_name || p.email || p.id]),
+  )
+
+  // assigneeId は同一会社プロフィールに存在する場合のみ有効
+  const validAssigneeId =
+    filter === 'assignee' && isValidUuid(assigneeIdParam) && profileNameMap.has(assigneeIdParam)
+      ? assigneeIdParam
+      : ''
+
+  // 実際に適用するフィルターを決定
+  let effectiveFilter: EffectiveFilter
+  if (filter === 'all') {
+    effectiveFilter = 'all'
+  } else if (filter === 'unassigned') {
+    effectiveFilter = 'unassigned'
+  } else if (filter === 'assignee') {
+    effectiveFilter = validAssigneeId ? 'assignee' : 'mine'
+  } else {
+    effectiveFilter = 'mine'
+  }
+
+  // Supabase クエリにフィルター適用
+  let query = supabase.from('cases').select('*').eq('property_id', id).eq('company_id', companyId)
+
+  if (effectiveFilter === 'mine') {
+    if (currentProfile?.id) {
+      query = query.eq('assigned_to', currentProfile.id)
+    } else {
+      query = query.is('assigned_to', null)
+    }
+  } else if (effectiveFilter === 'unassigned') {
+    query = query.is('assigned_to', null)
+  } else if (effectiveFilter === 'assignee') {
+    query = query.eq('assigned_to', validAssigneeId)
+  }
+  // effectiveFilter === 'all' のみ追加条件なし
+
+  const { data, error } = await query
 
   if (error) {
     return (
@@ -105,27 +167,10 @@ export default async function PropertyCasesPage({ params, searchParams }: Props)
       typeof item.id === 'string' && item.id.length > 0,
   )
 
-  const assignedToIds = Array.from(
-    new Set(
-      cases
-        .map((item) => item.assigned_to)
-        .filter((v): v is string => typeof v === 'string' && v.length > 0),
-    ),
-  )
-
-  const assigneeNameMap = new Map<string, string>()
-
-  if (assignedToIds.length > 0) {
-    const { data: profilesData } = await supabase
-      .from('profiles')
-      .select('id, display_name, email')
-      .eq('company_id', companyId)
-      .in('id', assignedToIds)
-
-    for (const p of (profilesData ?? []) as Array<{ id: string; display_name: string | null; email: string | null }>) {
-      assigneeNameMap.set(p.id, p.display_name || p.email || p.id)
-    }
-  }
+  const filterBarProfiles = allProfiles.map((p) => ({
+    id: p.id,
+    displayName: p.display_name || p.email || p.id,
+  }))
 
   return (
     <div className="space-y-6 p-6">
@@ -137,7 +182,7 @@ export default async function PropertyCasesPage({ params, searchParams }: Props)
               {property.name || '物件'} の案件一覧
             </h1>
             <p className="mt-2 text-sm text-slate-600">
-              この物件に紐づく案件を確認できます。
+              担当者で絞り込みできます。
             </p>
           </div>
 
@@ -156,6 +201,15 @@ export default async function PropertyCasesPage({ params, searchParams }: Props)
               案件を追加
             </Link>
           </div>
+        </div>
+
+        <div className="mt-4 border-t border-slate-100 pt-4">
+          <CaseFilterBar
+            basePath={`/properties/${id}/cases`}
+            currentFilter={effectiveFilter}
+            currentAssigneeId={validAssigneeId}
+            profiles={filterBarProfiles}
+          />
         </div>
       </section>
 
@@ -201,7 +255,7 @@ export default async function PropertyCasesPage({ params, searchParams }: Props)
                         期限: {formatDate(pickDueDate(item))}
                       </span>
                       <span className="rounded-full bg-white px-2 py-1 text-slate-600">
-                        担当者: {item.assigned_to ? (assigneeNameMap.get(item.assigned_to) ?? '未設定') : '未設定'}
+                        担当者: {item.assigned_to ? (profileNameMap.get(item.assigned_to) ?? '未設定') : '未設定'}
                       </span>
                       <span className="rounded-full bg-white px-2 py-1 text-slate-600">
                         登録日: {formatDate(item.created_at ?? null)}

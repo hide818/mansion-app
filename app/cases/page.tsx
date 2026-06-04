@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { getUserProfile } from '@/lib/getUserProfile'
+import { isValidUuid } from '@/lib/isValidUuid'
+import CaseFilterBar from '@/app/components/CaseFilterBar'
 import {
   formatDate,
   getStatusLabel,
@@ -12,7 +15,16 @@ import {
 
 type SearchParams = Promise<{
   sort?: string
+  filter?: string
+  assigneeId?: string
 }>
+
+type FilterKey = 'mine' | 'all' | 'unassigned' | 'assignee'
+
+function normalizeFilter(value?: string): FilterKey {
+  if (value === 'all' || value === 'unassigned' || value === 'assignee') return value
+  return 'mine'
+}
 
 type RawCaseRow = {
   id?: string
@@ -113,14 +125,69 @@ export default async function CasesPage({
 }) {
   const params = await searchParams
   const sort = normalizeSort(params?.sort)
+  const filter = normalizeFilter(params?.filter)
+  const assigneeIdParam = params?.assigneeId ?? ''
 
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
+  const currentProfile = await getUserProfile()
 
-  const { data, error } = await supabase
-    .from('cases')
-    .select('*')
+  // 全社プロフィール取得（フィルターバー用 + 担当者名解決用）
+  const { data: allProfilesData } = await supabase
+    .from('profiles')
+    .select('id, display_name, email')
     .eq('company_id', companyId)
+    .order('display_name')
+
+  const allProfiles = (allProfilesData ?? []) as Array<{
+    id: string
+    display_name: string | null
+    email: string | null
+  }>
+
+  const profileNameMap = new Map<string, string>(
+    allProfiles.map((p) => [p.id, p.display_name || p.email || p.id]),
+  )
+
+  // assigneeId は同一会社プロフィールに存在する場合のみ有効
+  const validAssigneeId =
+    filter === 'assignee' && isValidUuid(assigneeIdParam) && profileNameMap.has(assigneeIdParam)
+      ? assigneeIdParam
+      : ''
+
+  // 実際に適用するフィルターを決定
+  // - filter=assignee かつ validAssigneeId がない → mine にフォールバック
+  // - all は明示した場合のみ全社表示
+  type EffectiveFilter = 'mine' | 'all' | 'unassigned' | 'assignee'
+  let effectiveFilter: EffectiveFilter
+  if (filter === 'all') {
+    effectiveFilter = 'all'
+  } else if (filter === 'unassigned') {
+    effectiveFilter = 'unassigned'
+  } else if (filter === 'assignee') {
+    effectiveFilter = validAssigneeId ? 'assignee' : 'mine'
+  } else {
+    effectiveFilter = 'mine'
+  }
+
+  // Supabase クエリにフィルター適用
+  let query = supabase.from('cases').select('*').eq('company_id', companyId)
+
+  if (effectiveFilter === 'mine') {
+    if (currentProfile?.id) {
+      query = query.eq('assigned_to', currentProfile.id)
+    } else {
+      // プロフィール取得不能時は全社表示にせず未設定のみ
+      query = query.is('assigned_to', null)
+    }
+  } else if (effectiveFilter === 'unassigned') {
+    query = query.is('assigned_to', null)
+  } else if (effectiveFilter === 'assignee') {
+    query = query.eq('assigned_to', validAssigneeId)
+  }
+  // effectiveFilter === 'all' のみ追加条件なし
+
+  const { data, error } = await query
 
   if (error) {
     return (
@@ -155,35 +222,8 @@ export default async function CasesPage({
       .eq('company_id', companyId)
       .in('id', propertyIds)
 
-    const properties = (propertiesData ?? []) as Array<{
-      id: string
-      name: string | null
-    }>
-
-    for (const property of properties) {
+    for (const property of (propertiesData ?? []) as Array<{ id: string; name: string | null }>) {
       propertyNameMap.set(property.id, property.name)
-    }
-  }
-
-  const assignedToIds = Array.from(
-    new Set(
-      rawCases
-        .map((item) => item.assigned_to)
-        .filter((v): v is string => typeof v === 'string' && v.length > 0),
-    ),
-  )
-
-  const assigneeNameMap = new Map<string, string>()
-
-  if (assignedToIds.length > 0) {
-    const { data: profilesData } = await supabase
-      .from('profiles')
-      .select('id, display_name, email')
-      .eq('company_id', companyId)
-      .in('id', assignedToIds)
-
-    for (const p of (profilesData ?? []) as Array<{ id: string; display_name: string | null; email: string | null }>) {
-      assigneeNameMap.set(p.id, p.display_name || p.email || p.id)
     }
   }
 
@@ -196,10 +236,15 @@ export default async function CasesPage({
       createdAt: item.created_at ?? null,
       propertyId: item.property_id ?? null,
       propertyName: item.property_id ? (propertyNameMap.get(item.property_id) ?? null) : null,
-      assignedName: item.assigned_to ? (assigneeNameMap.get(item.assigned_to) ?? null) : null,
+      assignedName: item.assigned_to ? (profileNameMap.get(item.assigned_to) ?? null) : null,
     })),
     sort,
   )
+
+  const filterBarProfiles = allProfiles.map((p) => ({
+    id: p.id,
+    displayName: p.display_name || p.email || p.id,
+  }))
 
   return (
     <div className="space-y-6 p-6">
@@ -209,21 +254,37 @@ export default async function CasesPage({
             <p className="text-sm font-semibold text-slate-500">案件・タスク管理</p>
             <h1 className="mt-1 text-3xl font-bold text-slate-900">案件一覧</h1>
             <p className="mt-2 text-sm text-slate-600">
-              期限順・新しい順・古い順で並び替えできます。
+              担当者・並び順で絞り込みできます。
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
-            {SORT_OPTIONS.map((option) => (
-              <Link
-                key={option.key}
-                href={`/cases?sort=${option.key}`}
-                className={sortButtonClass(sort === option.key)}
-              >
-                {option.label}
-              </Link>
-            ))}
+            {SORT_OPTIONS.map((option) => {
+              const sp = new URLSearchParams()
+              sp.set('sort', option.key)
+              sp.set('filter', effectiveFilter)
+              if (validAssigneeId) sp.set('assigneeId', validAssigneeId)
+              return (
+                <Link
+                  key={option.key}
+                  href={`/cases?${sp.toString()}`}
+                  className={sortButtonClass(sort === option.key)}
+                >
+                  {option.label}
+                </Link>
+              )
+            })}
           </div>
+        </div>
+
+        <div className="mt-4 border-t border-slate-100 pt-4">
+          <CaseFilterBar
+            basePath="/cases"
+            currentFilter={effectiveFilter}
+            currentAssigneeId={validAssigneeId}
+            currentSort={sort}
+            profiles={filterBarProfiles}
+          />
         </div>
       </section>
 
