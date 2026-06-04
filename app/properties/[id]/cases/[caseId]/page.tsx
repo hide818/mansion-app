@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { getUserProfile } from '@/lib/getUserProfile'
 import { isValidUuid } from '@/lib/isValidUuid'
+import { canEdit } from '@/lib/permissions'
 
 type Props = {
   params: Promise<{
@@ -191,6 +192,9 @@ async function updateCaseAction(formData: FormData) {
   }
 
   const currentProfile = await getUserProfile()
+  if (!currentProfile || !canEdit(currentProfile.role)) {
+    redirect(`/properties/${propertyId}/cases?error=${encodeURIComponent('権限がありません')}`)
+  }
   const canViewAll =
     currentProfile?.role === 'admin' || currentProfile?.can_view_all_data === true
 
@@ -259,6 +263,9 @@ async function deleteCaseAction(formData: FormData) {
   const caseId = String(formData.get('case_id') ?? '')
 
   const currentProfile = await getUserProfile()
+  if (!currentProfile || !canEdit(currentProfile.role)) {
+    redirect(`/properties/${propertyId}/cases?error=${encodeURIComponent('権限がありません')}`)
+  }
   const canViewAll =
     currentProfile?.role === 'admin' || currentProfile?.can_view_all_data === true
 
