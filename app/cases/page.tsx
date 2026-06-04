@@ -25,6 +25,7 @@ type RawCaseRow = {
   limit_date?: string | null
   created_at?: string | null
   property_id?: string | null
+  assigned_to?: string | null
 }
 
 type CaseRow = {
@@ -35,6 +36,7 @@ type CaseRow = {
   createdAt: string | null
   propertyId: string | null
   propertyName: string | null
+  assignedName: string | null
 }
 
 const SORT_OPTIONS = [
@@ -163,6 +165,28 @@ export default async function CasesPage({
     }
   }
 
+  const assignedToIds = Array.from(
+    new Set(
+      rawCases
+        .map((item) => item.assigned_to)
+        .filter((v): v is string => typeof v === 'string' && v.length > 0),
+    ),
+  )
+
+  const assigneeNameMap = new Map<string, string>()
+
+  if (assignedToIds.length > 0) {
+    const { data: profilesData } = await supabase
+      .from('profiles')
+      .select('id, display_name, email')
+      .eq('company_id', companyId)
+      .in('id', assignedToIds)
+
+    for (const p of (profilesData ?? []) as Array<{ id: string; display_name: string | null; email: string | null }>) {
+      assigneeNameMap.set(p.id, p.display_name || p.email || p.id)
+    }
+  }
+
   const cases: CaseRow[] = sortCases(
     rawCases.map((item) => ({
       id: item.id,
@@ -172,6 +196,7 @@ export default async function CasesPage({
       createdAt: item.created_at ?? null,
       propertyId: item.property_id ?? null,
       propertyName: item.property_id ? (propertyNameMap.get(item.property_id) ?? null) : null,
+      assignedName: item.assigned_to ? (assigneeNameMap.get(item.assigned_to) ?? null) : null,
     })),
     sort,
   )
@@ -236,6 +261,9 @@ export default async function CasesPage({
                         </span>
                         <span className={getDueBadgeClass(dueLevel)}>
                           期限: {formatDate(item.dueDate)}
+                        </span>
+                        <span className="rounded-full bg-white px-2 py-1 text-slate-600">
+                          担当者: {item.assignedName || '未設定'}
                         </span>
                         <span className="rounded-full bg-white px-2 py-1 text-slate-600">
                           登録日: {formatDate(item.createdAt)}

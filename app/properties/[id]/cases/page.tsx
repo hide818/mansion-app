@@ -22,6 +22,7 @@ type RawCaseRow = {
   due_at?: string | null
   limit_date?: string | null
   created_at?: string | null
+  assigned_to?: string | null
 }
 
 function formatDate(value: string | null) {
@@ -104,6 +105,28 @@ export default async function PropertyCasesPage({ params, searchParams }: Props)
       typeof item.id === 'string' && item.id.length > 0,
   )
 
+  const assignedToIds = Array.from(
+    new Set(
+      cases
+        .map((item) => item.assigned_to)
+        .filter((v): v is string => typeof v === 'string' && v.length > 0),
+    ),
+  )
+
+  const assigneeNameMap = new Map<string, string>()
+
+  if (assignedToIds.length > 0) {
+    const { data: profilesData } = await supabase
+      .from('profiles')
+      .select('id, display_name, email')
+      .eq('company_id', companyId)
+      .in('id', assignedToIds)
+
+    for (const p of (profilesData ?? []) as Array<{ id: string; display_name: string | null; email: string | null }>) {
+      assigneeNameMap.set(p.id, p.display_name || p.email || p.id)
+    }
+  }
+
   return (
     <div className="space-y-6 p-6">
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -176,6 +199,9 @@ export default async function PropertyCasesPage({ params, searchParams }: Props)
                       </span>
                       <span className="rounded-full bg-white px-2 py-1 text-slate-600">
                         期限: {formatDate(pickDueDate(item))}
+                      </span>
+                      <span className="rounded-full bg-white px-2 py-1 text-slate-600">
+                        担当者: {item.assigned_to ? (assigneeNameMap.get(item.assigned_to) ?? '未設定') : '未設定'}
                       </span>
                       <span className="rounded-full bg-white px-2 py-1 text-slate-600">
                         登録日: {formatDate(item.created_at ?? null)}

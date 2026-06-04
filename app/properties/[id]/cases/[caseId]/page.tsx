@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { getUserProfile } from '@/lib/getUserProfile'
 import { isValidUuid } from '@/lib/isValidUuid'
 
 type Props = {
@@ -35,7 +36,14 @@ type RawCaseRow = {
   description?: string | null
   content?: string | null
   source_minutes_record_id?: string | null
+  assigned_to?: string | null
   [key: string]: unknown
+}
+
+type ProfileOption = {
+  id: string
+  display_name: string | null
+  email: string | null
 }
 
 type RawTaskRow = {
@@ -163,6 +171,7 @@ async function updateCaseAction(formData: FormData) {
   const status = String(formData.get('status') ?? 'todo')
   const dueDate = String(formData.get('due_date') ?? '').trim()
   const dueField = String(formData.get('due_field') ?? '').trim()
+  const assignedToCandidate = String(formData.get('assigned_to') ?? '').trim()
 
   if (!isValidUuid(propertyId)) {
     redirect('/properties')
@@ -180,9 +189,21 @@ async function updateCaseAction(formData: FormData) {
     )
   }
 
+  let assignedTo: string | null = null
+  if (assignedToCandidate && isValidUuid(assignedToCandidate)) {
+    const { data: assigneeProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', assignedToCandidate)
+      .eq('company_id', companyId)
+      .maybeSingle()
+    if (assigneeProfile) assignedTo = assignedToCandidate
+  }
+
   const payload: Record<string, string | null> = {
     status,
     [dueField]: dueDate || null,
+    assigned_to: assignedTo,
   }
 
   const { error } = await supabase
@@ -250,6 +271,15 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
 
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
+  const currentProfile = await getUserProfile()
+
+  const { data: profilesData } = await supabase
+    .from('profiles')
+    .select('id, display_name, email')
+    .eq('company_id', companyId)
+    .order('display_name')
+
+  const profiles = (profilesData ?? []) as ProfileOption[]
 
   const { data: property } = await supabase
     .from('properties')
@@ -335,6 +365,14 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
   const caseDueDate = pickCaseDueDate(targetCase)
   const caseDescription = pickCaseDescription(targetCase)
   const detectedDueField = detectCaseDateField(targetCase)
+
+  const assignedToId = typeof targetCase.assigned_to === 'string' ? targetCase.assigned_to : null
+  const assignedProfile = assignedToId
+    ? profiles.find((p) => p.id === assignedToId) ?? null
+    : null
+  const assignedName = assignedProfile
+    ? (assignedProfile.display_name || assignedProfile.email || '未設定')
+    : '未設定'
 
   return (
     <div className="space-y-6 p-6">
@@ -447,7 +485,7 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
         </section>
       ) : null}
 
-      <section className="grid gap-4 md:grid-cols-4">
+      <section className="grid gap-4 md:grid-cols-5">
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">状況</p>
           <p className="mt-2 text-2xl font-bold text-slate-900">
@@ -459,6 +497,13 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
           <p className="text-sm text-slate-500">期限</p>
           <p className="mt-2 text-2xl font-bold text-slate-900">
             {formatDate(caseDueDate)}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-sm text-slate-500">担当者</p>
+          <p className="mt-2 text-2xl font-bold text-slate-900">
+            {assignedName}
           </p>
         </div>
 
@@ -532,6 +577,24 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
                 defaultValue={toDateInputValue(caseDueDate)}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
               />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700">
+                担当者
+              </label>
+              <select
+                name="assigned_to"
+                defaultValue={assignedToId ?? ''}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+              >
+                <option value="">未設定</option>
+                {profiles.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.display_name || p.email || p.id}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="flex flex-wrap gap-3">

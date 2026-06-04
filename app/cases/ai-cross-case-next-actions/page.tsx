@@ -8,7 +8,8 @@ type CaseRow = {
   id: string
   title: string | null
   status: string | null
-  assignee: string | null
+  assigned_to: string | null
+  assignedName: string | null
   board_status: string | null
   board_scheduled_for: string | null
 }
@@ -40,9 +41,9 @@ export default async function AiCrossCaseNextActionsPage() {
 
   const supabase = await createSupabaseServerClient()
 
-  const { data: cases } = await supabase
+  const { data: casesData } = await supabase
     .from('cases')
-    .select('id, title, status, assignee, board_status, board_scheduled_for')
+    .select('id, title, status, assigned_to, board_status, board_scheduled_for')
     .eq('company_id', companyId)
     .order('created_at', { ascending: false })
     .limit(20)
@@ -54,7 +55,35 @@ export default async function AiCrossCaseNextActionsPage() {
     .order('created_at', { ascending: false })
     .limit(30)
 
-  const safeCases = (cases ?? []) as CaseRow[]
+  const rawCases = (casesData ?? []) as Array<Omit<CaseRow, 'assignedName'>>
+
+  const assignedToIds = Array.from(
+    new Set(
+      rawCases
+        .map((c) => c.assigned_to)
+        .filter((v): v is string => typeof v === 'string' && v.length > 0),
+    ),
+  )
+
+  const assigneeNameMap = new Map<string, string>()
+
+  if (assignedToIds.length > 0) {
+    const { data: profilesData } = await supabase
+      .from('profiles')
+      .select('id, display_name, email')
+      .eq('company_id', companyId)
+      .in('id', assignedToIds)
+
+    for (const p of (profilesData ?? []) as Array<{ id: string; display_name: string | null; email: string | null }>) {
+      assigneeNameMap.set(p.id, p.display_name || p.email || p.id)
+    }
+  }
+
+  const safeCases: CaseRow[] = rawCases.map((c) => ({
+    ...c,
+    assignedName: c.assigned_to ? (assigneeNameMap.get(c.assigned_to) ?? null) : null,
+  }))
+
   const safeTasks = (tasks ?? []) as TaskRow[]
 
   const contextText = `【AIへ渡す案件横断の判断材料】
@@ -65,7 +94,7 @@ ${
     : safeCases
         .map(
           (item) =>
-            `・案件名:${item.title ?? '案件名未設定'} / 状況:${item.status ?? '未設定'} / 担当:${item.assignee ?? '未設定'} / 理事会:${item.board_status ?? '未設定'} / 上程予定:${formatDate(item.board_scheduled_for)}`
+            `・案件名:${item.title ?? '案件名未設定'} / 状況:${item.status ?? '未設定'} / 担当:${item.assignedName ?? '未設定'} / 理事会:${item.board_status ?? '未設定'} / 上程予定:${formatDate(item.board_scheduled_for)}`
         )
         .join('\n')
 }

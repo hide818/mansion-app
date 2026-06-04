@@ -7,7 +7,7 @@ type CaseRow = {
   id: string
   title: string | null
   status: string | null
-  assignee: string | null
+  assignedName: string | null
   property_id: string | null
   created_at: string
 }
@@ -24,7 +24,7 @@ export default function CasesBoard({ initialCases }: Props) {
     return initialCases.filter((item) => {
       const matchesSearch =
         (item.title ?? '').toLowerCase().includes(search.toLowerCase()) ||
-        (item.assignee ?? '').toLowerCase().includes(search.toLowerCase())
+        (item.assignedName ?? '').toLowerCase().includes(search.toLowerCase())
 
       const matchesStatus =
         statusFilter === 'all' ? true : (item.status ?? '') === statusFilter
@@ -97,7 +97,7 @@ export default function CasesBoard({ initialCases }: Props) {
             </div>
 
             <p className="text-gray-600 mt-3">
-              担当者：{item.assignee ?? '未設定'}
+              担当者：{item.assignedName ?? '未設定'}
             </p>
 
             <p className="text-sm text-gray-400 mt-3 break-all">

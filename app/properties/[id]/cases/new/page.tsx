@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { getUserProfile } from '@/lib/getUserProfile'
 import { isValidUuid } from '@/lib/isValidUuid'
 
 type Props = {
@@ -11,6 +12,12 @@ type Props = {
   searchParams?: Promise<{
     error?: string
   }>
+}
+
+type ProfileOption = {
+  id: string
+  display_name: string | null
+  email: string | null
 }
 
 async function createCaseAction(formData: FormData) {
@@ -23,6 +30,7 @@ async function createCaseAction(formData: FormData) {
   const title = String(formData.get('title') ?? '').trim()
   const status = String(formData.get('status') ?? 'todo')
   const dueDate = String(formData.get('due_date') ?? '').trim()
+  const assignedToCandidate = String(formData.get('assigned_to') ?? '').trim()
 
   if (!isValidUuid(propertyId)) {
     redirect('/properties')
@@ -32,11 +40,23 @@ async function createCaseAction(formData: FormData) {
     redirect(`/properties/${propertyId}/cases/new?error=必須項目が不足しています`)
   }
 
+  let assignedTo: string | null = null
+  if (assignedToCandidate && isValidUuid(assignedToCandidate)) {
+    const { data: assigneeProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', assignedToCandidate)
+      .eq('company_id', companyId)
+      .maybeSingle()
+    if (assigneeProfile) assignedTo = assignedToCandidate
+  }
+
   const basePayload = {
     company_id: companyId,
     property_id: propertyId,
     title,
     status,
+    assigned_to: assignedTo,
   }
 
   let insertErrorMessage = ''
@@ -90,6 +110,18 @@ export default async function NewCasePage({ params, searchParams }: Props) {
   const errorMessage = resolvedSearchParams?.error
     ? decodeURIComponent(resolvedSearchParams.error)
     : ''
+
+  const supabase = await createSupabaseServerClient()
+  const companyId = await getUserCompanyId()
+  const currentProfile = await getUserProfile()
+
+  const { data: profilesData } = await supabase
+    .from('profiles')
+    .select('id, display_name, email')
+    .eq('company_id', companyId)
+    .order('display_name')
+
+  const profiles = (profilesData ?? []) as ProfileOption[]
 
   return (
     <div className="space-y-6 p-6">
@@ -160,6 +192,24 @@ export default async function NewCasePage({ params, searchParams }: Props) {
               name="due_date"
               className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
             />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              担当者
+            </label>
+            <select
+              name="assigned_to"
+              defaultValue={currentProfile?.id ?? ''}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+            >
+              <option value="">未設定</option>
+              {profiles.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.display_name || p.email || p.id}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="flex flex-wrap gap-3 pt-2">
