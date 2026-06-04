@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
 import { NextRequest, NextResponse } from 'next/server'
+import { createSupabaseServerClient } from '@/lib/supabaseServer'
 
 export const runtime = 'nodejs'
 
@@ -224,6 +225,12 @@ ${params.transcript}
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: '認証が必要です。' }, { status: 401 })
+    }
+
     const body = (await request.json()) as {
       meetingType?: string
       transcript?: string

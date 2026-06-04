@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
 import { NextRequest, NextResponse } from 'next/server'
+import { createSupabaseServerClient } from '@/lib/supabaseServer'
 
 export const runtime = 'nodejs'
 
@@ -11,6 +12,12 @@ const openai = process.env.OPENAI_API_KEY
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: '認証が必要です。' }, { status: 401 })
+    }
+
     if (!openai) {
       return NextResponse.json(
         { error: 'OPENAI_API_KEY が未設定です。' },

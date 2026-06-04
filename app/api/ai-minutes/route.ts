@@ -7,6 +7,7 @@ import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
+import { createSupabaseServerClient } from '@/lib/supabaseServer'
 
 export const runtime = 'nodejs'
 
@@ -436,6 +437,12 @@ export async function POST(request: Request) {
   const chunkDir = path.join(workDir, 'chunks')
 
   try {
+    const supabase = await createSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: '認証が必要です。' }, { status: 401 })
+    }
+
     const formData = await request.formData()
 
     const meetingTypeRaw = String(formData.get('meetingType') ?? '').trim()
