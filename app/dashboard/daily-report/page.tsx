@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import CopyReportButton from './CopyReportButton'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
+import { getUserCompanyId } from '@/lib/getUserCompanyId'
 
 type AnyRow = Record<string, unknown>
 
@@ -256,11 +258,31 @@ function buildDailyReport(params: {
 export default async function DailyReportPage() {
   const supabase = await createSupabaseServerClient()
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  const companyId = await getUserCompanyId()
+
+  if (!companyId) {
+    return (
+      <div className="p-6">
+        <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+          所属会社が設定されていません。
+        </div>
+      </div>
+    )
+  }
+
   const [casesRes, tasksRes, complaintsRes, logsRes] = await Promise.all([
-    supabase.from('cases').select('*').limit(100),
-    supabase.from('tasks').select('*').limit(100),
-    supabase.from('complaints').select('*').limit(100),
-    supabase.from('logs').select('*').limit(100),
+    supabase.from('cases').select('*').eq('company_id', companyId).limit(100),
+    supabase.from('tasks').select('*').eq('company_id', companyId).limit(100),
+    supabase.from('complaints').select('*').eq('company_id', companyId).limit(100),
+    supabase.from('logs').select('*').eq('company_id', companyId).limit(100),
   ])
 
   const cases = toArray(casesRes.data) as AnyRow[]

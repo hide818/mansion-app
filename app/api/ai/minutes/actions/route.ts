@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
+import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { isValidUuid } from '@/lib/isValidUuid'
 
 export const runtime = 'nodejs'
@@ -45,6 +46,21 @@ async function tryInsertSequentially(
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient()
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json({ error: '認証が必要です。' }, { status: 401 })
+    }
+
+    const companyId = await getUserCompanyId()
+
+    if (!companyId) {
+      return NextResponse.json({ error: '会社情報が取得できません。' }, { status: 403 })
+    }
+
     const body = (await request.json()) as {
       targetType?: 'task' | 'case'
       propertyId?: string
@@ -60,37 +76,27 @@ export async function POST(request: NextRequest) {
     const items = Array.isArray(body.items) ? body.items : []
 
     if (!propertyId) {
-      return NextResponse.json(
-        { error: 'propertyId が不足しています。' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'propertyId が不足しています。' }, { status: 400 })
     }
 
     if (!isValidUuid(propertyId)) {
-      return NextResponse.json(
-        { error: 'propertyId の形式が不正です。' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'propertyId の形式が不正です。' }, { status: 400 })
     }
 
+    // company_id で物件の所有権を確認
     const { data: property, error: propertyError } = await supabase
       .from('properties')
       .select('id')
       .eq('id', propertyId)
+      .eq('company_id', companyId)
       .maybeSingle()
 
     if (propertyError || !property) {
-      return NextResponse.json(
-        { error: '対象の物件が見つかりません。' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: '対象の物件が見つかりません。' }, { status: 404 })
     }
 
     if (items.length === 0) {
-      return NextResponse.json(
-        { error: '追加対象がありません。' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: '追加対象がありません。' }, { status: 400 })
     }
 
     let createdCount = 0
@@ -103,6 +109,7 @@ export async function POST(request: NextRequest) {
       if (targetType === 'task') {
         await tryInsertSequentially(supabase, 'tasks', [
           {
+            company_id: companyId,
             property_id: propertyId,
             case_id: caseId || null,
             title,
@@ -111,68 +118,43 @@ export async function POST(request: NextRequest) {
             memo: `${sourceLabel}\n${detail}`.trim(),
           },
           {
-            property_id: propertyId,
-            case_id: caseId || null,
-            title,
-            status: '未完了',
-            memo: `${sourceLabel}\n${detail}`.trim(),
-          },
-          {
+            company_id: companyId,
             property_id: propertyId,
             case_id: caseId || null,
             title,
             status: '未完了',
           },
           {
-            property_id: propertyId,
-            title,
-            status: '未完了',
-            memo: `${sourceLabel}\n${detail}`.trim(),
-          },
-          {
+            company_id: companyId,
             property_id: propertyId,
             title,
             status: '未完了',
           },
           {
+            company_id: companyId,
             property_id: propertyId,
             title,
-          },
-          {
-            property_id: propertyId,
-            name: title,
-            status: '未完了',
-          },
-          {
-            property_id: propertyId,
-            name: title,
           },
         ])
       } else {
         await tryInsertSequentially(supabase, 'cases', [
           {
+            company_id: companyId,
             property_id: propertyId,
             title,
             status: '進行中',
             memo: `${sourceLabel}\n${detail}`.trim(),
           },
           {
+            company_id: companyId,
             property_id: propertyId,
             title,
             status: '進行中',
           },
           {
+            company_id: companyId,
             property_id: propertyId,
             title,
-          },
-          {
-            property_id: propertyId,
-            name: title,
-            status: '進行中',
-          },
-          {
-            property_id: propertyId,
-            name: title,
           },
         ])
       }
@@ -180,16 +162,9 @@ export async function POST(request: NextRequest) {
       createdCount += 1
     }
 
-    return NextResponse.json({
-      ok: true,
-      createdCount,
-    })
+    return NextResponse.json({ ok: true, createdCount })
   } catch (error) {
     console.error('ai/minutes/actions route error', error)
-
-    return NextResponse.json(
-      { error: '宿題の追加に失敗しました。' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: '宿題の追加に失敗しました。' }, { status: 500 })
   }
 }

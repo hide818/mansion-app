@@ -333,13 +333,28 @@ export async function POST(request: Request, context: RouteContext) {
       )
     }
 
-    await getUserCompanyId()
+    const companyId = await getUserCompanyId()
+
+    if (!companyId) {
+      return NextResponse.json(
+        { error: '会社情報が取得できません。' },
+        { status: 403 }
+      )
+    }
 
     const { data: property } = await supabase
       .from('properties')
       .select('id, name, address')
       .eq('id', propertyId)
-      .single()
+      .eq('company_id', companyId)
+      .maybeSingle()
+
+    if (!property) {
+      return NextResponse.json(
+        { error: '対象の物件が見つかりません。' },
+        { status: 404 }
+      )
+    }
 
     const { data: cases } = await supabase
       .from('cases')
@@ -347,18 +362,21 @@ export async function POST(request: Request, context: RouteContext) {
         'id, title, status, assignee, created_at, board_status, board_scheduled_for, board_agenda_title, board_decision_status, board_decision_date, board_decision_note, board_next_action'
       )
       .eq('property_id', propertyId)
+      .eq('company_id', companyId)
       .order('created_at', { ascending: false })
 
     const { data: tasks } = await supabase
       .from('tasks')
       .select('id, title, status, due_date, case_id, priority, created_at')
       .eq('property_id', propertyId)
+      .eq('company_id', companyId)
       .order('created_at', { ascending: false })
 
     const { data: complaints } = await supabase
       .from('complaints')
       .select('id, title, detail, status, created_at, property_id')
       .eq('property_id', propertyId)
+      .eq('company_id', companyId)
       .order('created_at', { ascending: false })
 
     const caseIds = (cases ?? [])
