@@ -38,6 +38,56 @@ export default function Sidebar() {
       ],
     },
     {
+      label: '法定点検',
+      summary: 'エレベーター・消防・貯水槽の期限管理',
+      featured: true,
+      children: [
+        {
+          label: '点検スケジュール',
+          href: '/inspections',
+          description: '法律で定められた点検の期限を一元管理・アラート',
+        },
+      ],
+    },
+    {
+      label: '居住者・物件',
+      summary: '区分所有者・賃借人・修繕を管理',
+      featured: true,
+      children: [
+        {
+          label: '居住者管理',
+          href: '/residents',
+          description: '区分所有者・賃借人・理事会メンバーを一元管理',
+        },
+        {
+          label: '修繕履歴',
+          href: '/repairs',
+          description: '修繕の実績・施工中・計画を管理',
+        },
+        {
+          label: '見積管理',
+          href: '/estimates',
+          description: '相見積もりを物件別に比較・採否管理',
+        },
+        {
+          label: '業者管理',
+          href: '/contractors',
+          description: '取引業者の連絡先・カテゴリを管理',
+        },
+      ],
+    },
+    {
+      label: '居住者問い合わせ',
+      summary: '修繕要望・クレーム・問い合わせ対応',
+      children: [
+        {
+          label: '問い合わせ一覧',
+          href: '/resident-portal',
+          description: '住民からのクレーム・修繕要望・問い合わせを管理',
+        },
+      ],
+    },
+    {
       label: 'AI議事録',
       summary: '音声から議事録を自動生成',
       featured: true,
