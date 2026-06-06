@@ -8,6 +8,7 @@ import { randomUUID } from 'node:crypto'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
+import { getUserCompanyId } from '@/lib/getUserCompanyId'
 
 export const runtime = 'nodejs'
 
@@ -121,8 +122,9 @@ function buildMinutesPrompt(params: {
   propertyName: string
   agendas: string[]
   transcript: string
+  templateSampleText?: string | null
 }) {
-  const { meetingType, propertyName, agendas, transcript } = params
+  const { meetingType, propertyName, agendas, transcript, templateSampleText } = params
 
   const agendaText = agendas
     .map((title, index) => `${index + 1}. ${title}`)
@@ -132,6 +134,36 @@ function buildMinutesPrompt(params: {
     meetingType === '総会'
       ? '各議案の最終行は必ず「議長が本議案について承認を諮ったところ、賛成多数で承認された。」で統一すること。'
       : '理事会の場合は、承認が明確でない議題に無理に承認文を入れないこと。'
+
+  if (templateSampleText) {
+    return `
+あなたはマンション管理会社向けの議事録作成アシスタントです。
+以下のサンプル議事録のフォーマット・文体・構成・句読点を完全に踏襲して議事録を作成してください。
+
+【絶対ルール】
+- 登録済みの議題名は変更しないこと
+- 出力はプレーンテキストのみ（#・Markdown・コードブロック禁止）
+- 同じ議案を繰り返し出力しないこと
+- ヘッダー情報（物件名・日付等）は出力しないこと。議事録本文のみ出力すること
+- わからない内容は膨らませないこと
+
+【会議情報】
+会議種別: ${meetingType}
+マンション名: ${propertyName}
+
+【登録済み議題】
+${agendaText}
+
+【会議種別ごとの追加ルール】
+${closingRule}
+
+【フォーマットサンプル（このフォーマットに従うこと）】
+${templateSampleText}
+
+【文字起こし全文】
+${transcript}
+`.trim()
+  }
 
   return `
 あなたはマンション管理会社向けの議事録作成アシスタントです。
@@ -502,6 +534,16 @@ export async function POST(request: Request) {
 
     await ensureFfmpegAvailable()
 
+    // アクティブなフォーマットテンプレートを取得
+    const companyId = await getUserCompanyId()
+    const { data: templateRow } = await supabase
+      .from('minutes_templates')
+      .select('sample_text')
+      .eq('company_id', companyId)
+      .eq('is_active', true)
+      .maybeSingle()
+    const templateSampleText = templateRow?.sample_text ?? null
+
     await fs.mkdir(uploadDir, { recursive: true })
 
     const extension = getSafeExtension(audio.name)
@@ -524,6 +566,7 @@ export async function POST(request: Request) {
       propertyName,
       agendas,
       transcript: transcriptText,
+      templateSampleText,
     })
 
     const minutesResponse = await client.responses.create({

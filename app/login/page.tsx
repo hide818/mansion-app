@@ -128,9 +128,9 @@ export default function LoginPage() {
         {/* Brand header */}
         <div className="rounded-t-lg bg-[#1e3a5f] px-6 py-5">
           <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-blue-300">
-            MANSION SaaS
+            管理会社専用 AI
           </p>
-          <h1 className="mt-1 text-lg font-bold text-white">マンション管理アプリ</h1>
+          <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-white">Kura</h1>
         </div>
 
         {/* Form card */}
@@ -186,14 +186,17 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="mt-4 text-center text-xs text-gray-400">
-          分譲マンション管理会社向け業務支援システム
-        </p>
-        <p className="mt-2 text-center text-xs text-gray-400">
-          <a href="/privacy" className="hover:text-gray-600 underline">プライバシーポリシー</a>
-          <span className="mx-1">·</span>
-          <a href="/terms" className="hover:text-gray-600 underline">利用規約</a>
-        </p>
+        <div className="mt-4 text-center space-y-2">
+          <p className="text-xs text-gray-500">
+            アカウントをお持ちでない方は{' '}
+            <a href="/signup" className="font-semibold text-blue-600 hover:underline">新規登録</a>
+          </p>
+          <p className="text-xs text-gray-400">
+            <a href="/privacy" className="hover:text-gray-600 underline">プライバシーポリシー</a>
+            <span className="mx-1">·</span>
+            <a href="/terms" className="hover:text-gray-600 underline">利用規約</a>
+          </p>
+        </div>
       </div>
     </div>
   )

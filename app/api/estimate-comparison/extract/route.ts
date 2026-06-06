@@ -29,10 +29,12 @@ async function extractFromExcel(buffer: Buffer): Promise<string> {
 }
 
 async function extractFromPdf(buffer: Buffer): Promise<string> {
-  type PdfParseFn = (buf: Buffer) => Promise<{ text: string }>
-  const pdfParse = (await import('pdf-parse')) as unknown as PdfParseFn
-  const data = await pdfParse(buffer)
-  return data.text || ''
+  type PDFParseClass = new (opts: { data: Buffer }) => { getText(): Promise<{ text: string }>; destroy(): Promise<void> }
+  const { PDFParse } = (await import('pdf-parse')) as unknown as { PDFParse: PDFParseClass }
+  const parser = new PDFParse({ data: buffer })
+  const result = await parser.getText()
+  await parser.destroy()
+  return result.text || ''
 }
 
 async function extractText(file: File): Promise<{ text: string; warning?: string }> {

@@ -4,7 +4,7 @@ import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { getUserProfile } from '@/lib/getUserProfile'
 import { formatDate, isToday, isOverdue, getStatusLabel } from '@/lib/utils'
 import DashboardAlertsClient from '@/app/components/DashboardAlertsClient'
-import { primaryButtonClass, secondaryButtonClass } from '@/app/components/ui/buttonStyles'
+import PushNotificationSetup from '@/app/components/PushNotificationSetup'
 
 type TaskRow = {
   id: string
@@ -23,15 +23,20 @@ type PropertyRow = {
 
 function sortByDueDate(tasks: TaskRow[]) {
   return [...tasks].sort((a, b) => {
-    if (!a.due_date && !b.due_date) {
-      return (b.created_at ?? '').localeCompare(a.created_at ?? '')
-    }
-
+    if (!a.due_date && !b.due_date) return (b.created_at ?? '').localeCompare(a.created_at ?? '')
     if (!a.due_date) return 1
     if (!b.due_date) return -1
-
     return a.due_date.localeCompare(b.due_date)
   })
+}
+
+function todayLabel() {
+  return new Intl.DateTimeFormat('ja-JP', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'short',
+  }).format(new Date())
 }
 
 export default async function DashboardPage() {
@@ -39,7 +44,6 @@ export default async function DashboardPage() {
   const companyId = await getUserCompanyId()
   const currentProfile = await getUserProfile()
 
-  // 表示名を1回だけ取得（company_id で絞る）
   let userName = 'あなた'
   if (currentProfile?.id) {
     const { data: nameData } = await supabase
@@ -53,7 +57,6 @@ export default async function DashboardPage() {
     }
   }
 
-  // タスクを自分担当に絞る
   let taskQuery = supabase
     .from('tasks')
     .select('id, title, status, due_date, property_id, created_at')
@@ -79,14 +82,11 @@ export default async function DashboardPage() {
 
   if (taskError || propertyError) {
     return (
-      <div className="space-y-6 p-6">
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
-          <p className="text-sm font-semibold text-red-600">ダッシュボード</p>
-          <h1 className="mt-1 text-3xl font-bold text-red-700">データの取得に失敗しました</h1>
-          <div className="mt-4 space-y-2 text-sm text-red-600">
-            {taskError ? <p>tasks: {taskError.message}</p> : null}
-            {propertyError ? <p>properties: {propertyError.message}</p> : null}
-          </div>
+      <div className="p-6">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-6">
+          <p className="text-sm text-red-600">データの取得に失敗しました</p>
+          {taskError && <p className="text-xs text-red-500 mt-1">tasks: {taskError.message}</p>}
+          {propertyError && <p className="text-xs text-red-500 mt-1">properties: {propertyError.message}</p>}
         </div>
       </div>
     )
@@ -94,17 +94,12 @@ export default async function DashboardPage() {
 
   const tasks = sortByDueDate((taskData ?? []) as TaskRow[])
   const properties = (propertyData ?? []) as PropertyRow[]
-
-  const overdueTasks = tasks.filter((task) => isOverdue(task.due_date))
-  const todayTasks = tasks.filter((task) => isToday(task.due_date))
-  const upcomingTasks = tasks.filter(
-    (task) => !isToday(task.due_date) && !isOverdue(task.due_date),
-  )
-
+  const overdueTasks = tasks.filter((t) => isOverdue(t.due_date))
+  const todayTasks = tasks.filter((t) => isToday(t.due_date))
+  const upcomingTasks = tasks.filter((t) => !isToday(t.due_date) && !isOverdue(t.due_date))
   const urgentList = [...overdueTasks, ...todayTasks].slice(0, 5)
   const nextList = upcomingTasks.slice(0, 5)
 
-  // 有効な property_id のみリンクを表示するため、DBに存在するものだけ取得
   const taskPropertyIds = Array.from(
     new Set(tasks.map((t) => t.property_id).filter((v): v is string => typeof v === 'string' && v.length > 0))
   )
@@ -120,115 +115,134 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+
+      {/* グリーティング */}
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm font-semibold text-slate-500">ホーム</p>
-            <h1 className="mt-1 text-3xl font-bold text-slate-900">{userName} の仕事画面</h1>
-            <p className="mt-2 text-sm text-slate-600">
-              自分担当の期限が近いタスクから順番に確認できます。
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">{todayLabel()}</p>
+            <h1 className="mt-1 text-2xl font-bold text-slate-900">
+              おはようございます、{userName.split('@')[0]} さん
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              {overdueTasks.length > 0
+                ? `⚠️ 期限切れタスクが ${overdueTasks.length} 件あります。先に確認してください。`
+                : todayTasks.length > 0
+                ? `📅 今日期限のタスクが ${todayTasks.length} 件あります。`
+                : '今日の緊急タスクはありません。'}
             </p>
           </div>
-
-          <div className="flex flex-wrap gap-3">
-            <Link href="/today-tasks" className={primaryButtonClass}>
-              今日やることを見る
-            </Link>
-            <Link href="/ai-minutes" className={secondaryButtonClass}>
-              AI議事録を作成
-            </Link>
-            <Link href="/ai-minutes/records" className={secondaryButtonClass}>
-              保存済み議事録
-            </Link>
-            <Link href="/tasks" className={secondaryButtonClass}>
-              タスク一覧へ
-            </Link>
-            <Link href="/cases" className={secondaryButtonClass}>
-              案件一覧へ
-            </Link>
-          </div>
         </div>
       </section>
 
+      {/* プッシュ通知セットアップ */}
+      <PushNotificationSetup />
+
+      {/* 3本柱クイックアクション */}
+      <section>
+        <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400">AI機能</p>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Link
+            href="/ai-minutes"
+            className="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-400 hover:shadow-md"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-2xl group-hover:bg-blue-100">
+              🎙️
+            </div>
+            <div>
+              <p className="font-bold text-slate-800">AI議事録を作成</p>
+              <p className="text-xs text-slate-400 mt-0.5">録音→議事録を3分で</p>
+            </div>
+          </Link>
+          <Link
+            href="/handover-documents/new"
+            className="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-400 hover:shadow-md"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-green-50 text-2xl group-hover:bg-green-100">
+              📄
+            </div>
+            <div>
+              <p className="font-bold text-slate-800">AI引き継ぎ書を作成</p>
+              <p className="text-xs text-slate-400 mt-0.5">物件選択→即自動生成</p>
+            </div>
+          </Link>
+          <Link
+            href="/cases"
+            className="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-400 hover:shadow-md"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-2xl group-hover:bg-amber-100">
+              📋
+            </div>
+            <div>
+              <p className="font-bold text-slate-800">全案件を確認</p>
+              <p className="text-xs text-slate-400 mt-0.5">全物件の案件を一覧で</p>
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      {/* サマリーカード */}
+      <section className="grid gap-4 sm:grid-cols-3">
+        <div className={`rounded-xl border p-5 shadow-sm ${overdueTasks.length > 0 ? 'border-rose-200 bg-rose-50' : 'border-slate-200 bg-white'}`}>
+          <p className={`text-sm font-semibold ${overdueTasks.length > 0 ? 'text-rose-600' : 'text-slate-500'}`}>期限切れ</p>
+          <p className={`mt-2 text-4xl font-extrabold ${overdueTasks.length > 0 ? 'text-rose-700' : 'text-slate-800'}`}>{overdueTasks.length}</p>
+          <p className="mt-1 text-xs text-slate-400">件</p>
+        </div>
+        <div className={`rounded-xl border p-5 shadow-sm ${todayTasks.length > 0 ? 'border-amber-200 bg-amber-50' : 'border-slate-200 bg-white'}`}>
+          <p className={`text-sm font-semibold ${todayTasks.length > 0 ? 'text-amber-600' : 'text-slate-500'}`}>今日期限</p>
+          <p className={`mt-2 text-4xl font-extrabold ${todayTasks.length > 0 ? 'text-amber-700' : 'text-slate-800'}`}>{todayTasks.length}</p>
+          <p className="mt-1 text-xs text-slate-400">件</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-sm font-semibold text-slate-500">未完了タスク</p>
+          <p className="mt-2 text-4xl font-extrabold text-slate-800">{tasks.length}</p>
+          <p className="mt-1 text-xs text-slate-400">件（自分担当）</p>
+        </div>
+      </section>
+
+      {/* アラート */}
       <DashboardAlertsClient />
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-md border border-rose-200 bg-rose-50 p-5 shadow-sm">
-          <p className="text-sm font-medium text-rose-700">期限切れ</p>
-          <p className="mt-2 text-3xl font-bold text-rose-800">{overdueTasks.length}</p>
-        </div>
-
-        <div className="rounded-md border border-amber-200 bg-amber-50 p-5 shadow-sm">
-          <p className="text-sm font-medium text-amber-600">今日期限</p>
-          <p className="mt-2 text-3xl font-bold text-amber-700">{todayTasks.length}</p>
-        </div>
-
-        <div className="rounded-md border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">未完了タスク</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">{tasks.length}</p>
-        </div>
-      </section>
-
+      {/* タスクリスト + 物件 */}
       <section className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
         <div className="space-y-6">
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+
+          {/* 先にやること */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">先にやること</h2>
-                <p className="mt-1 text-sm text-slate-600">
-                  期限切れと今日期限のタスクです。
-                </p>
+                <h2 className="text-lg font-bold text-slate-900">先にやること</h2>
+                <p className="text-xs text-slate-400 mt-0.5">期限切れ・今日期限のタスク</p>
               </div>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">
+              <span className="rounded-full bg-rose-100 px-3 py-1 text-sm font-bold text-rose-700">
                 {urgentList.length}件
               </span>
             </div>
-
             {urgentList.length === 0 ? (
-              <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
-                先にやるタスクはありません。
+              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm text-slate-400">
+                緊急タスクなし — 今日も順調です
               </div>
             ) : (
               <div className="space-y-3">
                 {urgentList.map((task) => {
                   const overdue = isOverdue(task.due_date)
-
                   return (
-                    <div
-                      key={task.id}
-                      className={`rounded-md border p-4 ${
-                        overdue
-                          ? 'border-rose-200 bg-rose-50'
-                          : 'border-amber-200 bg-amber-50'
-                      }`}
-                    >
-                      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                    <div key={task.id} className={`rounded-xl border p-4 ${overdue ? 'border-rose-200 bg-rose-50' : 'border-amber-200 bg-amber-50'}`}>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                          <p className="text-base font-bold text-slate-900">
-                            {task.title || '無題タスク'}
-                          </p>
-                          <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                            <span className="rounded-full bg-white px-2 py-1 text-slate-600">
-                              状況: {getStatusLabel(task.status)}
-                            </span>
-                            <span
-                              className={`rounded-full bg-white px-2 py-1 ${
-                                overdue ? 'text-rose-700' : 'text-amber-700'
-                              }`}
-                            >
+                          <p className="font-semibold text-slate-900">{task.title || '無題タスク'}</p>
+                          <div className="mt-1.5 flex flex-wrap gap-1.5 text-xs">
+                            <span className="rounded-full bg-white px-2 py-0.5 text-slate-600">{getStatusLabel(task.status)}</span>
+                            <span className={`rounded-full bg-white px-2 py-0.5 ${overdue ? 'text-rose-600 font-semibold' : 'text-amber-600'}`}>
                               期限: {formatDate(task.due_date)}
                             </span>
                           </div>
                         </div>
-
-                        {task.property_id && validPropertyIdSet.has(task.property_id) ? (
-                          <Link
-                            href={`/properties/${task.property_id}/tasks`}
-                            className="text-sm font-medium text-slate-600 hover:underline"
-                          >
-                            物件タスクを見る
+                        {task.property_id && validPropertyIdSet.has(task.property_id) && (
+                          <Link href={`/properties/${task.property_id}/tasks`} className="shrink-0 text-xs font-medium text-blue-600 hover:underline">
+                            物件を見る →
                           </Link>
-                        ) : null}
+                        )}
                       </div>
                     </div>
                   )
@@ -237,53 +251,38 @@ export default async function DashboardPage() {
             )}
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          {/* このあとやること */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">このあとやること</h2>
-                <p className="mt-1 text-sm text-slate-600">
-                  期限順で並んでいます。
-                </p>
+                <h2 className="text-lg font-bold text-slate-900">このあとやること</h2>
+                <p className="text-xs text-slate-400 mt-0.5">期限順</p>
               </div>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">
                 {nextList.length}件
               </span>
             </div>
-
             {nextList.length === 0 ? (
-              <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
-                今後のタスクはありません。
+              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm text-slate-400">
+                今後のタスクはありません
               </div>
             ) : (
               <div className="space-y-3">
                 {nextList.map((task) => (
-                  <div
-                    key={task.id}
-                    className="rounded-md border border-slate-200 bg-slate-50 p-4"
-                  >
-                    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                  <div key={task.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <p className="text-base font-bold text-slate-900">
-                          {task.title || '無題タスク'}
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                          <span className="rounded-full bg-white px-2 py-1 text-slate-600">
-                            状況: {getStatusLabel(task.status)}
-                          </span>
-                          <span className="rounded-full bg-white px-2 py-1 text-slate-600">
-                            期限: {formatDate(task.due_date)}
-                          </span>
+                        <p className="font-semibold text-slate-900">{task.title || '無題タスク'}</p>
+                        <div className="mt-1.5 flex flex-wrap gap-1.5 text-xs">
+                          <span className="rounded-full bg-white px-2 py-0.5 text-slate-500">{getStatusLabel(task.status)}</span>
+                          <span className="rounded-full bg-white px-2 py-0.5 text-slate-500">期限: {formatDate(task.due_date)}</span>
                         </div>
                       </div>
-
-                      {task.property_id ? (
-                        <Link
-                          href={`/properties/${task.property_id}/tasks`}
-                          className="text-sm font-medium text-slate-600 hover:underline"
-                        >
-                          物件タスクを見る
+                      {task.property_id && (
+                        <Link href={`/properties/${task.property_id}/tasks`} className="shrink-0 text-xs font-medium text-blue-600 hover:underline">
+                          物件を見る →
                         </Link>
-                      ) : null}
+                      )}
                     </div>
                   </div>
                 ))}
@@ -292,41 +291,55 @@ export default async function DashboardPage() {
           </div>
         </div>
 
+        {/* 右カラム */}
         <div className="space-y-6">
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-slate-900">最近の物件</h2>
-              <Link
-                href="/properties"
-                className="text-sm font-medium text-slate-600 hover:underline"
-              >
-                物件一覧へ
+
+          {/* 最近の物件 */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-slate-900">物件</h2>
+              <Link href="/properties" className="text-xs font-medium text-blue-600 hover:underline">
+                すべて見る →
               </Link>
             </div>
-
-            <div className="mt-4 space-y-3">
-              {properties.length === 0 ? (
-                <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
-                  物件データはまだありません。
-                </div>
-              ) : (
-                properties.map((property) => (
-                  <Link
-                    key={property.id}
-                    href={`/properties/${property.id}`}
-                    className="block rounded-md border border-slate-200 bg-slate-50 p-4 hover:bg-slate-100"
-                  >
-                    <p className="text-sm font-semibold text-slate-900">
-                      {property.name || '無題物件'}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-500">
-                      登録日: {formatDate(property.created_at)}
-                    </p>
+            {properties.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm text-slate-400">
+                物件がまだ登録されていません
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {properties.map((property) => (
+                  <Link key={property.id} href={`/properties/${property.id}`} className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 hover:bg-slate-100 transition">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">{property.name || '無題物件'}</p>
+                      <p className="text-xs text-slate-400">{formatDate(property.created_at)}</p>
+                    </div>
+                    <span className="text-slate-300 text-sm">›</span>
                   </Link>
-                ))
-              )}
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ショートカット */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-900 mb-4">よく使う機能</h2>
+            <div className="space-y-2">
+              {[
+                { href: '/ai-minutes/records', label: '保存済み議事録', icon: '📑' },
+                { href: '/handover-documents', label: '引き継ぎ書一覧', icon: '📂' },
+                { href: '/manager', label: '危険案件ダッシュボード', icon: '🚨' },
+                { href: '/settings/minutes-template', label: '議事録フォーマット設定', icon: '⚙️' },
+              ].map(({ href, label, icon }) => (
+                <Link key={href} href={href} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition">
+                  <span>{icon}</span>
+                  {label}
+                  <span className="ml-auto text-slate-300">›</span>
+                </Link>
+              ))}
             </div>
           </div>
+
         </div>
       </section>
     </div>

@@ -1,11 +1,25 @@
 import './globals.css'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import Sidebar from './components/Sidebar'
 import LayoutShell from './LayoutShell'
 
 export const metadata: Metadata = {
-  title: 'マンション管理アプリ',
-  description: 'マンション管理会社向けSaaS',
+  title: 'Kura — 管理会社専用AI',
+  description: '担当者が辞めても止まらない管理会社を実現するAI SaaS',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Kura',
+  },
+  formatDetection: { telephone: false },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#2563eb',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 }
 
 export default function RootLayout({
@@ -15,6 +29,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
+      <head>
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+      </head>
       <body className="overflow-x-hidden bg-gray-50 text-slate-900 antialiased">
         <LayoutShell
           sidebar={

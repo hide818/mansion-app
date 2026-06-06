@@ -112,10 +112,10 @@ export default function SidebarClient({ menuGroups }: SidebarClientProps) {
         <div className="flex-none bg-[#1e3a5f] px-4 py-4">
           <Link href="/dashboard" className="block">
             <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-blue-300">
-              MANSION SaaS
+              管理会社専用 AI
             </p>
-            <h1 className="mt-1 text-[14px] font-bold leading-snug text-white">
-              マンション管理アプリ
+            <h1 className="mt-1 text-[18px] font-extrabold leading-snug tracking-tight text-white">
+              Kura
             </h1>
           </Link>
         </div>
