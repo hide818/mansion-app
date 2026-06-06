@@ -40,7 +40,7 @@ export default function PaymentsPage() {
   const [saving, setSaving] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
-  useEffect(() => { fetch('/api/properties').then(r => r.json()).then(setProperties).catch(() => {}) }, [])
+  useEffect(() => { fetch('/api/properties').then(r => r.json()).then(d => setProperties(Array.isArray(d) ? d : [])).catch(() => {}) }, [])
 
   const load = useCallback(async () => {
     if (!selectedProperty) return

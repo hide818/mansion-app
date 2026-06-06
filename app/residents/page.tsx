@@ -68,7 +68,7 @@ export default function ResidentsPage() {
   }, [filterProperty, search])
 
   useEffect(() => {
-    fetch('/api/properties').then(r => r.json()).then(setProperties).catch(() => {})
+    fetch('/api/properties').then(r => r.json()).then(d => setProperties(Array.isArray(d) ? d : [])).catch(() => {})
   }, [])
 
   useEffect(() => { loadResidents() }, [loadResidents])

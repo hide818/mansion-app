@@ -60,7 +60,7 @@ export default function InspectionReportPage() {
   const today = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })
 
   useEffect(() => {
-    fetch('/api/properties').then(r => r.json()).then(setProperties).catch(() => {})
+    fetch('/api/properties').then(r => r.json()).then(d => setProperties(Array.isArray(d) ? d : [])).catch(() => {})
   }, [])
 
   useEffect(() => {
