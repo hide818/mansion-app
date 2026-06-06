@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#1e3a5f"/>
+  <rect x="0" y="340" width="512" height="172" rx="0" fill="#162840"/>
+  <!-- buildings -->
+  <rect x="20" y="340" width="70" height="172" fill="#1a3050"/>
+  <rect x="100" y="280" width="50" height="232" fill="#162840"/>
+  <rect x="160" y="310" width="80" height="202" fill="#1a3050"/>
+  <rect x="250" y="260" width="40" height="252" fill="#162840"/>
+  <rect x="300" y="300" width="90" height="212" fill="#1a3050"/>
+  <rect x="400" y="270" width="55" height="242" fill="#162840"/>
+  <!-- K letter -->
+  <text x="256" y="290" font-family="system-ui, -apple-system, sans-serif" font-size="220" font-weight="900" fill="white" text-anchor="middle" dominant-baseline="middle">K</text>
+</svg>
