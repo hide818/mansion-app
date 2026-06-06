@@ -113,8 +113,39 @@ export default async function DashboardPage() {
     ;((validProps ?? []) as { id: string }[]).forEach((p) => validPropertyIdSet.add(p.id))
   }
 
+  const isNewUser = properties.length === 0 && tasks.length === 0
+
   return (
     <div className="space-y-6 p-6">
+
+      {/* 初回オンボーディング */}
+      {isNewUser && (
+        <section className="rounded-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white p-6 shadow-sm">
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-2xl text-white shadow-lg shadow-blue-500/30">K</div>
+            <div className="flex-1">
+              <h2 className="text-lg font-bold text-slate-900">Kuraへようこそ！ {userName.split('@')[0]} さん</h2>
+              <p className="mt-1 text-sm text-slate-500">3ステップで使い始められます。まず物件を登録してください。</p>
+              <div className="mt-4 space-y-3">
+                {[
+                  { step: 1, label: '物件を登録する', desc: '管理している物件を追加', href: '/properties', color: 'bg-blue-600', done: false },
+                  { step: 2, label: 'CSVで一括インポート', desc: 'ExcelデータをKuraに移行', href: '/import', color: 'bg-slate-600', done: false },
+                  { step: 3, label: 'AI議事録を試す', desc: '音声→議事録を体験', href: '/ai-minutes', color: 'bg-green-600', done: false },
+                ].map(s => (
+                  <a key={s.step} href={s.href} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 hover:border-blue-300 hover:shadow-sm transition">
+                    <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${s.color} text-xs font-bold text-white`}>{s.step}</span>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">{s.label}</p>
+                      <p className="text-xs text-slate-400">{s.desc}</p>
+                    </div>
+                    <svg className="ml-auto h-4 w-4 text-slate-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* グリーティング */}
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

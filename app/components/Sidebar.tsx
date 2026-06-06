@@ -136,6 +136,16 @@ export default function Sidebar() {
           description: '担当者別の期限切れ・停滞・クレームを一覧確認',
         },
         {
+          label: '法定点検レポート',
+          href: '/inspections/report',
+          description: '物件ごとの点検状況を理事会報告書としてPDF出力',
+        },
+        {
+          label: 'CSVインポート',
+          href: '/import',
+          description: 'ExcelデータをKuraに一括移行（物件・居住者・点検）',
+        },
+        {
           label: 'ユーザー管理',
           href: '/users',
           description: 'ユーザーと権限管理',
