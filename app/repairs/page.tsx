@@ -57,7 +57,7 @@ export default function RepairsPage() {
       fetch('/api/contractors'),
     ])
     if (repRes.ok) setRepairs(await repRes.json())
-    if (propRes.ok) setProperties(await propRes.json())
+    if (propRes.ok) { const d = await propRes.json(); setProperties(Array.isArray(d) ? d : []) }
     if (conRes.ok) setContractors(await conRes.json())
   }, [filterProperty])
 

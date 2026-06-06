@@ -58,7 +58,7 @@ export default function EstimatesPage() {
       fetch('/api/contractors'),
     ])
     if (estRes.ok) setEstimates(await estRes.json())
-    if (propRes.ok) setProperties(await propRes.json())
+    if (propRes.ok) { const d = await propRes.json(); setProperties(Array.isArray(d) ? d : []) }
     if (conRes.ok) setContractors(await conRes.json())
   }, [filterProperty])
 

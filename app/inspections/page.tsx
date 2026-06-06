@@ -92,7 +92,7 @@ export default function InspectionsPage() {
       fetch('/api/contractors'),
     ])
     if (insRes.ok) setInspections(await insRes.json())
-    if (propRes.ok) setProperties(await propRes.json())
+    if (propRes.ok) { const d = await propRes.json(); setProperties(Array.isArray(d) ? d : []) }
     if (conRes.ok) setContractors(await conRes.json())
   }, [filterProperty])
 

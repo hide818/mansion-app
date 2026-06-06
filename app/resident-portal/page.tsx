@@ -65,7 +65,7 @@ export default function ResidentPortalPage() {
       fetch('/api/properties'),
     ])
     if (reqRes.ok) setRequests(await reqRes.json())
-    if (propRes.ok) setProperties(await propRes.json())
+    if (propRes.ok) { const d = await propRes.json(); setProperties(Array.isArray(d) ? d : []) }
   }, [filterStatus, filterProperty])
 
   useEffect(() => { load() }, [load])

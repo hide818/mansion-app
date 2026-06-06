@@ -9,7 +9,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from('properties')
-    .select('id, name, address, total_units, built_year, manager_name')
+    .select('id, name, address')
     .eq('company_id', companyId)
     .order('name', { ascending: true })
 
