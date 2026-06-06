@@ -47,7 +47,7 @@ export default function PaymentsPage() {
     if (!selectedProperty) return
     const params = new URLSearchParams({ property_id: selectedProperty, year: String(year), month: String(month) })
     const res = await fetch(`/api/payments?${params}`)
-    if (res.ok) setRecords(await res.json())
+    if (res.ok) { const d = await res.json(); setRecords(Array.isArray(d) ? d : []) }
   }, [selectedProperty, year, month])
 
   useEffect(() => { load() }, [load])

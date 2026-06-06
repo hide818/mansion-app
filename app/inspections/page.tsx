@@ -91,9 +91,9 @@ export default function InspectionsPage() {
       fetch('/api/properties'),
       fetch('/api/contractors'),
     ])
-    if (insRes.ok) setInspections(await insRes.json())
+    if (insRes.ok) { const d = await insRes.json(); setInspections(Array.isArray(d) ? d : []) }
     if (propRes.ok) { const d = await propRes.json(); setProperties(Array.isArray(d) ? d : []) }
-    if (conRes.ok) setContractors(await conRes.json())
+    if (conRes.ok) { const d = await conRes.json(); setContractors(Array.isArray(d) ? d : []) }
   }, [filterProperty])
 
   useEffect(() => { load() }, [load])

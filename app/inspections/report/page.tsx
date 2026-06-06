@@ -67,7 +67,7 @@ export default function InspectionReportPage() {
     if (!selectedProperty) return
     setLoading(true)
     fetch(`/api/inspections?property_id=${selectedProperty}`)
-      .then(r => r.json()).then(setInspections).finally(() => setLoading(false))
+      .then(r => r.json()).then(d => setInspections(Array.isArray(d) ? d : [])).finally(() => setLoading(false))
   }, [selectedProperty])
 
   const property = properties.find(p => p.id === selectedProperty)

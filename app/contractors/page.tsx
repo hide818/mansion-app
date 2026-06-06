@@ -47,7 +47,7 @@ export default function ContractorsPage() {
 
   const load = useCallback(async () => {
     const res = await fetch('/api/contractors')
-    if (res.ok) setContractors(await res.json())
+    if (res.ok) { const d = await res.json(); setContractors(Array.isArray(d) ? d : []) }
   }, [])
 
   useEffect(() => { load() }, [load])

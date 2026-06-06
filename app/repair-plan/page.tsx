@@ -36,7 +36,7 @@ export default function RepairPlanPage() {
     if (!selectedProperty) { setRepairs([]); return }
     fetch(`/api/repairs?property_id=${selectedProperty}`)
       .then(r => r.json())
-      .then(setRepairs)
+      .then(d => setRepairs(Array.isArray(d) ? d : []))
       .catch(() => {})
   }, [selectedProperty])
 

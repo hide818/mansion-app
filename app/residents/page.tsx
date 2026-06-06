@@ -64,7 +64,7 @@ export default function ResidentsPage() {
     if (filterProperty) params.set('property_id', filterProperty)
     if (search) params.set('search', search)
     const res = await fetch(`/api/residents?${params}`)
-    if (res.ok) setResidents(await res.json())
+    if (res.ok) { const d = await res.json(); setResidents(Array.isArray(d) ? d : []) }
   }, [filterProperty, search])
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function ResidentsPage() {
   useEffect(() => {
     if (!form.property_id) { setUnits([]); return }
     fetch(`/api/units?property_id=${form.property_id}`)
-      .then(r => r.json()).then(setUnits).catch(() => {})
+      .then(r => r.json()).then(d => setUnits(Array.isArray(d) ? d : [])).catch(() => {})
   }, [form.property_id])
 
   function openNew() {
