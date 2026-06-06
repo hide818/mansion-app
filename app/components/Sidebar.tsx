@@ -82,11 +82,6 @@ export default function Sidebar() {
           description: '修繕の実績・施工中・計画を管理',
         },
         {
-          label: '長期修繕計画',
-          href: '/repair-plan',
-          description: '30年の修繕費用を可視化。総会資料として活用',
-        },
-        {
           label: '見積管理',
           href: '/estimates',
           description: '相見積もりを物件別に比較・採否管理',

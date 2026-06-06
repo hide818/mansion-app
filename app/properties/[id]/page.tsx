@@ -6,6 +6,7 @@ import { getUserProfile } from '@/lib/getUserProfile'
 import { canEdit } from '@/lib/permissions'
 import PropertyTimelineClient from '@/app/components/PropertyTimelineClient'
 import PropertyMemoryAiClient from '@/app/components/PropertyMemoryAiClient'
+import PropertyRepairPlanClient from '@/app/components/PropertyRepairPlanClient'
 
 type Props = {
   params: Promise<{
@@ -20,6 +21,8 @@ type PropertyRow = {
   id: string
   name: string | null
   address: string | null
+  repair_plan_file_path: string | null
+  repair_plan_file_name: string | null
 }
 
 type MinutesSettingsRow = {
@@ -118,7 +121,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
   // 物件の存在確認は確実に存在するカラムだけで行う
   const { data: property } = await supabase
     .from('properties')
-    .select('id, name, address')
+    .select('id, name, address, repair_plan_file_path, repair_plan_file_name')
     .eq('id', id)
     .eq('company_id', companyId)
     .maybeSingle<PropertyRow>()
@@ -317,6 +320,18 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
               引き継ぎ一覧を見る
             </Link>
           </div>
+        </div>
+
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+            長期修繕計画書
+          </p>
+          <p className="mb-3 text-xs text-slate-400">施工会社・設計事務所から受領した計画書PDFを保管</p>
+          <PropertyRepairPlanClient
+            propertyId={id}
+            initialFilePath={property.repair_plan_file_path ?? null}
+            initialFileName={property.repair_plan_file_name ?? null}
+          />
         </div>
       </section>
 
