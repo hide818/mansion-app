@@ -125,7 +125,28 @@ export default function PaymentsPage() {
       </div>
 
       {!selectedProperty ? (
-        <div className="flex items-center justify-center p-16 text-slate-400">物件を選択してください</div>
+        <div className="mx-4 sm:mx-6 rounded-2xl border border-slate-200 bg-white p-8">
+          <h2 className="text-base font-bold text-slate-800 mb-4">管理費・督促管理の使い方</h2>
+          <ol className="space-y-4">
+            {[
+              { n: '1', title: '物件を選択', desc: '上の「物件を選択」ドロップダウンから対象マンションを選んでください。' },
+              { n: '2', title: '月次請求を一括作成', desc: '「＋ 月次請求を一括作成」ボタンを押し、管理費・修繕積立金の金額を入力すると、全戸室分の請求レコードが自動生成されます。' },
+              { n: '3', title: '入金確認・督促', desc: '各戸室の支払い状況が一覧で表示されます。入金が確認できたら「入金確認」、未払いが続く場合は「督促済みにする」ボタンを押して督促履歴を記録します。' },
+            ].map(s => (
+              <li key={s.n} className="flex gap-4">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">{s.n}</span>
+                <div>
+                  <p className="font-semibold text-slate-800">{s.title}</p>
+                  <p className="text-sm text-slate-500 mt-0.5">{s.desc}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-6 rounded-xl bg-blue-50 border border-blue-100 p-4 text-sm text-blue-700">
+            <p className="font-semibold mb-1">ヒント</p>
+            <p>先に「デモデータ投入」でサンプルデータを作成すると、未払いのある状態を確認できます。</p>
+          </div>
+        </div>
       ) : (
         <>
           {/* サマリ */}

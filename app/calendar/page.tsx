@@ -100,6 +100,11 @@ export default function CalendarPage() {
       <div className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
         <h1 className="text-xl font-bold text-slate-900">カレンダー</h1>
         <p className="text-sm text-slate-500">タスク・法定点検・修繕の期限を一画面で確認</p>
+        <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-500">
+          <span className="rounded-full bg-slate-100 px-2.5 py-1">📋 タスク → 「案件・タスク」から登録</span>
+          <span className="rounded-full bg-slate-100 px-2.5 py-1">🔍 法定点検 → 「法定点検」から登録</span>
+          <span className="rounded-full bg-slate-100 px-2.5 py-1">🔧 修繕 → 「修繕履歴」から登録</span>
+        </div>
       </div>
 
       {/* 凡例 */}

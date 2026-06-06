@@ -169,7 +169,7 @@ export default function Sidebar() {
         },
         {
           label: 'デモデータ投入',
-          href: '/settings?demo=1',
+          href: '/demo',
           description: '動作確認用サンプルデータを一括作成',
         },
         {

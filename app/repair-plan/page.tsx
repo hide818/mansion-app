@@ -94,6 +94,10 @@ export default function RepairPlanPage() {
       <div className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
         <h1 className="text-xl font-bold text-slate-900">長期修繕計画</h1>
         <p className="text-sm text-slate-500">修繕費用の実績と30年計画を可視化。総会資料として活用できます。</p>
+        <div className="mt-3 rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-sm text-amber-800">
+          <p className="font-semibold mb-1">このページの使い方</p>
+          <p>「修繕履歴」ページで工事実績を登録すると、ここに自動でグラフ表示されます。「標準サイクル目安を表示」にチェックを入れると、築年数から30年分の修繕スケジュール目安（田中顧問監修）を重ねて確認できます。</p>
+        </div>
       </div>
 
       {/* 絞り込み */}
