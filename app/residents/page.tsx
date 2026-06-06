@@ -20,14 +20,27 @@ type Resident = {
 type Property = { id: string; name: string }
 type Unit = { id: string; unit_number: string; floor: number | null; layout: string | null }
 
-const BLANK_FORM = {
+type ResidentForm = {
+  property_id: string
+  unit_id: string
+  name: string
+  name_kana: string
+  phone: string
+  email: string
+  resident_type: 'owner' | 'tenant'
+  is_board_member: boolean
+  board_role: string
+  notes: string
+}
+
+const BLANK_FORM: ResidentForm = {
   property_id: '',
   unit_id: '',
   name: '',
   name_kana: '',
   phone: '',
   email: '',
-  resident_type: 'owner' as const,
+  resident_type: 'owner',
   is_board_member: false,
   board_role: '',
   notes: '',

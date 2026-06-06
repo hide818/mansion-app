@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
   if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

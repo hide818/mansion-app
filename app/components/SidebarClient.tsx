@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useMemo, useRef, useState } from 'react'
+import GlobalSearch from './GlobalSearch'
 
 export type NavChild = {
   label: string
@@ -118,6 +119,9 @@ export default function SidebarClient({ menuGroups }: SidebarClientProps) {
               Kura
             </h1>
           </Link>
+          <div className="mt-3">
+            <GlobalSearch />
+          </div>
         </div>
 
         {/* ナビゲーション */}

@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 
 export async function GET(req: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
   if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
   if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

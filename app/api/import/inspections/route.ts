@@ -26,7 +26,7 @@ const TYPE_MAP: Record<string, string> = {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
   if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

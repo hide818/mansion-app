@@ -131,28 +131,35 @@ export default function Home() {
           <p className="text-center text-slate-500 text-sm mb-12">
             すべてのプランに全AI機能が含まれます。初期費用・最低契約期間なし。
           </p>
-          <div className="grid gap-6 sm:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-4">
             <PricingCard
               name="スタータープラン"
-              price="¥30,000"
+              price="¥15,000"
               unit="/月"
-              desc="物件数 〜30棟"
-              features={['案件・タスク管理', 'AI議事録（自社フォーマット対応）', 'AI引き継ぎ書', 'ユーザー3名まで']}
+              desc="〜30物件"
+              features={['案件・タスク管理', 'AI議事録', 'AI引き継ぎ書', '管理費督促管理', 'カレンダービュー', 'ユーザー3名まで']}
             />
             <PricingCard
               name="スタンダードプラン"
-              price="¥50,000"
+              price="¥35,000"
               unit="/月"
-              desc="物件数 〜100棟"
-              features={['案件・タスク管理', 'AI議事録（自社フォーマット対応）', 'AI引き継ぎ書', 'ユーザー10名まで', '管理者ダッシュボード', 'CSVエクスポート']}
+              desc="〜100物件"
+              features={['スタータープランの全機能', '法定点検レポート出力', '長期修繕計画グラフ', 'グローバル検索', 'ユーザー10名まで', 'CSVインポート']}
               recommended
             />
             <PricingCard
-              name="エンタープライズ"
-              price="¥100,000"
+              name="プロプラン"
+              price="¥70,000"
               unit="/月"
-              desc="物件数 無制限"
-              features={['全機能', 'ユーザー無制限', '専用サポート', 'カスタム対応', 'SLA保証']}
+              desc="〜300物件"
+              features={['スタンダードプランの全機能', '危険案件ダッシュボード', 'プッシュ通知', 'ユーザー無制限', 'データエクスポート']}
+            />
+            <PricingCard
+              name="エンタープライズ"
+              price="応相談"
+              unit=""
+              desc="300物件超"
+              features={['プロプランの全機能', '専用オンボーディング', 'カスタム機能開発', 'SLA保証', '専任サポート']}
             />
           </div>
           <p className="text-center text-xs text-slate-400 mt-6">※ 税抜表示。消費税は別途申し受けます。</p>

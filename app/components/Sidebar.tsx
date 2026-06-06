@@ -50,6 +50,23 @@ export default function Sidebar() {
       ],
     },
     {
+      label: '管理費督促',
+      summary: '未払い管理費・督促を月次管理',
+      featured: true,
+      children: [
+        {
+          label: '管理費・督促管理',
+          href: '/payments',
+          description: '管理費・修繕積立金の未払い状況と督促を管理',
+        },
+        {
+          label: 'カレンダー',
+          href: '/calendar',
+          description: 'タスク・法定点検・修繕の期限を月次カレンダーで確認',
+        },
+      ],
+    },
+    {
       label: '居住者・物件',
       summary: '区分所有者・賃借人・修繕を管理',
       featured: true,
@@ -63,6 +80,11 @@ export default function Sidebar() {
           label: '修繕履歴',
           href: '/repairs',
           description: '修繕の実績・施工中・計画を管理',
+        },
+        {
+          label: '長期修繕計画',
+          href: '/repair-plan',
+          description: '30年の修繕費用を可視化。総会資料として活用',
         },
         {
           label: '見積管理',
@@ -144,6 +166,11 @@ export default function Sidebar() {
           label: 'CSVインポート',
           href: '/import',
           description: 'ExcelデータをKuraに一括移行（物件・居住者・点検）',
+        },
+        {
+          label: 'デモデータ投入',
+          href: '/settings?demo=1',
+          description: '動作確認用サンプルデータを一括作成',
         },
         {
           label: 'ユーザー管理',
