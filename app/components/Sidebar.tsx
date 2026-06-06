@@ -57,7 +57,7 @@ export default function Sidebar() {
         {
           label: '管理費・督促管理',
           href: '/payments',
-          description: '管理費・修繕積立金の未払い状況と督促を管理',
+          description: '管理費・修繕積立金の未払い状況管理・メール督促送信',
         },
         {
           label: 'カレンダー',

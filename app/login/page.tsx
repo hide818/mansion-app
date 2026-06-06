@@ -137,6 +137,8 @@ export default function LoginPage() {
               <Link href="/privacy" className="hover:text-blue-300">プライバシーポリシー</Link>
               <span className="mx-2">·</span>
               <Link href="/terms" className="hover:text-blue-300">利用規約</Link>
+              <span className="mx-2">·</span>
+              <Link href="/security" className="hover:text-blue-300">セキュリティ</Link>
             </p>
           </div>
         </div>

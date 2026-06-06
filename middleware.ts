@@ -2,7 +2,15 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 function isPublicPath(pathname: string) {
-  return pathname === '/login' || pathname === '/privacy' || pathname === '/terms'
+  return (
+    pathname === '/login' ||
+    pathname === '/signup' ||
+    pathname === '/privacy' ||
+    pathname === '/terms' ||
+    pathname === '/security' ||
+    pathname === '/lp' ||
+    pathname.startsWith('/lp/')
+  )
 }
 
 function isStaticPath(pathname: string) {

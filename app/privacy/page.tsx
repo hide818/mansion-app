@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'プライバシーポリシー | フロント管理AI',
+  title: 'プライバシーポリシー | Kura',
 }
 
 export default function PrivacyPage() {
@@ -135,6 +135,8 @@ export default function PrivacyPage() {
 
         <div className="mt-6 text-center text-xs text-slate-400">
           <Link href="/terms" className="hover:text-slate-600">利用規約</Link>
+          <span className="mx-2">·</span>
+          <Link href="/security" className="hover:text-slate-600">セキュリティ</Link>
           <span className="mx-2">·</span>
           <Link href="/login" className="hover:text-slate-600">ログイン</Link>
         </div>

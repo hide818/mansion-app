@@ -16,7 +16,7 @@ type PaymentRecord = {
   last_dunning_date: string | null
   notes: string | null
   units: { unit_number: string; floor: number | null } | null
-  residents: { name: string; phone: string | null } | null
+  residents: { name: string; phone: string | null; email: string | null } | null
 }
 
 type Property = { id: string; name: string }
@@ -39,6 +39,7 @@ export default function PaymentsPage() {
   const [bulkFees, setBulkFees] = useState({ management_fee: '18000', reserve_fund: '8000', other_fee: '0' })
   const [saving, setSaving] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [emailSent, setEmailSent] = useState<Set<string>>(new Set())
 
   useEffect(() => { fetch('/api/properties').then(r => r.json()).then(d => setProperties(Array.isArray(d) ? d : [])).catch(() => {}) }, [])
 
@@ -63,6 +64,19 @@ export default function PaymentsPage() {
     await fetch(`/api/payments/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dunning: true }) })
     setActionLoading(null)
     load()
+  }
+
+  async function handleEmailDunning(id: string) {
+    setActionLoading(`email-${id}`)
+    const res = await fetch(`/api/payments/${id}/send-email`, { method: 'POST' })
+    setActionLoading(null)
+    if (res.ok) {
+      setEmailSent(prev => new Set([...prev, id]))
+      load()
+    } else {
+      const json = await res.json()
+      alert(json.error ?? 'メール送信に失敗しました')
+    }
   }
 
   async function handleBulkCreate() {
@@ -197,6 +211,9 @@ export default function PaymentsPage() {
                         {r.residents?.phone && (
                           <a href={`tel:${r.residents.phone}`} className="text-xs text-blue-500 hover:underline">{r.residents.phone}</a>
                         )}
+                        {r.residents?.email && (
+                          <span className="text-xs text-slate-400">{r.residents.email}</span>
+                        )}
                         <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500">
                           <span>管理費 {yen(r.management_fee)}</span>
                           <span>積立金 {yen(r.reserve_fund)}</span>
@@ -212,8 +229,17 @@ export default function PaymentsPage() {
                             className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 disabled:opacity-50">
                             {isLoading ? '...' : '入金確認'}
                           </button>
+                          {r.residents?.email && (
+                            <button
+                              onClick={() => handleEmailDunning(r.id)}
+                              disabled={actionLoading === `email-${r.id}`}
+                              className={`rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50 ${emailSent.has(r.id) ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-700 hover:bg-orange-100'}`}
+                            >
+                              {actionLoading === `email-${r.id}` ? '送信中...' : emailSent.has(r.id) ? '送信済み' : 'メール督促'}
+                            </button>
+                          )}
                           <button onClick={() => handleDunning(r.id)} disabled={isLoading}
-                            className="rounded-lg bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 hover:bg-orange-100 disabled:opacity-50">
+                            className="rounded-lg bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-50">
                             督促済みにする
                           </button>
                         </div>

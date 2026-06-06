@@ -43,35 +43,39 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData()
     const file = formData.get('file')
+    const rawText = String(formData.get('rawText') ?? '').trim()
     const name = String(formData.get('name') ?? '').trim()
 
     if (!name) {
       return NextResponse.json({ error: 'テンプレート名を入力してください。' }, { status: 400 })
     }
 
-    if (!(file instanceof File)) {
-      return NextResponse.json({ error: 'PDFファイルを選択してください。' }, { status: 400 })
-    }
+    let sampleText = ''
 
-    if (file.size === 0) {
-      return NextResponse.json({ error: 'ファイルが空です。' }, { status: 400 })
-    }
-
-    const ext = file.name.split('.').pop()?.toLowerCase()
-    if (ext !== 'pdf') {
-      return NextResponse.json({ error: 'PDFファイルのみ対応しています。' }, { status: 400 })
-    }
-
-    type PDFParseClass = new (opts: { data: Buffer }) => { getText(): Promise<{ text: string }>; destroy(): Promise<void> }
-    const { PDFParse } = (await import('pdf-parse')) as unknown as { PDFParse: PDFParseClass }
-    const buffer = Buffer.from(await file.arrayBuffer())
-    const parser = new PDFParse({ data: buffer })
-    const parsed = await parser.getText()
-    await parser.destroy()
-    const sampleText = truncate(parsed.text.trim())
-
-    if (!sampleText) {
-      return NextResponse.json({ error: 'PDFからテキストを抽出できませんでした。' }, { status: 400 })
+    if (rawText) {
+      // テキスト直接入力モード
+      sampleText = truncate(rawText)
+    } else if (file instanceof File) {
+      // PDFアップロードモード
+      if (file.size === 0) {
+        return NextResponse.json({ error: 'ファイルが空です。' }, { status: 400 })
+      }
+      const ext = file.name.split('.').pop()?.toLowerCase()
+      if (ext !== 'pdf') {
+        return NextResponse.json({ error: 'PDFファイルのみ対応しています。' }, { status: 400 })
+      }
+      type PDFParseClass = new (opts: { data: Buffer }) => { getText(): Promise<{ text: string }>; destroy(): Promise<void> }
+      const { PDFParse } = (await import('pdf-parse')) as unknown as { PDFParse: PDFParseClass }
+      const buffer = Buffer.from(await file.arrayBuffer())
+      const parser = new PDFParse({ data: buffer })
+      const parsed = await parser.getText()
+      await parser.destroy()
+      sampleText = truncate(parsed.text.trim())
+      if (!sampleText) {
+        return NextResponse.json({ error: 'PDFからテキストを抽出できませんでした。' }, { status: 400 })
+      }
+    } else {
+      return NextResponse.json({ error: 'PDFファイルまたはテキストを入力してください。' }, { status: 400 })
     }
 
     // 既存テンプレートをすべて非アクティブに

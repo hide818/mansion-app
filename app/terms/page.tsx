@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 export const metadata = {
-  title: '利用規約 | フロント管理AI',
+  title: '利用規約 | Kura',
 }
 
 export default function TermsPage() {
@@ -141,6 +141,8 @@ export default function TermsPage() {
 
         <div className="mt-6 text-center text-xs text-slate-400">
           <Link href="/privacy" className="hover:text-slate-600">プライバシーポリシー</Link>
+          <span className="mx-2">·</span>
+          <Link href="/security" className="hover:text-slate-600">セキュリティ</Link>
           <span className="mx-2">·</span>
           <Link href="/login" className="hover:text-slate-600">ログイン</Link>
         </div>

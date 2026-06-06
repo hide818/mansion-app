@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabase
     .from('payment_records')
-    .select('*, units(unit_number, floor), residents!inner(name, phone)')
+    .select('*, units(unit_number, floor), residents(name, phone, email)')
     .eq('company_id', companyId)
     .eq('billing_year', parseInt(year))
     .eq('billing_month', parseInt(month))

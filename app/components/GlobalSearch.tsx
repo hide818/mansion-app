@@ -55,14 +55,14 @@ export default function GlobalSearch() {
 
   return (
     <>
-      {/* 検索トリガーボタン */}
+      {/* 検索トリガーボタン（デスクトップ：テキスト付き / モバイル：アイコンのみ） */}
       <button onClick={() => setOpen(true)}
         className="flex w-full items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-400 hover:border-blue-300 hover:bg-white transition">
         <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <circle cx="11" cy="11" r="8" /><path strokeLinecap="round" d="M21 21l-4.35-4.35" />
         </svg>
-        <span className="flex-1 text-left">検索...</span>
-        <kbd className="hidden rounded bg-slate-200 px-1.5 py-0.5 text-xs sm:block">⌘K</kbd>
+        <span className="flex-1 text-left text-xs sm:text-sm">検索...</span>
+        <kbd className="hidden rounded bg-slate-200 px-1.5 py-0.5 text-xs lg:block">⌘K</kbd>
       </button>
 
       {/* モーダル */}

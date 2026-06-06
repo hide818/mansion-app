@@ -3,13 +3,30 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+import GlobalSearch from './components/GlobalSearch'
 
 type Props = {
   children: ReactNode
   sidebar: ReactNode
 }
 
-const NO_SHELL_PATHS = ['/', '/login', '/signup']
+const NO_SHELL_PATHS = ['/', '/login', '/signup', '/privacy', '/terms', '/security', '/lp']
+
+function MobileTopBar() {
+  return (
+    <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-slate-200 bg-white px-4 lg:hidden">
+      <Link href="/dashboard" className="flex items-center gap-1.5">
+        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-600">
+          <span className="text-xs font-extrabold text-white">K</span>
+        </div>
+        <span className="text-sm font-bold text-slate-800">Kura</span>
+      </Link>
+      <div className="w-48">
+        <GlobalSearch />
+      </div>
+    </header>
+  )
+}
 
 function MobileBottomNav() {
   const pathname = usePathname()
@@ -93,16 +110,19 @@ function ManagerIcon({ active }: { active: boolean }) {
 export default function LayoutShell({ children, sidebar }: Props) {
   const pathname = usePathname()
 
-  if (NO_SHELL_PATHS.includes(pathname)) {
+  if (NO_SHELL_PATHS.includes(pathname) || pathname.startsWith('/lp/')) {
     return <>{children}</>
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen flex-col lg:flex-row">
       {sidebar}
-      <main className="min-w-0 flex-1 overflow-x-hidden pb-16 lg:pb-0">
-        {children}
-      </main>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <MobileTopBar />
+        <main className="min-w-0 flex-1 overflow-x-hidden pb-16 lg:pb-0">
+          {children}
+        </main>
+      </div>
       <MobileBottomNav />
     </div>
   )

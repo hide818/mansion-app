@@ -2,6 +2,32 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params
+    const supabase = await createSupabaseServerClient()
+    const companyId = await getUserCompanyId()
+
+    const { data, error } = await supabase
+      .from('minutes_templates')
+      .select('id, name, is_active, sample_text, created_at')
+      .eq('id', id)
+      .eq('company_id', companyId)
+      .single()
+
+    if (error || !data) {
+      return NextResponse.json({ error: '取得に失敗しました。' }, { status: 404 })
+    }
+
+    return NextResponse.json({ template: data })
+  } catch {
+    return NextResponse.json({ error: '取得中にエラーが発生しました。' }, { status: 500 })
+  }
+}
+
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
