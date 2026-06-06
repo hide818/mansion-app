@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import FileAttachment from '@/app/components/FileAttachment'
 
 type Inspection = {
   id: string
@@ -13,6 +14,8 @@ type Inspection = {
   status: string
   result: string | null
   notes: string | null
+  report_file_path: string | null
+  report_file_name: string | null
   properties: { id: string; name: string } | null
   contractors: { id: string; name: string } | null
 }
@@ -76,6 +79,9 @@ export default function InspectionsPage() {
   const [editTarget, setEditTarget] = useState<Inspection | null>(null)
   const [form, setForm] = useState(BLANK_FORM)
   const [saving, setSaving] = useState(false)
+  const [companyId, setCompanyId] = useState('')
+
+  useEffect(() => { fetch('/api/me').then(r => r.json()).then(d => setCompanyId(d.companyId ?? '')).catch(() => {}) }, [])
 
   const load = useCallback(async () => {
     const params = new URLSearchParams()
@@ -229,6 +235,25 @@ export default function InspectionsPage() {
                     {ins.last_inspection_date && <span>前回: {ins.last_inspection_date}</span>}
                     {ins.contractors?.name && <span>業者: {ins.contractors.name}</span>}
                   </div>
+                  {companyId && (
+                    <div className="mt-2 max-w-sm">
+                      <p className="mb-1 text-[10px] font-semibold text-slate-400">業者からの報告書</p>
+                      <FileAttachment
+                        companyId={companyId}
+                        folder={`inspections/${ins.id}`}
+                        filePath={ins.report_file_path}
+                        fileName={ins.report_file_name}
+                        onSaved={async (path, name) => {
+                          await fetch(`/api/inspections/${ins.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ report_file_path: path, report_file_name: name }) })
+                          load()
+                        }}
+                        onDeleted={async () => {
+                          await fetch(`/api/inspections/${ins.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ report_file_path: null, report_file_name: null }) })
+                          load()
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="flex shrink-0 gap-2">
                   {ins.status !== 'completed' && (

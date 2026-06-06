@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import FileAttachment from '@/app/components/FileAttachment'
 
 type Estimate = {
   id: string
@@ -10,6 +11,8 @@ type Estimate = {
   validity_date: string | null
   status: string
   notes: string | null
+  file_path: string | null
+  file_name: string | null
   properties: { id: string; name: string } | null
   contractors: { id: string; name: string } | null
 }
@@ -42,6 +45,9 @@ export default function EstimatesPage() {
   const [editTarget, setEditTarget] = useState<Estimate | null>(null)
   const [form, setForm] = useState(BLANK_FORM)
   const [saving, setSaving] = useState(false)
+  const [companyId, setCompanyId] = useState('')
+
+  useEffect(() => { fetch('/api/me').then(r => r.json()).then(d => setCompanyId(d.companyId ?? '')).catch(() => {}) }, [])
 
   const load = useCallback(async () => {
     const params = new URLSearchParams()
@@ -189,6 +195,24 @@ export default function EstimatesPage() {
                             {e.submitted_date && <span>提出: {e.submitted_date}</span>}
                             {e.validity_date && <span>有効期限: {e.validity_date}</span>}
                           </div>
+                          {companyId && (
+                            <div className="mt-2">
+                              <FileAttachment
+                                companyId={companyId}
+                                folder={`estimates/${e.id}`}
+                                filePath={e.file_path}
+                                fileName={e.file_name}
+                                onSaved={async (path, name) => {
+                                  await fetch(`/api/estimates/${e.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ file_path: path, file_name: name }) })
+                                  load()
+                                }}
+                                onDeleted={async () => {
+                                  await fetch(`/api/estimates/${e.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ file_path: null, file_name: null }) })
+                                  load()
+                                }}
+                              />
+                            </div>
+                          )}
                         </div>
                         <div className="flex shrink-0 flex-col gap-1.5">
                           {e.status === 'pending' && (
