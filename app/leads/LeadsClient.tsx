@@ -35,6 +35,8 @@ export default function LeadsClient({ leads: initialLeads }: { leads: Lead[] }) 
   const [selected, setSelected] = useState<Lead | null>(null)
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
+  const [sendingSetup, setSendingSetup] = useState(false)
+  const [setupSent, setSetupSent] = useState<string | null>(null)
 
   const counts = STATUS_OPTIONS.map(s => ({
     ...s,
@@ -48,6 +50,18 @@ export default function LeadsClient({ leads: initialLeads }: { leads: Lead[] }) 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, status }),
     })
+  }
+
+  async function sendSetupEmail(lead: Lead) {
+    setSendingSetup(true)
+    await fetch('/api/leads/send-setup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: lead.id, name: lead.name, email: lead.email, company: lead.company }),
+    })
+    await updateStatus(lead.id, 'converted')
+    setSetupSent(lead.id)
+    setSendingSetup(false)
   }
 
   async function saveNotes() {
@@ -184,6 +198,25 @@ export default function LeadsClient({ leads: initialLeads }: { leads: Lead[] }) 
                   <span className="text-slate-700 leading-relaxed">{selected.message}</span>
                 </div>
               )}
+            </div>
+
+            {/* 設定完了メール送信 */}
+            <div className="border-t border-slate-100 pt-4 mb-4">
+              <p className="text-xs font-semibold text-slate-600 mb-2">アカウント設定完了メール</p>
+              {setupSent === selected.id ? (
+                <div className="rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 font-semibold">
+                  送信済み — ステータスを「成約」に変更しました
+                </div>
+              ) : (
+                <button
+                  onClick={() => sendSetupEmail(selected)}
+                  disabled={sendingSetup}
+                  className="w-full rounded-xl bg-emerald-600 py-2.5 text-sm font-bold text-white hover:bg-emerald-500 disabled:opacity-50 transition-colors"
+                >
+                  {sendingSetup ? '送信中...' : '設定完了メールを送信してサインアップリンクを案内'}
+                </button>
+              )}
+              <p className="mt-1.5 text-xs text-slate-400">送信後、相手に登録用リンクとアクセス方法が届きます</p>
             </div>
 
             <div className="border-t border-slate-100 pt-4">

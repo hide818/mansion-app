@@ -6,42 +6,35 @@ export const metadata = {
 
 const SECURITY_ITEMS = [
   {
-    icon: '🔐',
+
     title: 'マルチテナント完全分離',
     body: '全データは company_id で厳密に分離されています。A社のデータがB社から閲覧・操作されることは設計上あり得ません。データベース・APIの両レイヤーで分離を保証しています。',
   },
   {
-    icon: '🛡️',
     title: '行レベルセキュリティ（RLS）',
     body: 'Supabase PostgreSQLの行レベルセキュリティ（RLS）により、データベース側でもアクセス制御を実施。APIが突破されてもDBレイヤーで不正アクセスをブロックします。',
   },
   {
-    icon: '🔒',
     title: '通信の完全暗号化',
     body: 'すべての通信はTLS/HTTPS暗号化で保護されています。通信経路上でのデータ盗聴・改ざんを防止します。',
   },
   {
-    icon: '👤',
     title: '権限管理（ロールベースアクセス制御）',
     body: 'ユーザーには admin（管理者）/ general（一般）/ viewer（閲覧のみ）の3段階の権限が設定できます。一般担当者が誤って重要データを削除するリスクを最小化します。',
   },
   {
-    icon: '☁️',
     title: 'クラウドインフラのセキュリティ',
     body: 'データはSupabase（PostgreSQL）に保管されます。Supabaseはビジネス・エンタープライズ向けのSOC 2 Type 2認証取得済みクラウドサービスです。ファイルはSupabase Storageにより暗号化保存されます。',
   },
   {
-    icon: '🤖',
     title: 'AI機能とデータ取り扱い',
     body: '議事録生成・AI引き継ぎ書などの機能ではOpenAI APIを利用しています。OpenAIはAPI利用データをモデルのトレーニングに使用しないことを規約で定めています。入力データには物件情報・議事内容が含まれる場合があります。',
   },
   {
-    icon: '🔑',
     title: '認証セキュリティ',
     body: 'Supabase Authを使用したセキュアな認証基盤を採用。セッショントークンはHttpOnly Cookieで管理し、XSS攻撃によるトークン窃取を防止します。',
   },
   {
-    icon: '📋',
     title: '監査ログ',
     body: '案件の更新・タスク完了などの主要な操作はログとして記録されます。担当者の行動履歴の追跡や、不正操作の検知に活用できます。',
   },
@@ -78,7 +71,6 @@ export default function SecurityPage() {
             {SECURITY_ITEMS.map((item) => (
               <div key={item.title} className="rounded-xl border border-slate-100 bg-slate-50 p-4">
                 <div className="mb-2 flex items-center gap-2">
-                  <span className="text-xl">{item.icon}</span>
                   <h2 className="text-sm font-bold text-slate-800">{item.title}</h2>
                 </div>
                 <p className="text-xs leading-6 text-slate-600">{item.body}</p>

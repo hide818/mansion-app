@@ -96,7 +96,7 @@ export default function GlobalSearch() {
                   {results.properties.map(p => (
                     <button key={p.id} onClick={() => go(`/properties/${p.id}`)}
                       className="flex w-full items-center gap-3 px-4 py-3 hover:bg-blue-50 transition text-left">
-                      <span className="text-lg">🏢</span>
+                      <span className="h-2 w-2 rounded-full bg-blue-400 shrink-0" />
                       <div><p className="text-sm font-medium text-slate-800">{p.name}</p>
                         {p.address && <p className="text-xs text-slate-400">{p.address}</p>}</div>
                     </button>
@@ -110,7 +110,7 @@ export default function GlobalSearch() {
                   {results.residents.map(r => (
                     <button key={r.id} onClick={() => go('/residents')}
                       className="flex w-full items-center gap-3 px-4 py-3 hover:bg-blue-50 transition text-left">
-                      <span className="text-lg">👤</span>
+                      <span className="h-2 w-2 rounded-full bg-purple-400 shrink-0" />
                       <div>
                         <p className="text-sm font-medium text-slate-800">{r.name}</p>
                         <p className="text-xs text-slate-400">
@@ -128,7 +128,7 @@ export default function GlobalSearch() {
                   {results.cases.map(c => (
                     <button key={c.id} onClick={() => go('/cases')}
                       className="flex w-full items-center gap-3 px-4 py-3 hover:bg-blue-50 transition text-left">
-                      <span className="text-lg">📋</span>
+                      <span className="h-2 w-2 rounded-full bg-amber-400 shrink-0" />
                       <div>
                         <p className="text-sm font-medium text-slate-800">{c.title}</p>
                         <p className="text-xs text-slate-400">{c.properties?.name}</p>
@@ -144,7 +144,7 @@ export default function GlobalSearch() {
                   {results.inspections.map(i => (
                     <button key={i.id} onClick={() => go('/inspections')}
                       className="flex w-full items-center gap-3 px-4 py-3 hover:bg-blue-50 transition text-left">
-                      <span className="text-lg">🔍</span>
+                      <span className="h-2 w-2 rounded-full bg-emerald-400 shrink-0" />
                       <div>
                         <p className="text-sm font-medium text-slate-800">{i.inspection_name}</p>
                         <p className="text-xs text-slate-400">{i.properties?.name} · 期限: {i.next_due_date}</p>
@@ -160,7 +160,7 @@ export default function GlobalSearch() {
                   {results.contractors.map(c => (
                     <button key={c.id} onClick={() => go('/contractors')}
                       className="flex w-full items-center gap-3 px-4 py-3 hover:bg-blue-50 transition text-left">
-                      <span className="text-lg">🏭</span>
+                      <span className="h-2 w-2 rounded-full bg-slate-400 shrink-0" />
                       <div>
                         <p className="text-sm font-medium text-slate-800">{c.name}</p>
                         {c.phone && <p className="text-xs text-slate-400">{c.phone}</p>}

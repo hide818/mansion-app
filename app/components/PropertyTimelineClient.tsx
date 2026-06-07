@@ -231,7 +231,7 @@ export default function PropertyTimelineClient({
           </p>
           {!loading && warningCount > 0 && (
             <p className="mt-1.5 text-sm font-semibold text-amber-600">
-              ⚠️ 要注意: 期限切れ・停滞 {warningCount}件
+              要注意: 期限切れ・停滞 {warningCount}件
             </p>
           )}
         </div>

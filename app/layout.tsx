@@ -6,7 +6,7 @@ import { getUserProfile } from '@/lib/getUserProfile'
 
 export const metadata: Metadata = {
   title: 'Kura — 管理会社専用AI',
-  description: '担当者が辞めても止まらない管理会社を実現するAI SaaS',
+  description: '担当者が辞めても止まらない管理会社を実現するAI SaaS。分譲マンション管理会社向け。',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -14,6 +14,19 @@ export const metadata: Metadata = {
     title: 'Kura',
   },
   formatDetection: { telephone: false },
+  openGraph: {
+    title: 'Kura — 担当者が辞めても止まらない管理会社へ',
+    description: '総会議事録が2時間→50分に。分譲マンション管理会社専用AI業務管理SaaS。',
+    url: 'https://kura-management.com',
+    siteName: 'Kura',
+    locale: 'ja_JP',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Kura — 担当者が辞めても止まらない管理会社へ',
+    description: '総会議事録が2時間→50分に。分譲マンション管理会社専用AI業務管理SaaS。',
+  },
 }
 
 export const viewport: Viewport = {

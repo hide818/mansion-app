@@ -7,10 +7,10 @@ import Link from 'next/link'
 type Tab = 'properties' | 'residents' | 'inspections'
 type ImportResult = { inserted: number; skipped: number; errors: string[] } | null
 
-const TABS: { key: Tab; label: string; icon: string }[] = [
-  { key: 'properties', label: '物件', icon: '🏢' },
-  { key: 'residents', label: '居住者', icon: '👤' },
-  { key: 'inspections', label: '法定点検', icon: '📋' },
+const TABS: { key: Tab; label: string }[] = [
+  { key: 'properties', label: '物件' },
+  { key: 'residents', label: '居住者' },
+  { key: 'inspections', label: '法定点検' },
 ]
 
 const TEMPLATES: Record<Tab, { headers: string[]; sample: string[][] }> = {
@@ -116,7 +116,7 @@ export default function ImportPage() {
           {TABS.map(t => (
             <button key={t.key} onClick={() => { setTab(t.key); setFile(null); setResult(null) }}
               className={`flex flex-1 items-center justify-center gap-2 py-3 text-sm font-semibold transition ${tab === t.key ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-50'}`}>
-              <span>{t.icon}</span>{t.label}
+              {t.label}
             </button>
           ))}
         </div>
@@ -169,13 +169,13 @@ export default function ImportPage() {
               <input ref={inputRef} type="file" accept=".csv" onChange={handleFileChange} className="hidden" />
               {file ? (
                 <>
-                  <p className="text-2xl">✅</p>
+                  <svg className="h-8 w-8 text-blue-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l3 3m0 0l3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
                   <p className="mt-2 font-semibold text-blue-700">{file.name}</p>
                   <p className="text-xs text-blue-500">{(file.size / 1024).toFixed(1)} KB</p>
                 </>
               ) : (
                 <>
-                  <p className="text-3xl text-slate-300">📂</p>
+                  <svg className="h-8 w-8 text-slate-300" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" /></svg>
                   <p className="mt-2 text-sm font-medium text-slate-500">タップしてCSVを選択</p>
                   <p className="text-xs text-slate-400">.csv ファイルのみ対応</p>
                 </>
@@ -193,7 +193,7 @@ export default function ImportPage() {
         {result && (
           <div className={`rounded-xl border p-5 ${result.errors.length === 0 ? 'border-green-200 bg-green-50' : 'border-orange-200 bg-orange-50'}`}>
             <p className={`font-bold ${result.errors.length === 0 ? 'text-green-800' : 'text-orange-800'}`}>
-              {result.errors.length === 0 ? '✅ インポート完了' : '⚠️ 一部エラーあり'}
+              {result.errors.length === 0 ? 'インポート完了' : '一部エラーあり'}
             </p>
             <div className="mt-2 flex gap-4 text-sm">
               <span className="text-green-700">成功: <strong>{result.inserted}件</strong></span>

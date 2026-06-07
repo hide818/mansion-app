@@ -107,7 +107,9 @@ function StepIndicator({ current }: { current: AppStep }) {
                     : 'bg-slate-200 text-slate-500'
                 }`}
               >
-                {done ? '✓' : i + 1}
+                {done ? (
+                  <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                ) : i + 1}
               </div>
               <span
                 className={`text-xs font-semibold whitespace-nowrap ${
@@ -155,7 +157,7 @@ function FileInput({
         htmlFor={id}
         className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm transition hover:border-emerald-400 hover:bg-emerald-50"
       >
-        <span className="text-base leading-none text-slate-400">📎</span>
+        <svg className="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" /></svg>
         {value ? (
           <span className="font-semibold text-emerald-700">{value.name}</span>
         ) : (

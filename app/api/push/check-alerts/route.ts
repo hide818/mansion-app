@@ -87,7 +87,7 @@ export async function GET(request: Request) {
     ].filter(Boolean).join('、')
 
     const payload = JSON.stringify({
-      title: '⚠️ Kura タスクアラート',
+      title: 'Kura タスクアラート',
       body,
       url: '/dashboard',
       urgent: overdueCount > 0,

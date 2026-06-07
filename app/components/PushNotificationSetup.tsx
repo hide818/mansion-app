@@ -77,7 +77,7 @@ export default function PushNotificationSetup() {
     <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-blue-800">📱 スマートフォン通知を有効にする</p>
+          <p className="text-sm font-semibold text-blue-800">スマートフォン通知を有効にする</p>
           <p className="text-xs text-blue-600 mt-0.5">期限切れ・今日期限のタスクをリアルタイムでお知らせします</p>
         </div>
         <button

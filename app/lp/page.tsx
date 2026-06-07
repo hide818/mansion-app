@@ -4,7 +4,16 @@ import ContactForm from '@/app/components/ContactForm'
 
 export const metadata = {
   title: 'Kura — 担当者が辞めても止まらない管理会社へ',
-  description: '分譲マンション管理会社向けAI業務管理SaaS。総会議事録を2時間→50分に。案件タスク管理・AI議事録・引き継ぎ書自動生成で属人化を解消。',
+  description: '分譲マンション管理会社向けAI業務管理SaaS。総会議事録を2時間→50分に。案件タスク管理・AI議事録・引き継ぎ書自動生成で属人化を解消。初期3社限定・3ヶ月無料。',
+  keywords: '分譲マンション管理,管理会社,議事録,AI,属人化,引き継ぎ,タスク管理,SaaS',
+  openGraph: {
+    title: 'Kura — 担当者が辞めても止まらない管理会社へ',
+    description: '総会議事録が2時間→50分に。分譲マンション管理会社専用AI業務管理SaaS。',
+    url: 'https://kura-management.com/lp',
+    siteName: 'Kura',
+    locale: 'ja_JP',
+    type: 'website',
+  },
 }
 
 const PRICING = [
@@ -574,10 +583,25 @@ export default function LpPage() {
         <div className="mx-auto max-w-xl">
           <p className="mb-3 text-center text-xs font-bold uppercase tracking-widest text-blue-600">Contact</p>
           <h2 className="mb-3 text-center text-3xl font-extrabold text-slate-900">デモ・お問い合わせ</h2>
-          <p className="mb-10 text-center text-sm text-slate-500">
-            30分のオンラインデモで、貴社の業務への活用イメージをお見せします。<br />
-            お申し込み後、3営業日以内にご連絡いたします。
+          <p className="mb-6 text-center text-sm text-slate-500">
+            初期3社限定・3ヶ月間完全無料でお使いいただけます。
           </p>
+          <div className="mb-10 flex flex-col sm:flex-row items-center justify-center gap-3 text-xs text-slate-400">
+            {[
+              { step: '1', label: 'フォームを送信' },
+              { step: '2', label: '弊社でアカウント設定（3営業日以内）' },
+              { step: '3', label: '設定完了メールが届く' },
+              { step: '4', label: '3ヶ月無料でスタート' },
+            ].map((s, i, arr) => (
+              <div key={s.step} className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">{s.step}</span>
+                  <span>{s.label}</span>
+                </div>
+                {i < arr.length - 1 && <span className="hidden text-slate-300 sm:inline">→</span>}
+              </div>
+            ))}
+          </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
             <ContactForm />
           </div>
