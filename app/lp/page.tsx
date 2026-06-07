@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import KuraLogo from '@/app/components/KuraLogo'
+import ContactForm from '@/app/components/ContactForm'
 
 export const metadata = {
   title: 'Kura — 担当者が辞めても止まらない管理会社へ',
   description: '分譲マンション管理会社向けAI業務管理SaaS。総会議事録を2時間→50分に。案件タスク管理・AI議事録・引き継ぎ書自動生成で属人化を解消。',
 }
 
-// ── 料金プラン ─────────────────────────────────────────────────────
 const PRICING = [
   {
     name: 'トライアル',
@@ -15,8 +15,6 @@ const PRICING = [
     badge: null,
     sub: '初期3社限定',
     features: ['全機能が利用可能', '物件数無制限', 'ユーザー3名まで', 'メールサポート'],
-    cta: '無料で始める',
-    ctaHref: '/signup',
     primary: false,
   },
   {
@@ -26,8 +24,6 @@ const PRICING = [
     badge: 'おすすめ',
     sub: '中小管理会社向け',
     features: ['全機能が利用可能', '物件数無制限', 'ユーザー10名まで', 'メール・チャットサポート'],
-    cta: '資料請求・お問い合わせ',
-    ctaHref: 'mailto:info@kura-app.com',
     primary: true,
   },
   {
@@ -37,8 +33,6 @@ const PRICING = [
     badge: null,
     sub: '中堅管理会社向け',
     features: ['全機能が利用可能', '物件数・ユーザー無制限', '専任サポート担当', 'CSV一括インポート支援', '稟議用セキュリティ資料'],
-    cta: '資料請求・お問い合わせ',
-    ctaHref: 'mailto:info@kura-app.com',
     primary: false,
   },
 ]
@@ -87,9 +81,9 @@ export default function LpPage() {
             <Link href="/login" className="hidden text-sm font-medium text-slate-600 hover:text-slate-900 sm:inline transition-colors">
               ログイン
             </Link>
-            <Link href="/signup"
+            <Link href="#contact"
               className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-blue-500 transition-colors">
-              無料で試す
+              デモを申し込む
             </Link>
           </div>
         </div>
@@ -98,11 +92,9 @@ export default function LpPage() {
       {/* ━━━━━ HERO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section className="relative overflow-hidden bg-[#070E1C]">
 
-        {/* 背景装飾 */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
           <div className="absolute -top-40 left-1/2 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-blue-600 opacity-[0.06] blur-[100px]" />
           <div className="absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full bg-indigo-600 opacity-[0.04] blur-[80px]" />
-          {/* グリッドライン */}
           <svg className="absolute inset-0 h-full w-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
@@ -116,7 +108,6 @@ export default function LpPage() {
         <div className="relative z-10 mx-auto max-w-6xl px-6 pb-16 pt-20 lg:pt-24">
           <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-16">
 
-            {/* テキスト */}
             <div className="flex-1 lg:max-w-[520px]">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
@@ -135,9 +126,9 @@ export default function LpPage() {
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link href="/signup"
+                <Link href="#contact"
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-500 px-7 py-3.5 text-base font-bold text-white shadow-lg shadow-blue-500/25 hover:bg-blue-400 transition-colors">
-                  まず無料で試してみる
+                  デモを申し込む
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                   </svg>
@@ -155,7 +146,6 @@ export default function LpPage() {
                 初期3社限定 · 3ヶ月間完全無料 · クレジットカード不要
               </p>
 
-              {/* 信頼シグナル */}
               <div className="mt-8 flex flex-wrap gap-5">
                 {['TLS暗号化通信', '現役フロントマンが設計', '最短10分で導入'].map(text => (
                   <div key={text} className="flex items-center gap-1.5 text-xs text-slate-500">
@@ -169,21 +159,16 @@ export default function LpPage() {
             {/* プロダクトモックアップ */}
             <div className="w-full lg:w-[440px] lg:shrink-0">
               <div className="relative rounded-2xl border border-white/10 bg-[#0D1B2E] shadow-2xl shadow-black/50 overflow-hidden">
-
-                {/* ウィンドウバー */}
                 <div className="flex items-center gap-1.5 border-b border-white/5 bg-black/20 px-4 py-3">
                   <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F56]" />
                   <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
                   <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F]" />
                   <div className="ml-3 flex-1 rounded-md bg-white/5 px-3 py-1 text-[10px] text-white/20">
-                    kura-app.com/ai-minutes
+                    kura-management.com/ai-minutes
                   </div>
                 </div>
 
-                {/* アプリUI */}
                 <div className="p-5">
-
-                  {/* アプリヘッダー */}
                   <div className="mb-4 flex items-center gap-2">
                     <KuraLogo size={20} variant="seal" />
                     <span className="text-xs font-bold text-white">AI議事録</span>
@@ -192,7 +177,6 @@ export default function LpPage() {
                     </span>
                   </div>
 
-                  {/* 完成した議事録カード */}
                   <div className="rounded-xl bg-white p-4 shadow-lg">
                     <div className="mb-3 border-b border-slate-100 pb-2.5">
                       <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
@@ -227,7 +211,6 @@ export default function LpPage() {
                     </div>
                   </div>
 
-                  {/* 時間バッジ */}
                   <div className="mt-3 flex items-center justify-between rounded-xl bg-white/5 px-3 py-2">
                     <div className="flex items-center gap-2">
                       <svg className="h-3.5 w-3.5 text-green-400" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -243,7 +226,6 @@ export default function LpPage() {
                 </div>
               </div>
 
-              {/* 補足テキスト */}
               <p className="mt-3 text-center text-xs text-slate-600">
                 実際の画面イメージ。音声アップロード→議事録完成まで。
               </p>
@@ -324,7 +306,6 @@ export default function LpPage() {
           <p className="mb-14 text-center text-sm text-slate-500">ITに詳しくなくても、当日から使えます</p>
 
           <div className="relative grid gap-8 sm:grid-cols-3">
-            {/* 接続線 */}
             <div className="absolute left-[calc(16.6%+16px)] top-8 hidden h-0.5 bg-gradient-to-r from-blue-200 to-blue-200 sm:block" style={{ width: 'calc(66.7% - 32px)' }} />
 
             {[
@@ -352,7 +333,7 @@ export default function LpPage() {
                 step: '03',
                 icon: (
                   <svg className="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.707l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 ),
                 title: '議事録＋タスクが完成',
@@ -379,8 +360,6 @@ export default function LpPage() {
         <div className="mx-auto max-w-3xl">
           <p className="mb-8 text-center text-xs font-bold uppercase tracking-widest text-blue-600">Before / After</p>
           <div className="grid gap-4 sm:grid-cols-2">
-
-            {/* Before */}
             <div className="rounded-2xl border border-red-200 bg-white p-6">
               <p className="mb-4 text-xs font-bold uppercase tracking-widest text-red-400">Kura 導入前</p>
               <div className="space-y-3">
@@ -401,7 +380,6 @@ export default function LpPage() {
               </div>
             </div>
 
-            {/* After */}
             <div className="rounded-2xl border border-emerald-200 bg-white p-6">
               <p className="mb-4 text-xs font-bold uppercase tracking-widest text-emerald-500">Kura 導入後</p>
               <div className="space-y-3">
@@ -421,7 +399,6 @@ export default function LpPage() {
                 ))}
               </div>
             </div>
-
           </div>
         </div>
       </section>
@@ -515,10 +492,17 @@ export default function LpPage() {
             月2回の総会・理事会があれば、月あたり<span className="font-bold text-white">3時間20分</span>を節約。<br />
             担当者が10名なら年間で<span className="font-bold text-white">400時間以上</span>。
           </p>
+          <Link href="#contact"
+            className="mt-10 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-500 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-400 transition-colors">
+            デモを申し込む
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </Link>
         </div>
       </section>
 
-      {/* ━━━━━ PRICING ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {/* ━━━━━ PRICING ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section id="pricing" className="bg-slate-50 px-6 py-20">
         <div className="mx-auto max-w-4xl">
           <p className="mb-3 text-center text-xs font-bold uppercase tracking-widest text-blue-600">Pricing</p>
@@ -554,9 +538,9 @@ export default function LpPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href={plan.ctaHref}
+                <Link href="#contact"
                   className={`block rounded-xl py-3 text-center text-sm font-bold transition-colors ${plan.primary ? 'bg-blue-600 text-white hover:bg-blue-500' : 'border border-slate-200 text-slate-700 hover:bg-slate-50'}`}>
-                  {plan.cta}
+                  デモを申し込む
                 </Link>
               </div>
             ))}
@@ -585,33 +569,18 @@ export default function LpPage() {
         </div>
       </section>
 
-      {/* ━━━━━ FINAL CTA ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-      <section className="relative overflow-hidden bg-[#070E1C] px-6 py-20">
-        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div className="absolute -bottom-40 left-1/2 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-blue-600 opacity-[0.07] blur-[100px]" />
-        </div>
-        <div className="relative z-10 mx-auto max-w-xl text-center">
-          <KuraLogo size={48} variant="seal" />
-          <h2 className="mt-5 text-3xl font-extrabold leading-tight text-white">
-            あなたの会社でも、<br />できます。
-          </h2>
-          <p className="mt-4 text-base text-slate-400">
-            管理担当者が3ヶ月無料で試せます。<br />
-            クレジットカードも初期費用も不要。
+      {/* ━━━━━ CONTACT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <section id="contact" className="bg-slate-50 px-6 py-20">
+        <div className="mx-auto max-w-xl">
+          <p className="mb-3 text-center text-xs font-bold uppercase tracking-widest text-blue-600">Contact</p>
+          <h2 className="mb-3 text-center text-3xl font-extrabold text-slate-900">デモ・お問い合わせ</h2>
+          <p className="mb-10 text-center text-sm text-slate-500">
+            30分のオンラインデモで、貴社の業務への活用イメージをお見せします。<br />
+            初期3社限定で3ヶ月間完全無料でご利用いただけます。
           </p>
-          <Link href="/signup"
-            className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-500 px-9 py-4 text-base font-bold text-white shadow-xl shadow-blue-500/20 hover:bg-blue-400 transition-colors">
-            無料アカウントを作成する
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </Link>
-          <p className="mt-3 text-xs text-slate-600">
-            ご質問は{' '}
-            <a href="mailto:info@kura-app.com" className="text-blue-400 hover:text-blue-300">
-              info@kura-app.com
-            </a>
-          </p>
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+            <ContactForm />
+          </div>
         </div>
       </section>
 
