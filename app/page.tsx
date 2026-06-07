@@ -61,12 +61,11 @@ export default function Home() {
           <h2 className="text-center text-xl font-bold text-white mb-10">管理会社が抱えるこんな課題、ありませんか？</h2>
           <div className="grid gap-4 sm:grid-cols-3">
             {[
-              { icon: '😰', text: '担当者が退職して引き継ぎが曖昧になった' },
-              { icon: '📝', text: '議事録の作成に毎回1〜2時間かかっている' },
-              { icon: '🔥', text: '案件の抜け漏れで居住者からクレームが来た' },
-            ].map(({ icon, text }) => (
+              '担当者が退職して引き継ぎが曖昧になった',
+              '議事録の作成に毎回1〜2時間かかっている',
+              '案件の抜け漏れで居住者からクレームが来た',
+            ].map((text) => (
               <div key={text} className="rounded-xl bg-slate-800 p-5 text-center">
-                <div className="text-3xl mb-3">{icon}</div>
                 <p className="text-sm text-slate-300 leading-relaxed">{text}</p>
               </div>
             ))}
@@ -88,19 +87,16 @@ export default function Home() {
           </p>
           <div className="grid gap-6 sm:grid-cols-3">
             <FeatureCard
-              icon="📋"
               title="案件・タスク管理"
               description="全物件の案件・タスクを一覧で把握。期限切れ・停滞・クレームを自動アラート。誰が担当していても状況が見える。"
               badge="属人化防止"
             />
             <FeatureCard
-              icon="🎙️"
               title="AI議事録"
               description="会議の録音をアップロードするだけ。AIが文字起こし〜議事録作成まで自動化。自社フォーマットにも対応。"
               badge="30分→3分"
             />
             <FeatureCard
-              icon="📄"
               title="AI引き継ぎ書"
               description="物件を選ぶだけでAIが引き継ぎ書を自動生成。担当交代時のミスゼロ。新人でも即戦力に。"
               badge="引き継ぎ革命"
@@ -190,19 +186,16 @@ export default function Home() {
 }
 
 function FeatureCard({
-  icon,
   title,
   description,
   badge,
 }: {
-  icon: string
   title: string
   description: string
   badge: string
 }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="mb-3 text-3xl">{icon}</div>
       <div className="mb-2 inline-flex rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-600">
         {badge}
       </div>
@@ -258,7 +251,7 @@ function PricingCard({
       <ul className="mt-5 space-y-2">
         {features.map((f) => (
           <li key={f} className="flex items-center gap-2 text-sm">
-            <span className={recommended ? 'text-blue-200' : 'text-blue-500'}>✓</span>
+            <svg className={`h-4 w-4 shrink-0 ${recommended ? 'text-blue-200' : 'text-blue-500'}`} fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
             {f}
           </li>
         ))}
@@ -314,7 +307,7 @@ function ContactSection() {
 
         {status === 'done' ? (
           <div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center">
-            <p className="text-2xl mb-2">✅</p>
+            <div className="flex justify-center mb-3"><svg className="h-10 w-10 text-green-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
             <p className="font-bold text-green-800">お問い合わせを受け付けました</p>
             <p className="text-sm text-green-600 mt-1">通常1営業日以内にご連絡します。</p>
           </div>
