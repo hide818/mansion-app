@@ -3,6 +3,10 @@
     {
       "path": "/api/push/check-alerts",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/email/task-alerts",
+      "schedule": "0 8 * * *"
     }
   ]
 }
