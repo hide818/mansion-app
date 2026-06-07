@@ -10,6 +10,7 @@ function isPublicPath(pathname: string) {
     pathname === '/security' ||
     pathname === '/lp' ||
     pathname.startsWith('/lp/') ||
+    pathname === '/api/contact' ||
     pathname === '/promo' ||
     pathname === '/promo/logo'
   )
@@ -77,7 +78,8 @@ export async function middleware(request: NextRequest) {
 
   if (!user) {
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    // ルートアクセスは未ログインならLPへ
+    url.pathname = pathname === '/' ? '/lp' : '/login'
     return NextResponse.redirect(url)
   }
 
