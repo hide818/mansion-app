@@ -576,7 +576,7 @@ export default function LpPage() {
           <h2 className="mb-3 text-center text-3xl font-extrabold text-slate-900">デモ・お問い合わせ</h2>
           <p className="mb-10 text-center text-sm text-slate-500">
             30分のオンラインデモで、貴社の業務への活用イメージをお見せします。<br />
-            初期3社限定で3ヶ月間完全無料でご利用いただけます。
+            お申し込み後、3営業日以内にご連絡いたします。
           </p>
           <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
             <ContactForm />
