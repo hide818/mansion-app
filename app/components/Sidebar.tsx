@@ -1,8 +1,8 @@
 import SidebarClient from './SidebarClient'
 import type { NavGroup } from './SidebarClient'
 
-export default function Sidebar() {
-  const menuGroups: NavGroup[] = [
+export default function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
+  const allMenuGroups: NavGroup[] = [
     {
       label: 'ホーム',
       href: '/dashboard',
@@ -175,6 +175,10 @@ export default function Sidebar() {
       ],
     },
   ]
+
+  const menuGroups = isAdmin
+    ? allMenuGroups
+    : allMenuGroups.filter((g) => g.label !== '管理者')
 
   return <SidebarClient menuGroups={menuGroups} />
 }

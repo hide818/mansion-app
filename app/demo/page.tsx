@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function DemoPage() {
@@ -8,6 +8,12 @@ export default function DemoPage() {
   const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+
+  useEffect(() => {
+    fetch('/api/me').then(r => r.json()).then(d => {
+      if (!d.isAdmin) router.replace('/dashboard')
+    }).catch(() => router.replace('/dashboard'))
+  }, [router])
 
   async function handleInsert() {
     if (!confirm('サンプルデータを投入します。既存データは削除されません。続けますか？')) return

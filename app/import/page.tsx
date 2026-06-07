@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 type Tab = 'properties' | 'residents' | 'inspections'
@@ -59,6 +60,13 @@ export default function ImportPage() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<ImportResult>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
+
+  useEffect(() => {
+    fetch('/api/me').then(r => r.json()).then(d => {
+      if (!d.isAdmin) router.replace('/dashboard')
+    }).catch(() => router.replace('/dashboard'))
+  }, [router])
 
   function handleDownloadTemplate() {
     const t = TEMPLATES[tab]

@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { createSupabaseServerClient } from '@/lib/supabaseServer'
-import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import { getUserProfile } from '@/lib/getUserProfile'
 import { getRiskSummary, type AssigneeRisk } from '@/lib/managerRiskSummary'
 
 function RiskBadge({ level }: { level: AssigneeRisk['riskLevel'] }) {
@@ -27,17 +26,14 @@ function RiskBadge({ level }: { level: AssigneeRisk['riskLevel'] }) {
 }
 
 export default async function ManagerPage() {
-  const supabase = await createSupabaseServerClient()
+  const profile = await getUserProfile()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  if (!profile) redirect('/login')
 
-  if (!user) {
-    redirect('/login')
-  }
+  const isAdmin = profile.role === 'admin' || profile.can_view_all_data === true
+  if (!isAdmin) redirect('/dashboard')
 
-  const companyId = await getUserCompanyId()
+  const companyId = profile.company_id
 
   if (!companyId) {
     return (

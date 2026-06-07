@@ -4,21 +4,21 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import GlobalSearch from './components/GlobalSearch'
+import KuraLogo from './components/KuraLogo'
 
 type Props = {
   children: ReactNode
   sidebar: ReactNode
+  isAdmin?: boolean
 }
 
-const NO_SHELL_PATHS = ['/', '/login', '/signup', '/privacy', '/terms', '/security', '/lp']
+const NO_SHELL_PATHS = ['/', '/login', '/signup', '/privacy', '/terms', '/security', '/lp', '/promo', '/promo/logo']
 
 function MobileTopBar() {
   return (
     <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-slate-200 bg-white px-4 lg:hidden">
       <Link href="/dashboard" className="flex items-center gap-1.5">
-        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-600">
-          <span className="text-xs font-extrabold text-white">K</span>
-        </div>
+        <KuraLogo size={24} variant="seal" />
         <span className="text-sm font-bold text-slate-800">Kura</span>
       </Link>
       <div className="w-48">
@@ -28,16 +28,19 @@ function MobileTopBar() {
   )
 }
 
-function MobileBottomNav() {
+function MobileBottomNav({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname()
 
-  const items = [
+  const baseItems = [
     { href: '/dashboard', label: 'ホーム', icon: HomeIcon },
     { href: '/cases', label: '案件', icon: CasesIcon },
     { href: '/ai-minutes', label: 'AI議事録', icon: MinutesIcon },
     { href: '/handover-documents/new', label: '引き継ぎ', icon: HandoverIcon },
-    { href: '/manager', label: '管理者', icon: ManagerIcon },
   ]
+
+  const items = isAdmin
+    ? [...baseItems, { href: '/manager', label: '管理者', icon: ManagerIcon }]
+    : baseItems
 
   function isActive(href: string) {
     if (href === '/dashboard') return pathname === '/dashboard'
@@ -107,7 +110,7 @@ function ManagerIcon({ active }: { active: boolean }) {
   )
 }
 
-export default function LayoutShell({ children, sidebar }: Props) {
+export default function LayoutShell({ children, sidebar, isAdmin = false }: Props) {
   const pathname = usePathname()
 
   if (NO_SHELL_PATHS.includes(pathname) || pathname.startsWith('/lp/')) {
@@ -123,7 +126,7 @@ export default function LayoutShell({ children, sidebar }: Props) {
           {children}
         </main>
       </div>
-      <MobileBottomNav />
+      <MobileBottomNav isAdmin={isAdmin} />
     </div>
   )
 }

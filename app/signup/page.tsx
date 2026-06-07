@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import KuraLogo from '@/app/components/KuraLogo'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -78,11 +79,9 @@ export default function SignupPage() {
 
         {/* ロゴ */}
         <div className="mb-8 text-center">
-          <Link href="/">
-            <div className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500 shadow-lg shadow-blue-500/30">
-              <span className="text-2xl font-extrabold text-white">K</span>
-            </div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-white">Kura</h1>
+          <Link href="/" className="inline-flex flex-col items-center gap-2">
+            <KuraLogo size={56} variant="seal" />
+            <span className="text-4xl font-extrabold tracking-tight text-white">Kura</span>
           </Link>
           <p className="mt-1 text-xs text-blue-400/70">新規アカウント登録</p>
         </div>
