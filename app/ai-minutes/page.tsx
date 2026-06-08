@@ -576,6 +576,8 @@ function buildGeneralMeetingStatusRows(params: {
     effectiveVotingRightsCount,
   } = params
 
+  const totalPeople = (parseInt(attendeesCount) || 0) + (parseInt(proxyCount) || 0) + (parseInt(writtenVoteCount) || 0)
+
   return `
     <tr>
       <td>組合員総数</td>
@@ -602,7 +604,8 @@ function buildGeneralMeetingStatusRows(params: {
       <td>${escapeHtml(writtenVoteRightsCount || '0')}個</td>
     </tr>
     <tr>
-      <td colspan="2"></td>
+      <td>合計</td>
+      <td>${totalPeople}人</td>
       <td>有効議決権数</td>
       <td>${escapeHtml(effectiveVotingRightsCount || '0')}個</td>
     </tr>
