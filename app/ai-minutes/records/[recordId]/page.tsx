@@ -24,6 +24,7 @@ type RecordDetailRow = {
   meeting_round: string | null
   meeting_place: string | null
   attendees_text: string | null
+  absentee_text: string | null
   chairperson_name: string | null
   bylaws_article: string | null
   signature_date: string | null
@@ -71,6 +72,7 @@ export default async function AiMinutesRecordDetailPage({ params }: PageProps) {
       meeting_round,
       meeting_place,
       attendees_text,
+      absentee_text,
       chairperson_name,
       bylaws_article,
       signature_date,
@@ -171,6 +173,7 @@ export default async function AiMinutesRecordDetailPage({ params }: PageProps) {
           meetingRound={row.meeting_round ?? ''}
           meetingPlace={row.meeting_place ?? ''}
           attendeesText={row.attendees_text ?? ''}
+          absenteeText={row.absentee_text ?? ''}
           chairpersonName={row.chairperson_name ?? ''}
           bylawsArticle={row.bylaws_article ?? ''}
           signatureDate={row.signature_date}

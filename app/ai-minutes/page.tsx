@@ -76,6 +76,7 @@ type SavedMinutesRecordResponse =
         meetingRound: string
         meetingPlace: string
         attendeesText: string
+        absenteeText?: string
         chairpersonName: string
         bylawsArticle: string
         signatureDate: string | null
@@ -257,6 +258,7 @@ function buildBoardFormalPrintHtml(params: {
   endTime: string
   meetingPlace: string
   attendeesText: string
+  absenteeText?: string
   managementCompanyDisplay: string
   chairpersonName: string
   bylawsArticle: string
@@ -276,6 +278,7 @@ function buildBoardFormalPrintHtml(params: {
     endTime,
     meetingPlace,
     attendeesText,
+    absenteeText = '',
     managementCompanyDisplay,
     chairpersonName,
     bylawsArticle,
@@ -505,6 +508,7 @@ function buildBoardFormalPrintHtml(params: {
       <tr><td class="info-label">開催日時</td><td>${escapeHtml(heldOnText)}</td></tr>
       <tr><td class="info-label">開催場所</td><td>${escapeHtml(meetingPlace || '')}</td></tr>
       <tr><td class="info-label">出席者</td><td>${escapeHtml(attendeesText || '')}</td></tr>
+      ${absenteeText ? `<tr><td class="info-label">欠席者</td><td>${escapeHtml(absenteeText)}</td></tr>` : ''}
       <tr><td class="info-label">管理会社</td><td>${escapeHtml(managementCompanyDisplay || '')}</td></tr>
     </table>
 
@@ -981,6 +985,7 @@ function AiMinutesInner() {
   const [meetingRound, setMeetingRound] = useState('')
   const [meetingPlace, setMeetingPlace] = useState('')
   const [attendeesText, setAttendeesText] = useState('')
+  const [absenteeText, setAbsenteeText] = useState('')
   const [chairpersonName, setChairpersonName] = useState('')
   const [bylawsArticle, setBylawsArticle] = useState('')
   const [signatureDate, setSignatureDate] = useState('')
@@ -1071,6 +1076,7 @@ function AiMinutesInner() {
   const safeMeetingRound = meetingRound.trim()
   const safeMeetingPlace = meetingPlace.trim()
   const safeAttendeesText = attendeesText.trim()
+  const safeAbsenteeText = absenteeText.trim()
   const safeChairpersonName = chairpersonName.trim()
   const safeBylawsArticle = bylawsArticle.trim()
   const managementCompanyDisplay = [companyNameDisplay.trim(), staffAssignee.trim()]
@@ -1329,6 +1335,7 @@ function AiMinutesInner() {
         setMeetingRound(record.meetingRound ?? '')
         setMeetingPlace(record.meetingPlace ?? '')
         setAttendeesText(record.attendeesText ?? '')
+        setAbsenteeText(record.absenteeText ?? '')
         setChairpersonName(record.chairpersonName ?? '')
         setBylawsArticle(record.bylawsArticle ?? '')
         setSignatureDate(record.signatureDate ?? record.heldOn ?? '')
@@ -1538,6 +1545,7 @@ function AiMinutesInner() {
       meetingRound: isBoardMeeting ? safeMeetingRound : '',
       meetingPlace: safeMeetingPlace,
       attendeesText: safeAttendeesText,
+      absenteeText: isBoardMeeting ? safeAbsenteeText : '',
       chairpersonName: safeChairpersonName,
       bylawsArticle: safeBylawsArticle,
       signatureDate: isBoardMeeting ? signatureDate || heldOn || null : heldOn || null,
@@ -1740,6 +1748,7 @@ function AiMinutesInner() {
             endTime,
             meetingPlace: safeMeetingPlace,
             attendeesText: safeAttendeesText,
+            absenteeText: safeAbsenteeText,
             managementCompanyDisplay: safeManagementCompanyDisplay,
             chairpersonName: safeChairpersonName,
             bylawsArticle: safeBylawsArticle,
@@ -1821,6 +1830,7 @@ function AiMinutesInner() {
             endTime,
             meetingPlace: safeMeetingPlace,
             attendeesText: safeAttendeesText,
+            absenteeText: safeAbsenteeText,
             managementCompanyDisplay: safeManagementCompanyDisplay,
             chairpersonName: safeChairpersonName,
             bylawsArticle: safeBylawsArticle,
@@ -2314,6 +2324,17 @@ function AiMinutesInner() {
                   onChange={(e) => setAttendeesText(e.target.value)}
                   className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
                   placeholder="例：岡本、高橋、野田"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">欠席者</label>
+                <input
+                  type="text"
+                  value={absenteeText}
+                  onChange={(e) => setAbsenteeText(e.target.value)}
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
+                  placeholder="例：田中（未入力なら欄なし）"
                 />
               </div>
 

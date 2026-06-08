@@ -20,6 +20,7 @@ type UpdatePayload = {
   meetingRound?: string
   meetingPlace?: string
   attendeesText?: string
+  absenteeText?: string
   chairpersonName?: string
   bylawsArticle?: string
   signatureDate?: string
@@ -55,6 +56,7 @@ type RecordDetailRow = {
   meeting_round: string | null
   meeting_place: string | null
   attendees_text: string | null
+  absentee_text: string | null
   chairperson_name: string | null
   bylaws_article: string | null
   signature_date: string | null
@@ -133,6 +135,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
         meeting_round,
         meeting_place,
         attendees_text,
+        absentee_text,
         chairperson_name,
         bylaws_article,
         signature_date,
@@ -239,6 +242,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
         meetingRound: row.meeting_round ?? '',
         meetingPlace: row.meeting_place ?? '',
         attendeesText: row.attendees_text ?? '',
+        absenteeText: row.absentee_text ?? '',
         chairpersonName: row.chairperson_name ?? '',
         bylawsArticle: row.bylaws_article ?? '',
         signatureDate: row.signature_date,
@@ -286,6 +290,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       meetingRound,
       meetingPlace,
       attendeesText,
+      absenteeText,
       chairpersonName,
       bylawsArticle,
       signatureDate,
@@ -373,6 +378,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       meeting_round: normalizeText(meetingRound),
       meeting_place: normalizeText(meetingPlace),
       attendees_text: normalizeText(attendeesText),
+      absentee_text: normalizeText(absenteeText),
       chairperson_name: normalizeText(chairpersonName),
       bylaws_article: normalizeText(bylawsArticle),
       signature_date: normalizeHeldOn(signatureDate),
@@ -403,6 +409,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
         meeting_round,
         meeting_place,
         attendees_text,
+        absentee_text,
         chairperson_name,
         bylaws_article,
         signature_date,
@@ -436,6 +443,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
         meetingRound: data.meeting_round ?? '',
         meetingPlace: data.meeting_place ?? '',
         attendeesText: data.attendees_text ?? '',
+        absenteeText: data.absentee_text ?? '',
         chairpersonName: data.chairperson_name ?? '',
         bylawsArticle: data.bylaws_article ?? '',
         signatureDate: data.signature_date,

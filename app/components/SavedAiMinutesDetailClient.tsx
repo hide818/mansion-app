@@ -77,6 +77,7 @@ type SavedAiMinutesDetailClientProps = {
   meetingRound?: string | null
   meetingPlace?: string | null
   attendeesText?: string | null
+  absenteeText?: string | null
   chairpersonName?: string | null
   bylawsArticle?: string | null
   signatureDate?: string | null
@@ -215,6 +216,7 @@ function buildBoardFormalPages({
   heldOn,
   meetingPlace,
   attendeesText,
+  absenteeText = '',
   managementCompanyDisplay,
   chairpersonName,
   bylawsArticle,
@@ -227,6 +229,7 @@ function buildBoardFormalPages({
   heldOn: string | null
   meetingPlace: string
   attendeesText: string
+  absenteeText?: string
   managementCompanyDisplay: string
   chairpersonName: string
   bylawsArticle: string
@@ -358,6 +361,7 @@ function buildBoardFormalPages({
       heldOn: formatDateOnly(heldOn),
       meetingPlace,
       attendeesText,
+      absenteeText,
       managementCompanyDisplay,
     },
   }
@@ -370,6 +374,7 @@ async function createBoardFormalPdf({
   heldOn,
   meetingPlace,
   attendeesText,
+  absenteeText = '',
   managementCompanyDisplay,
   chairpersonName,
   bylawsArticle,
@@ -382,6 +387,7 @@ async function createBoardFormalPdf({
   heldOn: string | null
   meetingPlace: string
   attendeesText: string
+  absenteeText?: string
   managementCompanyDisplay: string
   chairpersonName: string
   bylawsArticle: string
@@ -409,6 +415,7 @@ async function createBoardFormalPdf({
     heldOn,
     meetingPlace,
     attendeesText,
+    absenteeText,
     managementCompanyDisplay,
     chairpersonName,
     bylawsArticle,
@@ -481,6 +488,7 @@ async function createBoardFormalPdf({
           ['開催日時', tableValues.heldOn || ''],
           ['開催場所', tableValues.meetingPlace || ''],
           ['出席者', tableValues.attendeesText || ''],
+          ...(tableValues.absenteeText ? [['欠席者', tableValues.absenteeText]] : []),
           ['管理会社', tableValues.managementCompanyDisplay || ''],
         ]
 
@@ -502,7 +510,7 @@ async function createBoardFormalPdf({
           ctx.fillText(row[1], leftX + leftWidth + 16, rowY + 36)
         })
 
-        y += 220
+        y += rowHeight * rows.length
         continue
       }
 
@@ -617,6 +625,7 @@ function createBoardFormalWordBlob({
   heldOn,
   meetingPlace,
   attendeesText,
+  absenteeText = '',
   managementCompanyDisplay,
   chairpersonName,
   bylawsArticle,
@@ -633,6 +642,7 @@ function createBoardFormalWordBlob({
   heldOn: string | null
   meetingPlace: string
   attendeesText: string
+  absenteeText?: string
   managementCompanyDisplay: string
   chairpersonName: string
   bylawsArticle: string
@@ -750,6 +760,7 @@ body {
       <td class="label">出席者</td>
       <td>${attendeesText || ''}</td>
     </tr>
+    ${absenteeText ? `<tr><td class="label">欠席者</td><td>${absenteeText}</td></tr>` : ''}
     <tr>
       <td class="label">管理会社</td>
       <td>${managementCompanyDisplay || ''}</td>
@@ -812,6 +823,7 @@ export default function SavedAiMinutesDetailClient({
   meetingRound = '',
   meetingPlace = '',
   attendeesText = '',
+  absenteeText = '',
   chairpersonName = '',
   bylawsArticle = '',
   signatureDate = null,
@@ -856,6 +868,7 @@ export default function SavedAiMinutesDetailClient({
   const safeMeetingRound = meetingRound ?? ''
   const safeMeetingPlace = meetingPlace ?? ''
   const safeAttendeesText = attendeesText ?? ''
+  const safeAbsenteeText = absenteeText ?? ''
   const safeChairpersonName = chairpersonName ?? ''
   const safeBylawsArticle = bylawsArticle ?? ''
   const safeManagementCompanyDisplay = managementCompanyDisplay ?? ''
@@ -1153,6 +1166,7 @@ export default function SavedAiMinutesDetailClient({
           heldOn,
           meetingPlace: safeMeetingPlace,
           attendeesText: safeAttendeesText,
+          absenteeText: safeAbsenteeText,
           managementCompanyDisplay: safeManagementCompanyDisplay,
           chairpersonName: safeChairpersonName,
           bylawsArticle: safeBylawsArticle,
@@ -1198,6 +1212,7 @@ export default function SavedAiMinutesDetailClient({
               heldOn,
               meetingPlace: safeMeetingPlace,
               attendeesText: safeAttendeesText,
+              absenteeText: safeAbsenteeText,
               managementCompanyDisplay: safeManagementCompanyDisplay,
               chairpersonName: safeChairpersonName,
               bylawsArticle: safeBylawsArticle,
@@ -1655,6 +1670,7 @@ export default function SavedAiMinutesDetailClient({
                 {safeMeetingRound ? <p>理事会回数: 第{safeMeetingRound}回</p> : null}
                 {safeMeetingPlace ? <p>開催場所: {safeMeetingPlace}</p> : null}
                 {safeAttendeesText ? <p>出席者: {safeAttendeesText}</p> : null}
+                {safeAbsenteeText ? <p>欠席者: {safeAbsenteeText}</p> : null}
                 {safeManagementCompanyDisplay ? (
                   <p>管理会社: {safeManagementCompanyDisplay}</p>
                 ) : null}
@@ -1720,6 +1736,16 @@ export default function SavedAiMinutesDetailClient({
                             {safeAttendeesText}
                           </td>
                         </tr>
+                        {safeAbsenteeText ? (
+                          <tr>
+                            <td className="border border-slate-400 px-4 py-3 font-semibold text-slate-900">
+                              欠席者
+                            </td>
+                            <td className="border border-slate-400 px-4 py-3 text-slate-700">
+                              {safeAbsenteeText}
+                            </td>
+                          </tr>
+                        ) : null}
                         <tr>
                           <td className="border border-slate-400 px-4 py-3 font-semibold text-slate-900">
                             管理会社
@@ -1993,6 +2019,12 @@ export default function SavedAiMinutesDetailClient({
                       <td className="font-semibold">出席者</td>
                       <td>{safeAttendeesText}</td>
                     </tr>
+                    {safeAbsenteeText ? (
+                      <tr>
+                        <td className="font-semibold">欠席者</td>
+                        <td>{safeAbsenteeText}</td>
+                      </tr>
+                    ) : null}
                     <tr>
                       <td className="font-semibold">管理会社</td>
                       <td>{safeManagementCompanyDisplay}</td>
