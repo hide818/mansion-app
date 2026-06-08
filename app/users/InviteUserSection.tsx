@@ -40,7 +40,7 @@ export default function InviteUserSection() {
         return
       }
 
-      const url = `${window.location.origin}/login?invite=${token}`
+      const url = `${window.location.origin}/join?token=${token}`
       setInviteUrl(url)
     } catch (error) {
       console.error(error)

@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
   const isPublicFile =
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon.ico') ||
-    pathname.match(/\.(?:svg|png|jpg|jpeg|gif|webp)$/)
+    pathname.match(/\.(?:svg|png|jpg|jpeg|gif|webp|html|pdf)$/)
 
   if (isPublicFile) {
     return response

@@ -11,8 +11,16 @@ function isPublicPath(pathname: string) {
     pathname === '/lp' ||
     pathname.startsWith('/lp/') ||
     pathname === '/api/contact' ||
+    pathname === '/api/auth/signup' ||
+    pathname === '/api/auth/login' ||
+    pathname === '/api/demo' ||
+    pathname === '/api/invitations/accept' ||
+    pathname === '/api/stripe/webhook' ||
+    pathname === '/join' ||
+    pathname === '/help' ||
     pathname === '/promo' ||
-    pathname === '/promo/logo'
+    pathname === '/promo/logo' ||
+    pathname.endsWith('.html')
   )
 }
 
@@ -22,7 +30,7 @@ function isStaticPath(pathname: string) {
     pathname.startsWith('/_next/image') ||
     pathname.startsWith('/_next/webpack-hmr') ||
     pathname === '/favicon.ico' ||
-    /\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map)$/.test(pathname)
+    /\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|html)$/.test(pathname)
   )
 }
 

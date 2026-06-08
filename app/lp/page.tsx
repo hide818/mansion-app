@@ -5,7 +5,10 @@ import ContactForm from '@/app/components/ContactForm'
 export const metadata = {
   title: 'Kura — 担当者が辞めても止まらない管理会社へ',
   description: '分譲マンション管理会社向けAI業務管理SaaS。総会議事録を2時間→50分に。案件タスク管理・AI議事録・引き継ぎ書自動生成で属人化を解消。初期3社限定・3ヶ月無料。',
-  keywords: '分譲マンション管理,管理会社,議事録,AI,属人化,引き継ぎ,タスク管理,SaaS',
+  keywords: '分譲マンション管理,管理会社,議事録,AI,属人化,引き継ぎ,タスク管理,SaaS,分譲マンション,管理業務,DX',
+  alternates: {
+    canonical: 'https://kura-management.com/lp',
+  },
   openGraph: {
     title: 'Kura — 担当者が辞めても止まらない管理会社へ',
     description: '総会議事録が2時間→50分に。分譲マンション管理会社専用AI業務管理SaaS。',
@@ -14,34 +17,39 @@ export const metadata = {
     locale: 'ja_JP',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Kura — 担当者が辞めても止まらない管理会社へ',
+    description: '総会議事録が2時間→50分に。分譲マンション管理会社専用AI業務管理SaaS。',
+  },
 }
 
 const PRICING = [
   {
-    name: 'トライアル',
-    price: '無料',
-    period: '3ヶ月間',
+    name: 'スタータープラン',
+    price: '¥29,800',
+    period: '/ 月（税抜）',
     badge: null,
-    sub: '初期3社限定',
-    features: ['全機能が利用可能', '物件数無制限', 'ユーザー3名まで', 'メールサポート'],
+    sub: '5名まで・50棟まで',
+    features: ['全機能が利用可能', '50棟まで', 'ユーザー5名まで', 'メールサポート'],
     primary: false,
   },
   {
-    name: 'スタンダード',
-    price: '¥30,000',
+    name: 'スタンダードプラン',
+    price: '¥59,800',
     period: '/ 月（税抜）',
     badge: 'おすすめ',
-    sub: '中小管理会社向け',
-    features: ['全機能が利用可能', '物件数無制限', 'ユーザー10名まで', 'メール・チャットサポート'],
+    sub: '20名まで・200棟まで',
+    features: ['全機能が利用可能', '200棟まで', 'ユーザー20名まで', 'メール・チャットサポート'],
     primary: true,
   },
   {
-    name: 'プロ',
-    price: '¥50,000',
-    period: '/ 月（税抜）',
+    name: 'エンタープライズ',
+    price: '要相談',
+    period: '',
     badge: null,
-    sub: '中堅管理会社向け',
-    features: ['全機能が利用可能', '物件数・ユーザー無制限', '専任サポート担当', 'CSV一括インポート支援', '稟議用セキュリティ資料'],
+    sub: 'ユーザー・棟数無制限',
+    features: ['全機能が利用可能', '棟数・ユーザー無制限', '専任サポート担当', 'CSV一括インポート支援', '稟議用セキュリティ資料'],
     primary: false,
   },
 ]
@@ -69,9 +77,37 @@ const FAQ = [
   },
 ]
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Kura',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  url: 'https://kura-management.com/lp',
+  description: '分譲マンション管理会社向けAI業務管理SaaS。案件タスク管理・AI議事録・引き継ぎ書自動生成で属人化を解消。',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'JPY',
+    description: '3ヶ月間無料トライアル',
+  },
+  featureList: [
+    '案件・タスク管理',
+    'AI議事録自動生成',
+    'AI引き継ぎ書自動生成',
+    '居住者管理',
+    'CSVデータインポート',
+    'タスクアラートメール',
+  ],
+}
+
 export default function LpPage() {
   return (
     <div className="min-h-screen bg-white text-slate-900 antialiased">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       {/* ━━━━━ NAV ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <nav className="sticky top-0 z-50 border-b border-slate-100 bg-white/95 backdrop-blur-md">

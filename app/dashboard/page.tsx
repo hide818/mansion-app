@@ -386,6 +386,7 @@ export default async function DashboardPage() {
             <h2 className="text-lg font-bold text-slate-900 mb-4">よく使う機能</h2>
             <div className="space-y-2">
               {[
+                { href: '/help', label: '使い方ガイド' },
                 { href: '/ai-minutes/records', label: '保存済み議事録' },
                 { href: '/handover-documents', label: '引き継ぎ書一覧' },
                 { href: '/manager', label: '危険案件ダッシュボード' },

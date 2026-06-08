@@ -55,8 +55,14 @@ export async function POST(request: NextRequest) {
           </div>
           <p style="line-height:1.8;color:#475569;">
             まずは物件を登録して、AI議事録機能をお試しください。<br>
-            設定でお困りの際はいつでもご連絡ください。
+            設定でお困りの際は使い方ガイドをご覧ください。
           </p>
+          <div style="text-align:center;margin:16px 0;">
+            <a href="https://kura-management.com/help"
+              style="display:inline-block;background:#f1f5f9;color:#2563eb;font-weight:bold;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none;border:1px solid #e2e8f0;">
+              使い方ガイドを見る
+            </a>
+          </div>
           <p style="margin-top:32px;color:#475569;">
             よろしくお願いいたします。<br>
             <strong>Kura サポートチーム</strong>

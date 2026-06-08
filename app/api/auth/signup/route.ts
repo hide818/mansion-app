@@ -25,7 +25,17 @@ export async function POST(request: NextRequest) {
     // 新しいcompany_idを生成
     const companyId = crypto.randomUUID()
 
-    // ユーザー作成
+    // ① companies テーブルに会社レコードを先に作成
+    const { error: companyError } = await supabaseAdmin
+      .from('companies')
+      .insert({ id: companyId, name: companyName })
+
+    if (companyError) {
+      console.error('company insert error:', companyError)
+      return NextResponse.json({ error: '会社の作成に失敗しました: ' + companyError.message }, { status: 500 })
+    }
+
+    // ② Supabase Auth ユーザーを作成
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
@@ -34,6 +44,8 @@ export async function POST(request: NextRequest) {
     })
 
     if (authError || !authData.user) {
+      // ロールバック: 作成した会社を削除
+      await supabaseAdmin.from('companies').delete().eq('id', companyId)
       const msg = authError?.message ?? 'ユーザーの作成に失敗しました'
       if (msg.includes('already registered')) {
         return NextResponse.json({ error: 'このメールアドレスはすでに登録されています' }, { status: 400 })
@@ -41,7 +53,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: msg }, { status: 400 })
     }
 
-    // プロフィール作成（admin権限）
+    // ③ profiles テーブルにプロフィールを作成
     const { error: profileError } = await supabaseAdmin
       .from('profiles')
       .insert({
@@ -49,12 +61,12 @@ export async function POST(request: NextRequest) {
         company_id: companyId,
         role: 'admin',
         display_name: displayName || email,
-        email,
       })
 
     if (profileError) {
-      // ロールバック: 作成したユーザーを削除
+      // ロールバック: 作成したユーザーと会社を削除
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
+      await supabaseAdmin.from('companies').delete().eq('id', companyId)
       console.error('profile insert error:', profileError)
       return NextResponse.json({ error: 'プロフィールの作成に失敗しました: ' + profileError.message }, { status: 500 })
     }

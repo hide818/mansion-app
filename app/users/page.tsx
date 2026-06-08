@@ -1,10 +1,13 @@
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
+import { createClient } from '@supabase/supabase-js'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { getUserRole, type AppRole } from '@/lib/getUserRole'
 import { canManageUsers } from '@/lib/permissions'
+import { getPlanLabel, getPlanPrice, getPlanUserLimit } from '@/lib/planLimits'
 import RoleSelect from '@/app/users/RoleSelect'
 import InviteUserSection from '@/app/users/InviteUserSection'
+import UpgradeSection from '@/app/users/UpgradeSection'
 
 type UserRow = {
   id: string
@@ -16,6 +19,9 @@ type UserRow = {
 type CompanyRow = {
   id: string
   name: string
+  plan: string | null
+  trial_ends_at: string | null
+  stripe_subscription_id: string | null
 }
 
 function roleLabel(role: AppRole | null) {
@@ -59,6 +65,11 @@ export default async function UsersPage() {
     )
   }
 
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  )
+
   const [{ data: users, error: usersError }, { data: company, error: companyError }] =
     await Promise.all([
       supabase
@@ -66,9 +77,9 @@ export default async function UsersPage() {
         .select('id, display_name, company_id, role')
         .eq('company_id', companyId)
         .order('id', { ascending: true }),
-      supabase
+      supabaseAdmin
         .from('companies')
-        .select('id, name')
+        .select('id, name, plan, trial_ends_at, stripe_subscription_id')
         .eq('id', companyId)
         .maybeSingle(),
     ])
@@ -86,15 +97,26 @@ export default async function UsersPage() {
   }
 
   if (companyError) {
-    console.error('users page company error:', companyError)
+    console.error('users page company error:', companyError?.message, companyError?.code, companyError?.details, companyError?.hint)
   }
 
   const safeUsers = (users ?? []) as UserRow[]
+  // rpc returns the json object directly as data
   const safeCompany = (company ?? null) as CompanyRow | null
 
   const adminCount = safeUsers.filter((item) => item.role === 'admin').length
   const generalCount = safeUsers.filter((item) => item.role === 'general').length
   const viewerCount = safeUsers.filter((item) => item.role === 'viewer').length
+
+  const plan = safeCompany?.plan ?? 'trial'
+  const userLimit = getPlanUserLimit(plan)
+  const usedCount = safeUsers.length
+  const remainingSlots = userLimit === Infinity ? null : userLimit - usedCount
+  const isNearLimit = remainingSlots !== null && remainingSlots <= 1
+  const isAtLimit = remainingSlots !== null && remainingSlots <= 0
+  const trialEndsAt = safeCompany?.trial_ends_at
+    ? new Date(safeCompany.trial_ends_at).toLocaleDateString('ja-JP')
+    : null
 
   return (
     <div className="p-6">
@@ -105,6 +127,23 @@ export default async function UsersPage() {
         </p>
       </div>
 
+      {/* プランバナー */}
+      {plan === 'trial' && trialEndsAt && (
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          ⏳ 無料トライアル中（{trialEndsAt} まで）。期限後はスタータープラン以上へのアップグレードが必要です。
+        </div>
+      )}
+      {isAtLimit && (
+        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          🚫 ユーザー数が上限（{userLimit}名）に達しています。招待するにはプランをアップグレードしてください。
+        </div>
+      )}
+      {isNearLimit && !isAtLimit && (
+        <div className="mb-4 rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
+          ⚠️ あと {remainingSlots} 名しか招待できません（上限 {userLimit}名）。
+        </div>
+      )}
+
       <div className="mb-6 grid gap-4 md:grid-cols-4">
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
           <div className="text-sm text-gray-500">会社名</div>
@@ -114,24 +153,36 @@ export default async function UsersPage() {
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-          <div className="text-sm text-gray-500">所属ユーザー数</div>
+          <div className="text-sm text-gray-500">現在のプラン</div>
+          <div className="mt-1 text-base font-bold text-gray-900">{getPlanLabel(plan)}</div>
+          <div className="text-sm text-gray-500">{getPlanPrice(plan)}</div>
+        </div>
+
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div className="text-sm text-gray-500">ユーザー数</div>
           <div className="mt-2 text-2xl font-bold text-gray-900">
-            {safeUsers.length}
+            {usedCount}
+            <span className="text-base font-normal text-gray-400">
+              {userLimit === Infinity ? '' : ` / ${userLimit}名`}
+            </span>
           </div>
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-          <div className="text-sm text-gray-500">管理者</div>
-          <div className="mt-2 text-2xl font-bold text-gray-900">{adminCount}</div>
-        </div>
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-          <div className="text-sm text-gray-500">一般 / 閲覧のみ</div>
+          <div className="text-sm text-gray-500">管理者 / 一般・閲覧</div>
           <div className="mt-2 text-2xl font-bold text-gray-900">
-            {generalCount + viewerCount}
+            {adminCount}
+            <span className="text-base font-normal text-gray-400"> / {generalCount + viewerCount}</span>
           </div>
         </div>
       </div>
+
+      {canManageUsers(myRole) && (
+        <UpgradeSection
+          currentPlan={plan}
+          hasStripeSubscription={!!safeCompany?.stripe_subscription_id}
+        />
+      )}
 
       <div className="mb-6">
         <InviteUserSection />

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
+import { getPlanUserLimit, getPlanLabel } from '@/lib/planLimits'
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,6 +27,25 @@ export async function POST(request: NextRequest) {
 
     if (actorProfile.role !== 'admin') {
       return new NextResponse('管理者のみ招待リンクを発行できます。', { status: 403 })
+    }
+
+    const companyId = actorProfile.company_id
+
+    // ── プラン上限チェック ──────────────────────────────────────
+    const [{ data: companyRow }, { count: currentUserCount }] = await Promise.all([
+      supabase.from('companies').select('plan').eq('id', companyId).maybeSingle(),
+      supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('company_id', companyId),
+    ])
+
+    const plan = companyRow?.plan ?? 'trial'
+    const limit = getPlanUserLimit(plan)
+    const used = currentUserCount ?? 0
+
+    if (used >= limit) {
+      return new NextResponse(
+        `ユーザー数の上限（${limit}名）に達しています。現在のプラン：${getPlanLabel(plan)}。プランをアップグレードしてください。`,
+        { status: 403 },
+      )
     }
 
     const body = await request.json()

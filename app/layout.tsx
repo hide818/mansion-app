@@ -14,6 +14,9 @@ export const metadata: Metadata = {
     title: 'Kura',
   },
   formatDetection: { telephone: false },
+  verification: {
+    google: 'GtAOeh1Lr1cGNjgk3b1lJkHGpqIjaX0iXXQJeEiWtwE',
+  },
   openGraph: {
     title: 'Kura — 担当者が辞めても止まらない管理会社へ',
     description: '総会議事録が2時間→50分に。分譲マンション管理会社専用AI業務管理SaaS。',
