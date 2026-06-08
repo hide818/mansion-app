@@ -2,338 +2,166 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
-import HandoverEditor from './HandoverEditor'
+import HandoverEditor, { type HandoverSections } from './HandoverEditor'
 import HandoverExportButtons from './HandoverExportButtons'
 
-type PageProps = {
-  params: Promise<{
-    id: string
-  }>
+type PageProps = { params: Promise<{ id: string }> }
+
+function fmt(value: string | null | undefined) {
+  if (!value) return null
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return value
+  return new Intl.DateTimeFormat('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(d)
 }
 
-type PropertyRow = {
-  id: string
-  name: string | null
-  address: string | null
-}
-
-type PropertyCardRow = {
-  management_memo: string | null
-  board_memo: string | null
-  resident_memo: string | null
-  caution_note: string | null
-  special_rule: string | null
-  annual_schedule_memo: string | null
-  chairman_memo: string | null
-  officers_memo: string | null
-  contact_memo: string | null
-  past_trouble_summary: string | null
-  pinned_note: string | null
-}
-
-type CaseRow = {
-  id: string
-  title: string | null
-  status: string | null
-  assignee: string | null
-  board_next_action: string | null
-  created_at: string | null
-}
-
-type TaskRow = {
-  id: string
-  title: string | null
-  status: string | null
-  due_date: string | null
-  priority: string | null
-  case_id: string | null
-}
-
-type ComplaintRow = {
-  id: string
-  title: string | null
-  detail: string | null
-  status: string | null
-  created_at: string | null
-  property_id: string
-}
-
-type HandoverDocumentRow = {
-  id: string
-  property_id: string
-  company_id: string | null
-  title: string
-  content: string
-  generated_content: string | null
-  created_at: string
-  updated_at: string
-}
-
-function formatDate(value: string | null) {
-  if (!value) return '未設定'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return '未設定'
-
-  return new Intl.DateTimeFormat('ja-JP', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(date)
-}
-
-function safeText(value: string | null | undefined, fallback = '特記事項なし') {
-  if (!value) return fallback
-  const trimmed = value.trim()
-  return trimmed ? trimmed : fallback
-}
-
-function buildGeneratedHandoverText(args: {
-  property: PropertyRow
-  card: PropertyCardRow | null
-  cases: CaseRow[]
-  tasks: TaskRow[]
-  complaints: ComplaintRow[]
-}) {
-  const { property, card, cases, tasks, complaints } = args
-
-  const incompleteTasks = tasks.filter((task) => task.status !== '完了')
-  const urgentTasks = incompleteTasks.filter((task) => {
-    if (!task.due_date) return false
-    const due = new Date(task.due_date)
-    if (Number.isNaN(due.getTime())) return false
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    due.setHours(0, 0, 0, 0)
-    return due <= today
-  })
-
-  const activeCases = cases.filter((item) => item.status !== '完了')
-  const recentComplaints = complaints.slice(0, 5)
-
-  const lines: string[] = []
-
-  lines.push('【物件名】')
-  lines.push(`${safeText(property.name, '名称未設定')}`)
-  lines.push('')
-  lines.push('【住所】')
-  lines.push(`${safeText(property.address, '住所未設定')}`)
-  lines.push('')
-  lines.push('【引き継ぎ総評】')
-  lines.push(
-    `継続案件は ${activeCases.length} 件、未完了タスクは ${incompleteTasks.length} 件、対応注意が必要なクレームは ${recentComplaints.length} 件あります。`
-  )
-  lines.push(
-    urgentTasks.length > 0
-      ? `期限超過または本日期限のタスクが ${urgentTasks.length} 件あるため、優先確認が必要です。`
-      : '直近で強い期限アラートのあるタスクは多くありません。'
-  )
-  lines.push('')
-  lines.push('【重要情報】')
-  lines.push(`・重要ピン留め: ${safeText(card?.pinned_note)}`)
-  lines.push(`・注意事項: ${safeText(card?.caution_note)}`)
-  lines.push(`・特殊ルール: ${safeText(card?.special_rule)}`)
-  lines.push(`・連絡方法メモ: ${safeText(card?.contact_memo)}`)
-  lines.push('')
-  lines.push('【管理・理事会メモ】')
-  lines.push(`・管理メモ: ${safeText(card?.management_memo)}`)
-  lines.push(`・理事会メモ: ${safeText(card?.board_memo)}`)
-  lines.push(`・年間スケジュールメモ: ${safeText(card?.annual_schedule_memo)}`)
-  lines.push('')
-  lines.push('【人対応メモ】')
-  lines.push(`・理事長メモ: ${safeText(card?.chairman_memo)}`)
-  lines.push(`・役員メモ: ${safeText(card?.officers_memo)}`)
-  lines.push(`・居住者対応メモ: ${safeText(card?.resident_memo)}`)
-  lines.push('')
-  lines.push('【過去トラブル要約】')
-  lines.push(`${safeText(card?.past_trouble_summary)}`)
-  lines.push('')
-  lines.push('【継続案件の要点】')
-
-  if (activeCases.length === 0) {
-    lines.push('・継続案件なし')
-  } else {
-    activeCases.slice(0, 10).forEach((item, index) => {
-      lines.push(
-        `・${index + 1}. ${safeText(item.title, '件名未設定')} / 状況: ${safeText(
-          item.status,
-          '未設定'
-        )} / 担当: ${safeText(item.assignee, '未設定')} / 次アクション: ${safeText(
-          item.board_next_action
-        )}`
-      )
-    })
-  }
-
-  lines.push('')
-  lines.push('【未完了タスク】')
-
-  if (incompleteTasks.length === 0) {
-    lines.push('・未完了タスクなし')
-  } else {
-    incompleteTasks.slice(0, 15).forEach((task, index) => {
-      lines.push(
-        `・${index + 1}. ${safeText(task.title, 'タスク名未設定')} / 優先度: ${safeText(
-          task.priority,
-          '未設定'
-        )} / 期限: ${formatDate(task.due_date)} / 状況: ${safeText(task.status, '未設定')}`
-      )
-    })
-  }
-
-  lines.push('')
-  lines.push('【最近のクレーム】')
-
-  if (recentComplaints.length === 0) {
-    lines.push('・最近のクレームなし')
-  } else {
-    recentComplaints.forEach((item, index) => {
-      lines.push(
-        `・${index + 1}. ${safeText(item.title, '件名未設定')} / 状況: ${safeText(
-          item.status,
-          '未設定'
-        )} / 内容: ${safeText(item.detail)}`
-      )
-    })
-  }
-
-  lines.push('')
-  lines.push('【次担当者が最初にやること】')
-  if (urgentTasks.length > 0) {
-    urgentTasks.slice(0, 5).forEach((task, index) => {
-      lines.push(`・${index + 1}. ${safeText(task.title, 'タスク名未設定')} を確認する`)
-    })
-  } else if (activeCases.length > 0) {
-    activeCases.slice(0, 5).forEach((item, index) => {
-      lines.push(`・${index + 1}. ${safeText(item.title, '件名未設定')} の進捗を確認する`)
-    })
-  } else {
-    lines.push('・物件カルテの内容と直近ログを確認する')
-    lines.push('・次回理事会や点検予定の有無を確認する')
-  }
-
-  lines.push('')
-  lines.push('【引き継ぎ補足メモ】')
-  lines.push('・必要に応じて、この欄へ手入力で補足してください。')
-
-  return lines.join('\n')
+function safe(v: string | null | undefined) {
+  return v?.trim() || null
 }
 
 export default async function HandoverAiPage({ params }: PageProps) {
-  const resolvedParams = await params
-  const propertyId = resolvedParams.id
-
+  const { id: propertyId } = await params
   const supabase = await createSupabaseServerClient()
   const companyId = await getUserCompanyId()
 
-  const { data: property, error: propertyError } = await supabase
-    .from('properties')
-    .select('id, name, address')
-    .eq('id', propertyId)
-    .single<PropertyRow>()
+  const [
+    { data: property },
+    { data: card },
+    { data: cases },
+    { data: tasks },
+    { data: complaints },
+    { data: saved },
+  ] = await Promise.all([
+    supabase.from('properties')
+      .select('id, name, address, built_year, structure, total_units, total_floors, association_name, president_name, president_phone, president_email, management_fee, repair_reserve, reserve_balance, repair_plan_year, contract_start, contract_renewal, cleaning_company, elevator_company, insurance_company')
+      .eq('id', propertyId).eq('company_id', companyId).maybeSingle(),
+    supabase.from('property_cards')
+      .select('management_memo, board_memo, caution_notes, officer_memo, pinned_note')
+      .eq('property_id', propertyId).maybeSingle(),
+    supabase.from('cases')
+      .select('id, title, status, assignee, board_next_action, created_at')
+      .eq('property_id', propertyId).eq('company_id', companyId)
+      .neq('status', '完了').order('created_at', { ascending: false }).limit(15),
+    supabase.from('tasks')
+      .select('id, title, status, due_date, priority')
+      .eq('property_id', propertyId).eq('company_id', companyId)
+      .neq('status', '完了').order('due_date', { ascending: true }).limit(15),
+    supabase.from('complaints')
+      .select('id, title, status, created_at')
+      .eq('property_id', propertyId).eq('company_id', companyId)
+      .order('created_at', { ascending: false }).limit(8),
+    supabase.from('handover_documents')
+      .select('content, updated_at')
+      .eq('property_id', propertyId).eq('company_id', companyId).maybeSingle(),
+  ])
 
-  if (propertyError || !property) {
-    notFound()
+  if (!property) notFound()
+
+  // ── セクション初期値をDBから構築 ──────────────────────────────
+
+  const builtYear = property.built_year
+  const age = builtYear ? `${new Date().getFullYear() - builtYear}年（${builtYear}年竣工）` : null
+
+  const 物件概要Lines = [
+    `物件名: ${property.name ?? '未設定'}`,
+    `住所: ${property.address ?? '未設定'}`,
+    age && `築年数: ${age}`,
+    property.structure && `構造: ${property.structure}`,
+    property.total_units && `総戸数: ${property.total_units}戸`,
+    property.total_floors && `総階数: ${property.total_floors}階`,
+    property.association_name && `管理組合: ${property.association_name}`,
+    property.president_name && `理事長: ${property.president_name}`,
+    property.president_phone && `理事長電話: ${property.president_phone}`,
+    property.president_email && `理事長メール: ${property.president_email}`,
+  ].filter(Boolean).map((l) => `・${l}`).join('\n')
+
+  const 財務情報Lines = [
+    property.management_fee && `管理費: ${property.management_fee.toLocaleString()}円/月/戸`,
+    property.repair_reserve && `修繕積立金: ${property.repair_reserve.toLocaleString()}円/月/戸`,
+    property.reserve_balance && `積立金残高: 約${Math.round(property.reserve_balance / 10000)}万円`,
+    property.repair_plan_year && `長期修繕計画 次回改定: ${property.repair_plan_year}年`,
+    property.contract_start && `委託契約開始: ${fmt(property.contract_start)}`,
+    property.contract_renewal && `委託契約更新: ${fmt(property.contract_renewal)}`,
+    property.cleaning_company && `清掃業者: ${property.cleaning_company}`,
+    property.elevator_company && `EV保守: ${property.elevator_company}`,
+    property.insurance_company && `損保: ${property.insurance_company}`,
+  ].filter(Boolean).map((l) => `・${l}`).join('\n')
+
+  const 重要注意事項 = [
+    card?.pinned_note && `【重要ピン留め】\n${card.pinned_note}`,
+    card?.caution_notes && `【注意事項】\n${card.caution_notes}`,
+  ].filter(Boolean).join('\n\n')
+
+  const 理事長対応 = safe(card?.officer_memo) ?? ''
+  const 管理メモ = [
+    card?.management_memo && `【管理メモ】\n${card.management_memo}`,
+    card?.board_memo && `【理事会メモ】\n${card.board_memo}`,
+  ].filter(Boolean).join('\n\n')
+
+  // 案件・タスク・クレームはDB一覧をそのまま表示（AIで改善可能）
+  const 進行中案件Lines = (cases ?? []).length === 0
+    ? '・進行中の案件はありません'
+    : (cases ?? []).map((c) => `・${c.title ?? '無題'} / 状況: ${c.status ?? '-'} / 担当: ${c.assignee ?? '-'}${c.board_next_action ? ` / 次アクション: ${c.board_next_action}` : ''}`).join('\n')
+
+  const 未完了タスクLines = (tasks ?? []).length === 0
+    ? '・未完了タスクはありません'
+    : (tasks ?? []).map((t) => `・${t.title ?? '無題'} / 優先: ${t.priority ?? '-'} / 期限: ${fmt(t.due_date) ?? '未設定'}`).join('\n')
+
+  const クレームLines = (complaints ?? []).length === 0
+    ? '・継続中のクレームはありません'
+    : (complaints ?? []).map((c) => `・${c.title ?? '無題'} / 状況: ${c.status ?? '-'} / ${fmt(c.created_at) ?? '-'}`).join('\n')
+
+  // 保存済み引き継ぎ書があればセクションを復元、なければDBから構築
+  function parseSaved(content: string): Partial<HandoverSections> {
+    const result: Partial<HandoverSections> = {}
+    const keys: string[] = ['物件概要','財務情報','重要注意事項','理事長対応メモ','管理・理事会メモ','進行中の案件','未完了タスク','クレーム・継続事項','次担当者への申し送り']
+    const sectionKeys: (keyof HandoverSections)[] = ['物件概要','財務情報','重要注意事項','理事長対応','管理メモ','進行中案件','未完了タスク','クレーム継続事項','申し送り']
+    for (let i = 0; i < keys.length; i++) {
+      const label = keys[i]
+      const key = sectionKeys[i]
+      const regex = new RegExp(`【${label}】\\n([\\s\\S]*?)(?=【|$)`)
+      const match = content.match(regex)
+      if (match) result[key] = match[1].replace(/（記入なし）/g, '').trim()
+    }
+    return result
   }
 
-  const { data: card } = await supabase
-    .from('property_cards')
-    .select(
-      'management_memo, board_memo, resident_memo, caution_note, special_rule, annual_schedule_memo, chairman_memo, officers_memo, contact_memo, past_trouble_summary, pinned_note'
-    )
-    .eq('property_id', propertyId)
-    .maybeSingle<PropertyCardRow>()
+  const savedSections = saved?.content ? parseSaved(saved.content) : {}
 
-  const { data: cases } = await supabase
-    .from('cases')
-    .select('id, title, status, assignee, board_next_action, created_at')
-    .eq('property_id', propertyId)
-    .order('created_at', { ascending: false })
-    .returns<CaseRow[]>()
+  const initialSections: HandoverSections = {
+    物件概要:      savedSections.物件概要      ?? 物件概要Lines,
+    財務情報:      savedSections.財務情報      ?? 財務情報Lines,
+    重要注意事項:  savedSections.重要注意事項  ?? 重要注意事項,
+    理事長対応:    savedSections.理事長対応    ?? 理事長対応,
+    管理メモ:      savedSections.管理メモ      ?? 管理メモ,
+    進行中案件:    savedSections.進行中案件    ?? 進行中案件Lines,
+    未完了タスク:  savedSections.未完了タスク  ?? 未完了タスクLines,
+    クレーム継続事項: savedSections.クレーム継続事項 ?? クレームLines,
+    申し送り:      savedSections.申し送り      ?? '',
+  }
 
-  const { data: tasks } = await supabase
-    .from('tasks')
-    .select('id, title, status, due_date, priority, case_id')
-    .eq('property_id', propertyId)
-    .order('created_at', { ascending: false })
-    .returns<TaskRow[]>()
-
-  const { data: complaints } = await supabase
-    .from('complaints')
-    .select('id, title, detail, status, created_at, property_id')
-    .eq('property_id', propertyId)
-    .order('created_at', { ascending: false })
-    .returns<ComplaintRow[]>()
-
-  const { data: savedDocument } = await supabase
-    .from('handover_documents')
-    .select('id, property_id, company_id, title, content, generated_content, created_at, updated_at')
-    .eq('property_id', propertyId)
-    .eq('company_id', companyId)
-    .maybeSingle<HandoverDocumentRow>()
-
-  const generatedContent = buildGeneratedHandoverText({
-    property,
-    card: card ?? null,
-    cases: cases ?? [],
-    tasks: tasks ?? [],
-    complaints: complaints ?? [],
-  })
-
-  const initialContent = savedDocument?.content?.trim()
-    ? savedDocument.content
-    : generatedContent
-
-  const exportContent = savedDocument?.content?.trim()
-    ? savedDocument.content
-    : generatedContent
-
-  const urgentCount =
-    (tasks ?? []).filter((task) => {
-      if (task.status === '完了') return false
-      if (!task.due_date) return false
-      const due = new Date(task.due_date)
-      if (Number.isNaN(due.getTime())) return false
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      due.setHours(0, 0, 0, 0)
-      return due <= today
-    }).length
+  const urgentCount = (tasks ?? []).filter((t) => {
+    if (!t.due_date) return false
+    const d = new Date(t.due_date)
+    d.setHours(0, 0, 0, 0)
+    const td = new Date(); td.setHours(0, 0, 0, 0)
+    return d <= td
+  }).length
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex flex-wrap items-center gap-3">
-        <Link
-          href={`/properties/${propertyId}`}
-          className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-        >
-          物件詳細へ戻る
-        </Link>
-      </div>
+      <Link href={`/properties/${propertyId}`} className="inline-block rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+        ← 物件詳細へ戻る
+      </Link>
 
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-sm font-semibold tracking-wide text-slate-500">
-          引き継ぎAI
-        </p>
-        <h1 className="mt-2 text-2xl font-bold text-slate-900">
-          {property.name ?? '物件名未設定'} の引き継ぎ書
-        </h1>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          AI生成文を初期値として表示しています。実務で使う前提で、この画面で編集して保存してください。
-        </p>
-
-        <div className="mt-4 flex flex-wrap gap-3 text-sm">
-          <div className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-            継続案件 {(cases ?? []).filter((item) => item.status !== '完了').length} 件
-          </div>
-          <div className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-            未完了タスク {(tasks ?? []).filter((item) => item.status !== '完了').length} 件
-          </div>
-          <div className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-            要注意期限 {urgentCount} 件
-          </div>
-          <div className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-            最近クレーム {(complaints ?? []).length} 件
-          </div>
+        <p className="text-sm font-semibold tracking-wide text-slate-500">引き継ぎAI</p>
+        <h1 className="mt-2 text-2xl font-bold text-slate-900">{property.name ?? '物件名未設定'} の引き継ぎ書</h1>
+        <p className="mt-2 text-sm text-slate-600">物件情報・カルテは自動入力済みです。「引き継ぎ書を生成する」ボタンで案件・タスク・クレームをAIが補完します。</p>
+        <div className="mt-4 flex flex-wrap gap-2 text-sm">
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">継続案件 {(cases ?? []).length}件</span>
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">未完了タスク {(tasks ?? []).length}件</span>
+          {urgentCount > 0 && <span className="rounded-full bg-red-100 px-3 py-1 text-red-700">期限超過 {urgentCount}件</span>}
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">クレーム {(complaints ?? []).length}件</span>
         </div>
       </div>
 
@@ -341,37 +169,14 @@ export default async function HandoverAiPage({ params }: PageProps) {
         propertyId={propertyId}
         propertyName={property.name ?? '物件名未設定'}
         address={property.address ?? '住所未設定'}
-        content={exportContent}
+        content={saved?.content ?? ''}
       />
 
       <HandoverEditor
         propertyId={propertyId}
-        propertyName={property.name ?? '物件名未設定'}
-        initialContent={initialContent}
-        generatedContent={generatedContent}
-        updatedAt={savedDocument?.updated_at ?? null}
+        initialSections={initialSections}
+        updatedAt={saved?.updated_at ?? null}
       />
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-bold text-slate-900">AI生成の元データ</h2>
-          <div className="mt-4 space-y-2 text-sm text-slate-700">
-            <p>・物件カルテ</p>
-            <p>・継続案件</p>
-            <p>・未完了タスク</p>
-            <p>・最近のクレーム</p>
-          </div>
-        </section>
-
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-bold text-slate-900">今回の保存ルール</h2>
-          <div className="mt-4 space-y-2 text-sm text-slate-700">
-            <p>・物件ごとに保存済み引き継ぎ書は1件です</p>
-            <p>・保存すると上書き更新されます</p>
-            <p>・印刷ページは保存版を優先表示します</p>
-          </div>
-        </section>
-      </div>
     </div>
   )
 }

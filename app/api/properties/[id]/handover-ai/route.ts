@@ -4,473 +4,170 @@ import { getUserCompanyId } from '@/lib/getUserCompanyId'
 
 export const runtime = 'nodejs'
 
-type RouteContext = {
-  params: Promise<{
-    id: string
-  }>
-}
-
-type GenerateRequestBody = {
-  title?: string
-  currentContent?: string
-}
+type RouteContext = { params: Promise<{ id: string }> }
 
 type CaseRow = {
-  id: string
-  title: string | null
-  status: string | null
-  assignee: string | null
-  created_at: string | null
-  board_status: string | null
-  board_scheduled_for: string | null
-  board_agenda_title: string | null
-  board_decision_status: string | null
-  board_decision_date: string | null
-  board_decision_note: string | null
+  id: string; title: string | null; status: string | null; assignee: string | null
+  created_at: string | null; board_status: string | null; board_agenda_title: string | null
   board_next_action: string | null
 }
-
 type TaskRow = {
-  id: string
-  title: string | null
-  status: string | null
-  due_date: string | null
-  case_id: string | null
-  priority: string | null
-  created_at: string | null
+  id: string; title: string | null; status: string | null
+  due_date: string | null; priority: string | null; case_id: string | null
 }
-
 type ComplaintRow = {
-  id: string
-  title: string | null
-  detail: string | null
-  status: string | null
-  created_at: string | null
-  property_id: string
+  id: string; title: string | null; detail: string | null
+  status: string | null; created_at: string | null
 }
+type LogRow = { id: string; case_id: string; message: string | null; created_at: string | null; type: string | null }
 
-type LogRow = {
-  id: string
-  case_id: string
-  message: string | null
-  created_at: string | null
-  type: string | null
-}
-
-type PropertyRow = {
-  id: string
-  name?: string | null
-  address?: string | null
-}
-
-type AIReferenceData = {
-  物件情報: {
-    物件ID: string
-    物件名: string
-    住所: string
-  }
-  進行中案件一覧: Array<{
-    案件名: string
-    状況: string
-    担当者: string
-    理事会関連状況: string
-    理事会議案名: string
-    次アクション: string
-    作成日: string
-  }>
-  未完了タスク一覧: Array<{
-    タスク名: string
-    状況: string
-    期限: string
-    優先度: string
-    関連案件ID: string
-  }>
-  期限切れタスク件数: number
-  理事会関連案件件数: number
-  クレーム一覧: Array<{
-    件名: string
-    状況: string
-    発生日: string
-    内容要約: string
-  }>
-  最近のログ一覧: Array<{
-    日付: string
-    種別: string
-    内容: string
-  }>
-}
-
-function toJsonText(value: unknown) {
-  return JSON.stringify(value, null, 2)
-}
-
-function formatDate(value: string | null | undefined) {
+function fmt(value: string | null | undefined) {
   if (!value) return '-'
-
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-
-  return new Intl.DateTimeFormat('ja-JP', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(date)
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return value
+  return new Intl.DateTimeFormat('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(d)
 }
 
-function trimText(value: string | null | undefined, maxLength: number) {
-  const text = (value || '').replace(/\s+/g, ' ').trim()
-  if (!text) return ''
-  if (text.length <= maxLength) return text
-  return `${text.slice(0, maxLength)}...`
-}
-
-function priorityRank(priority: string | null | undefined) {
-  if (priority === '高') return 0
-  if (priority === '中') return 1
-  if (priority === '低') return 2
-  return 3
-}
-
-function sortTasksForHandover(tasks: TaskRow[]) {
-  return [...tasks].sort((a, b) => {
-    const priorityDiff = priorityRank(a.priority) - priorityRank(b.priority)
-    if (priorityDiff !== 0) return priorityDiff
-
-    const aDue = a.due_date ? new Date(a.due_date).getTime() : Number.MAX_SAFE_INTEGER
-    const bDue = b.due_date ? new Date(b.due_date).getTime() : Number.MAX_SAFE_INTEGER
-    if (aDue !== bDue) return aDue - bDue
-
-    const aCreated = a.created_at ? new Date(a.created_at).getTime() : 0
-    const bCreated = b.created_at ? new Date(b.created_at).getTime() : 0
-    return bCreated - aCreated
-  })
-}
-
-function createReferenceData(params: {
-  property: PropertyRow | null
-  cases: CaseRow[]
-  tasks: TaskRow[]
-  complaints: ComplaintRow[]
-  logs: LogRow[]
-}) {
-  const { property, cases, tasks, complaints, logs } = params
-
-  const unfinishedTasks = tasks.filter((task) => task.status !== '完了')
-  const sortedUnfinishedTasks = sortTasksForHandover(unfinishedTasks)
-
-  const overdueTasks = sortedUnfinishedTasks.filter((task) => {
-    if (!task.due_date) return false
-    const due = new Date(task.due_date)
-    const today = new Date()
-    due.setHours(0, 0, 0, 0)
-    today.setHours(0, 0, 0, 0)
-    return due < today
-  })
-
-  const boardRelatedCases = cases.filter(
-    (item) =>
-      Boolean(item.board_status) ||
-      Boolean(item.board_agenda_title) ||
-      Boolean(item.board_next_action)
-  )
-
-  const referenceData: AIReferenceData = {
-    物件情報: {
-      物件ID: property?.id || '不明',
-      物件名: property?.name || '不明',
-      住所: property?.address || '不明',
-    },
-    進行中案件一覧: cases.slice(0, 10).map((item) => ({
-      案件名: item.title || '無題案件',
-      状況: item.status || '不明',
-      担当者: item.assignee || '未設定',
-      理事会関連状況: item.board_status || '特記事項なし',
-      理事会議案名: item.board_agenda_title || '未設定',
-      次アクション: trimText(item.board_next_action, 80) || '未設定',
-      作成日: formatDate(item.created_at),
-    })),
-    未完了タスク一覧: sortedUnfinishedTasks.slice(0, 12).map((item) => ({
-      タスク名: item.title || '無題タスク',
-      状況: item.status || '不明',
-      期限: formatDate(item.due_date),
-      優先度: item.priority || '未設定',
-      関連案件ID: item.case_id || '未設定',
-    })),
-    期限切れタスク件数: overdueTasks.length,
-    理事会関連案件件数: boardRelatedCases.length,
-    クレーム一覧: complaints.slice(0, 8).map((item) => ({
-      件名: item.title || '無題クレーム',
-      状況: item.status || '不明',
-      発生日: formatDate(item.created_at),
-      内容要約: trimText(item.detail, 180) || '詳細なし',
-    })),
-    最近のログ一覧: logs.slice(0, 12).map((item) => ({
-      日付: formatDate(item.created_at),
-      種別: item.type || '不明',
-      内容: trimText(item.message, 140) || '内容なし',
-    })),
-  }
-
-  return referenceData
-}
-
-function buildPrompt(params: {
-  currentTitle: string
-  currentContent: string
-  referenceData: AIReferenceData
-}) {
-  const { currentTitle, currentContent, referenceData } = params
-
-  return `
-あなたは、マンション管理会社のフロント担当者に引き継ぐための実務文書を作成するAIです。
-目的は、次担当者が朝一で読んだ時に、何が進行中で、何が危険で、何から手を付けるべきかをすぐ理解できるようにすることです。
-読みやすさと実務性を最優先してください。
-
-【最重要ルール】
-1. 出力は必ず日本語のプレーンテキストにしてください
-2. 英語のカラム名や英語の変数名は絶対に本文へ出さないでください
-3. 見出しは必ず以下の順で固定してください
-【引き継ぎタイトル】
-【物件概要】
-【現在進行中の案件】
-【未完了タスク】
-【クレーム・注意事項】
-【理事会で意識すべき事項】
-【次担当者の初動】
-【補足】
-
-4. 各見出しの中では、短い段落または「・」の箇条書きを使って読みやすくしてください
-5. 抽象的な表現を避け、次担当者が取る行動が想像できる文章にしてください
-6. 存在しない事実は書かないでください
-7. 情報が不足している箇所は「現時点で確認情報は限定的です」と明記してください
-8. 総花的に全部同じ重さで書かず、優先順位が伝わるようにしてください
-9. 期限切れタスク、停滞しそうな案件、クレーム、理事会関連は優先して触れてください
-10. 【次担当者の初動】では、朝一で確認する順番を具体的に3〜5個書いてください
-11. タイトルは今のタイトルをベースに、少し自然に整える程度にしてください
-12. 「AIが生成しました」などの説明文は書かないでください
-13. データ項目を説明する時は、日本語の自然な文章に言い換えてください
-14. 箇条書きの先頭は「・」を使ってください
-15. 「次担当者の初動」は特に具体的に書いてください
-
-【悪い例】
-・board_status が否決です
-・board_next_action は業者連絡です
-
-【良い例】
-・理事会では否決扱いとなっているため、業者連絡の実施有無と今後の進め方を確認してください
-
-【現在のタイトル】
-${currentTitle || '引き継ぎ書'}
-
-【現在の本文】
-${currentContent || '未入力'}
-
-【AIへ渡す参照データ】
-${toJsonText(referenceData)}
-`.trim()
-}
-
-function extractAssistantText(content: unknown) {
-  if (typeof content === 'string') return content.trim()
-
-  if (Array.isArray(content)) {
-    const texts = content
-      .map((item) => {
-        if (
-          item &&
-          typeof item === 'object' &&
-          'type' in item &&
-          item.type === 'text' &&
-          'text' in item &&
-          typeof item.text === 'string'
-        ) {
-          return item.text
-        }
-        return ''
-      })
-      .filter(Boolean)
-
-    return texts.join('\n').trim()
-  }
-
-  return ''
+function trim(v: string | null | undefined, n = 120) {
+  const s = (v || '').replace(/\s+/g, ' ').trim()
+  return s.length > n ? `${s.slice(0, n)}…` : s
 }
 
 export async function POST(request: Request, context: RouteContext) {
   try {
     const { id: propertyId } = await context.params
-
-    if (!propertyId) {
-      return NextResponse.json(
-        { error: '物件IDがありません。' },
-        { status: 400 }
-      )
-    }
-
     const apiKey = process.env.OPENAI_API_KEY
-
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: 'OPENAI_API_KEY が設定されていません。.env.local を確認してください。' },
-        { status: 500 }
-      )
-    }
-
-    const body = (await request.json()) as GenerateRequestBody
-    const currentTitle = (body.title || '引き継ぎ書').trim() || '引き継ぎ書'
-    const currentContent = (body.currentContent || '').trim()
+    if (!apiKey) return NextResponse.json({ error: 'OPENAI_API_KEY が未設定です。' }, { status: 500 })
 
     const supabase = await createSupabaseServerClient()
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'ログインが必要です。' },
-        { status: 401 }
-      )
-    }
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'ログインが必要です。' }, { status: 401 })
 
     const companyId = await getUserCompanyId()
+    if (!companyId) return NextResponse.json({ error: '会社情報が取得できません。' }, { status: 403 })
 
-    if (!companyId) {
-      return NextResponse.json(
-        { error: '会社情報が取得できません。' },
-        { status: 403 }
-      )
-    }
+    // 物件基本 + 新フィールド + カルテを同時取得
+    const [
+      { data: property },
+      { data: card },
+      { data: cases },
+      { data: tasks },
+      { data: complaints },
+    ] = await Promise.all([
+      supabase.from('properties')
+        .select('id, name, address, built_year, structure, total_units, total_floors, association_name, president_name, president_phone, management_fee, repair_reserve, reserve_balance, repair_plan_year, contract_renewal, cleaning_company, elevator_company, insurance_company')
+        .eq('id', propertyId).eq('company_id', companyId).maybeSingle(),
+      supabase.from('property_cards')
+        .select('management_memo, board_memo, caution_notes, officer_memo, pinned_note')
+        .eq('property_id', propertyId).maybeSingle(),
+      supabase.from('cases')
+        .select('id, title, status, assignee, created_at, board_status, board_agenda_title, board_next_action')
+        .eq('property_id', propertyId).eq('company_id', companyId)
+        .order('created_at', { ascending: false }).limit(20),
+      supabase.from('tasks')
+        .select('id, title, status, due_date, priority, case_id')
+        .eq('property_id', propertyId).eq('company_id', companyId)
+        .neq('status', '完了').order('due_date', { ascending: true }).limit(20),
+      supabase.from('complaints')
+        .select('id, title, detail, status, created_at')
+        .eq('property_id', propertyId).eq('company_id', companyId)
+        .order('created_at', { ascending: false }).limit(10),
+    ])
 
-    const { data: property } = await supabase
-      .from('properties')
-      .select('id, name, address')
-      .eq('id', propertyId)
-      .eq('company_id', companyId)
-      .maybeSingle()
+    if (!property) return NextResponse.json({ error: '物件が見つかりません。' }, { status: 404 })
 
-    if (!property) {
-      return NextResponse.json(
-        { error: '対象の物件が見つかりません。' },
-        { status: 404 }
-      )
-    }
-
-    const { data: cases } = await supabase
-      .from('cases')
-      .select(
-        'id, title, status, assignee, created_at, board_status, board_scheduled_for, board_agenda_title, board_decision_status, board_decision_date, board_decision_note, board_next_action'
-      )
-      .eq('property_id', propertyId)
-      .eq('company_id', companyId)
-      .order('created_at', { ascending: false })
-
-    const { data: tasks } = await supabase
-      .from('tasks')
-      .select('id, title, status, due_date, case_id, priority, created_at')
-      .eq('property_id', propertyId)
-      .eq('company_id', companyId)
-      .order('created_at', { ascending: false })
-
-    const { data: complaints } = await supabase
-      .from('complaints')
-      .select('id, title, detail, status, created_at, property_id')
-      .eq('property_id', propertyId)
-      .eq('company_id', companyId)
-      .order('created_at', { ascending: false })
-
-    const caseIds = (cases ?? [])
-      .map((item) => item.id)
-      .filter((value): value is string => Boolean(value))
-
+    const caseIds = (cases ?? []).map((c) => c.id).filter(Boolean)
     let logs: LogRow[] = []
-
     if (caseIds.length > 0) {
-      const { data: logData } = await supabase
-        .from('logs')
+      const { data: logData } = await supabase.from('logs')
         .select('id, case_id, message, created_at, type')
-        .in('case_id', caseIds)
-        .order('created_at', { ascending: false })
-        .limit(20)
-
+        .in('case_id', caseIds).order('created_at', { ascending: false }).limit(30)
       logs = (logData ?? []) as LogRow[]
     }
 
-    const referenceData = createReferenceData({
-      property: (property as PropertyRow | null) ?? null,
-      cases: ((cases ?? []) as CaseRow[]).slice(0, 20),
-      tasks: ((tasks ?? []) as TaskRow[]).slice(0, 30),
-      complaints: ((complaints ?? []) as ComplaintRow[]).slice(0, 20),
-      logs,
+    const activeCases = ((cases ?? []) as CaseRow[]).filter((c) => c.status !== '完了')
+    const safeTasks = (tasks ?? []) as TaskRow[]
+    const safeComplaints = (complaints ?? []) as ComplaintRow[]
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const overdueTasks = safeTasks.filter((t) => {
+      if (!t.due_date) return false
+      const d = new Date(t.due_date)
+      d.setHours(0, 0, 0, 0)
+      return d < today
     })
 
-    const prompt = buildPrompt({
-      currentTitle,
-      currentContent,
-      referenceData,
-    })
+    const contextText = `
+【物件】${property.name ?? '未設定'} / ${property.address ?? '未設定'}
+築年: ${property.built_year ? `${new Date().getFullYear() - property.built_year}年（${property.built_year}年竣工）` : '不明'} / 構造: ${property.structure ?? '不明'} / ${property.total_units ?? '?'}戸 ${property.total_floors ?? '?'}階建
+管理組合: ${property.association_name ?? '未設定'} / 理事長: ${property.president_name ?? '未設定'}（${property.president_phone ?? '電話未設定'}）
+管理費: ${property.management_fee ? `${property.management_fee.toLocaleString()}円/月/戸` : '未設定'} / 修繕積立金: ${property.repair_reserve ? `${property.repair_reserve.toLocaleString()}円/月/戸` : '未設定'} / 積立金残高: ${property.reserve_balance ? `${Math.round(property.reserve_balance / 10000)}万円` : '未設定'}
+契約更新: ${fmt(property.contract_renewal)} / 清掃: ${property.cleaning_company ?? '未設定'} / EV保守: ${property.elevator_company ?? '未設定'}
+
+【物件カルテ】
+ピン留め: ${card?.pinned_note ?? '特記なし'}
+注意事項: ${card?.caution_notes ?? '特記なし'}
+管理メモ: ${trim(card?.management_memo, 200) ?? '特記なし'}
+理事会メモ: ${trim(card?.board_memo, 200) ?? '特記なし'}
+理事長対応: ${trim(card?.officer_memo, 200) ?? '特記なし'}
+
+【継続案件 ${activeCases.length}件】
+${activeCases.slice(0, 10).map((c) => `・${c.title ?? '無題'} / 状況:${c.status ?? '-'} / 担当:${c.assignee ?? '-'} / 次アクション:${trim(c.board_next_action, 80) || '-'}`).join('\n') || '・なし'}
+
+【未完了タスク ${safeTasks.length}件（うち期限超過${overdueTasks.length}件）】
+${safeTasks.slice(0, 15).map((t) => `・${t.title ?? '無題'} / 優先度:${t.priority ?? '-'} / 期限:${fmt(t.due_date)}`).join('\n') || '・なし'}
+
+【クレーム ${safeComplaints.length}件】
+${safeComplaints.slice(0, 8).map((c) => `・${c.title ?? '無題'} / 状況:${c.status ?? '-'} / ${fmt(c.created_at)} / ${trim(c.detail, 100) || '詳細なし'}`).join('\n') || '・なし'}
+
+【最近のログ】
+${logs.slice(0, 15).map((l) => `・${fmt(l.created_at)} [${l.type ?? '-'}] ${trim(l.message, 100)}`).join('\n') || '・なし'}
+`.trim()
+
+    const systemPrompt = `あなたはマンション管理会社のベテランフロント担当者です。
+後任担当者が朝イチで読んで即動けるように、引き継ぎ書の3セクションを生成してください。
+出力は必ずJSONで返してください。他のテキストは一切不要です。
+形式: {"進行中案件":"...","未完了タスク":"...","クレーム継続事項":"..."}
+各セクションは「・」始まりの箇条書き。優先度の高いものを先に。事実のみ記載。英語カラム名禁止。`
+
+    const userPrompt = `以下のデータをもとに3セクションを生成してください。\n\n${contextText}`
 
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 60000)
 
     try {
-      const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
         body: JSON.stringify({
           model: 'gpt-5.4-mini',
           messages: [
-            {
-              role: 'system',
-              content:
-                'あなたはマンション管理会社向けの実務文書作成AIです。必ず日本語で、優先順位が明確で、次担当者がすぐ動ける詳細な引き継ぎ書を作成してください。英語の項目名は使わず、自然な日本語で書いてください。',
-            },
-            {
-              role: 'user',
-              content: prompt,
-            },
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
           ],
-          max_completion_tokens: 1800,
+          max_completion_tokens: 1600,
+          response_format: { type: 'json_object' },
         }),
         signal: controller.signal,
       })
 
-      const openAIJson = await openAIResponse.json()
+      const json = await res.json()
+      if (!res.ok) return NextResponse.json({ error: json?.error?.message ?? 'AI生成に失敗しました。' }, { status: 500 })
 
-      if (!openAIResponse.ok) {
-        const message =
-          openAIJson?.error?.message || 'OpenAI API の呼び出しに失敗しました。'
-        return NextResponse.json({ error: message }, { status: 500 })
-      }
-
-      const assistantContent = extractAssistantText(
-        openAIJson?.choices?.[0]?.message?.content
-      )
-
-      if (!assistantContent) {
-        return NextResponse.json(
-          { error: 'AIの返答が空でした。もう一度お試しください。' },
-          { status: 500 }
-        )
-      }
+      const raw = json?.choices?.[0]?.message?.content ?? ''
+      let sections: Record<string, string> = {}
+      try { sections = JSON.parse(raw) } catch { sections = {} }
 
       return NextResponse.json({
-        title: currentTitle,
-        content: assistantContent,
-        referenceData,
+        進行中案件: sections['進行中案件'] ?? '',
+        未完了タスク: sections['未完了タスク'] ?? '',
+        クレーム継続事項: sections['クレーム継続事項'] ?? '',
       })
     } finally {
       clearTimeout(timeout)
     }
   } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : '引き継ぎAI生成中に不明なエラーが発生しました。'
-
-      return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: error instanceof Error ? error.message : '不明なエラー' }, { status: 500 })
   }
 }

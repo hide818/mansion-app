@@ -7,6 +7,7 @@ import { canEdit } from '@/lib/permissions'
 import PropertyTimelineClient from '@/app/components/PropertyTimelineClient'
 import PropertyMemoryAiClient from '@/app/components/PropertyMemoryAiClient'
 import PropertyRepairPlanClient from '@/app/components/PropertyRepairPlanClient'
+import PropertyInfoForm from '@/app/properties/[id]/PropertyInfoForm'
 
 type Props = {
   params: Promise<{
@@ -129,6 +130,21 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
   if (!property) {
     return notFound()
   }
+
+  // 物件情報フィールド
+  const { data: propertyInfo } = await supabase
+    .from('properties')
+    .select(`
+      built_year, structure, total_units, total_floors,
+      association_name, president_name, president_phone, president_email,
+      board_frequency, general_meeting_month,
+      management_fee, repair_reserve, reserve_balance, repair_plan_year,
+      contract_start, contract_renewal,
+      cleaning_company, elevator_company, insurance_company
+    `)
+    .eq('id', id)
+    .eq('company_id', companyId)
+    .maybeSingle()
 
   // 議事録設定は別クエリで取得（SQL migration 未実施でもエラーを無視して続行）
   const { data: minutesSettings } = await supabase
@@ -333,6 +349,35 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
             initialFileName={property.repair_plan_file_name ?? null}
           />
         </div>
+      </section>
+
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-slate-900 mb-1">物件情報</h2>
+        <p className="text-sm text-slate-500 mb-5">建物・管理組合・財務・契約・業者情報。引き継ぎ書AIにも自動反映されます。</p>
+        <PropertyInfoForm
+          propertyId={id}
+          initial={{
+            built_year: propertyInfo?.built_year ?? null,
+            structure: propertyInfo?.structure ?? null,
+            total_units: propertyInfo?.total_units ?? null,
+            total_floors: propertyInfo?.total_floors ?? null,
+            association_name: propertyInfo?.association_name ?? null,
+            president_name: propertyInfo?.president_name ?? null,
+            president_phone: propertyInfo?.president_phone ?? null,
+            president_email: propertyInfo?.president_email ?? null,
+            board_frequency: propertyInfo?.board_frequency ?? null,
+            general_meeting_month: propertyInfo?.general_meeting_month ?? null,
+            management_fee: propertyInfo?.management_fee ?? null,
+            repair_reserve: propertyInfo?.repair_reserve ?? null,
+            reserve_balance: propertyInfo?.reserve_balance ?? null,
+            repair_plan_year: propertyInfo?.repair_plan_year ?? null,
+            contract_start: propertyInfo?.contract_start ?? null,
+            contract_renewal: propertyInfo?.contract_renewal ?? null,
+            cleaning_company: propertyInfo?.cleaning_company ?? null,
+            elevator_company: propertyInfo?.elevator_company ?? null,
+            insurance_company: propertyInfo?.insurance_company ?? null,
+          }}
+        />
       </section>
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
