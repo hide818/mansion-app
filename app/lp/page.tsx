@@ -112,9 +112,9 @@ export default function LpPage() {
             <Link href="/login" className="hidden text-[13px] text-[#0071e3] hover:underline sm:inline">
               ログイン
             </Link>
-            <Link href="#contact"
+            <Link href="/signup"
               className="rounded-full bg-[#0071e3] px-4 py-1.5 text-[13px] font-medium text-white hover:bg-[#0077ed] transition-colors">
-              デモを申し込む
+              無料で試す
             </Link>
           </div>
         </div>
@@ -137,16 +137,16 @@ export default function LpPage() {
             音声をアップロードするだけ。自社フォーマットで議事録を自動生成。宿題・タスクまで自動抽出。
           </p>
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link href="#contact"
+            <Link href="/signup"
               className="rounded-full bg-[#0071e3] px-8 py-3.5 text-[17px] font-medium text-white hover:bg-[#0077ed] transition-colors">
+              14日間無料で試す
+            </Link>
+            <Link href="#contact"
+              className="rounded-full border border-[#424245] px-8 py-3.5 text-[17px] font-medium text-white hover:border-[#6e6e73] transition-colors">
               デモを申し込む
             </Link>
-            <Link href="/promo"
-              className="rounded-full border border-[#424245] px-8 py-3.5 text-[17px] font-medium text-white hover:border-[#6e6e73] transition-colors">
-              動画を見る（54秒）
-            </Link>
           </div>
-          <p className="mt-5 text-[13px] text-[#424245]">月額¥50,000〜 · 棟数無制限 · 最短10分で導入</p>
+          <p className="mt-5 text-[13px] text-[#424245]">クレジットカード不要 · 無料期間中はいつでも解約可 · 最短10分で導入</p>
         </div>
       </section>
 
@@ -402,9 +402,9 @@ export default function LpPage() {
             月2回の総会・理事会があれば、月あたり<span className="font-semibold text-[#1d1d1f]">3時間20分</span>を節約。<br />
             担当者が10名なら年間で<span className="font-semibold text-[#1d1d1f]">400時間以上</span>を取り戻せます。
           </p>
-          <Link href="#contact"
+          <Link href="/signup"
             className="mt-10 inline-flex rounded-full bg-[#0071e3] px-8 py-3.5 text-[17px] font-medium text-white hover:bg-[#0077ed] transition-colors">
-            デモを申し込む
+            14日間無料で試す
           </Link>
         </div>
       </section>
@@ -415,7 +415,8 @@ export default function LpPage() {
           <div className="text-center">
             <p className="text-[13px] font-medium uppercase tracking-widest text-[#6e6e73]">Pricing</p>
             <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] text-[#1d1d1f]">料金プラン</h2>
-            <p className="mt-4 text-[17px] text-[#6e6e73]">すべてのプランで棟数は無制限。</p>
+            <p className="mt-4 text-[17px] text-[#6e6e73]">すべてのプランで棟数は無制限。14日間無料でお試しいただけます。</p>
+            <p className="mt-2 text-[13px] text-[#6e6e73]">クレジットカード不要 · 無料期間中はいつでも解約可</p>
           </div>
 
           <div className="mt-14 grid gap-4 sm:grid-cols-3">
@@ -445,9 +446,9 @@ export default function LpPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="#contact"
+                <Link href={plan.name === 'エンタープライズ' ? '#contact' : '/signup'}
                   className={`block rounded-full py-2.5 text-center text-[15px] font-medium transition-colors ${plan.primary ? 'bg-[#0071e3] text-white hover:bg-[#0077ed]' : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e5e5ea]'}`}>
-                  デモを申し込む
+                  {plan.name === 'エンタープライズ' ? 'お問い合わせ' : '14日間無料で試す'}
                 </Link>
               </div>
             ))}

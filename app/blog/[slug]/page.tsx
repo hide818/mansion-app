@@ -6,6 +6,9 @@ import { ArticleSogai } from '../posts/sogai-gijiroku-sakusei'
 import { ArticleZokuninuka } from '../posts/zokuninuka-kaisho'
 import { ArticleHikitsugisho } from '../posts/hikitsugisho-template'
 import { ArticleKanriDx } from '../posts/kanri-kaisha-dx-guide'
+import { ArticleKanriKaishaSaaS } from '../posts/kanri-kaisha-saas-hikaku'
+import { ArticleRijiKaiAI } from '../posts/riji-kai-ai-gijiroku'
+import { ArticleNinmuHikitsugi } from '../posts/kanri-kaisha-ninmu-hikitsugi'
 import type { Metadata } from 'next'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -16,6 +19,9 @@ const ARTICLES: Record<string, React.FC> = {
   'zokuninuka-kaisho': ArticleZokuninuka,
   'hikitsugisho-template': ArticleHikitsugisho,
   'kanri-kaisha-dx-guide': ArticleKanriDx,
+  'kanri-kaisha-saas-hikaku': ArticleKanriKaishaSaaS,
+  'riji-kai-ai-gijiroku': ArticleRijiKaiAI,
+  'kanri-kaisha-ninmu-hikitsugi': ArticleNinmuHikitsugi,
 }
 
 export async function generateStaticParams() {
@@ -115,10 +121,10 @@ export default async function BlogPostPage({ params }: Props) {
           <h2 className="mb-3 text-xl font-extrabold">この記事で紹介した業務を自動化する</h2>
           <p className="mb-6 text-sm opacity-80">AI議事録・案件管理・引き継ぎ書自動生成を1つにまとめたSaaS。月額¥50,000〜。</p>
           <Link
-            href="/lp"
+            href="/signup"
             className="inline-block rounded-xl bg-white px-6 py-3 text-sm font-bold text-blue-600 hover:bg-blue-50"
           >
-            無料で試してみる →
+            14日間無料で試してみる →
           </Link>
         </div>
 

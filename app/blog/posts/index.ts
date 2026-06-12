@@ -48,4 +48,28 @@ export const posts: Post[] = [
     category: 'DX・IT化',
     keywords: ['マンション管理 DX', '管理会社 IT化', 'マンション管理 SaaS', '中小管理会社'],
   },
+  {
+    slug: 'kanri-kaisha-saas-hikaku',
+    title: 'マンション管理会社向けSaaS比較【2026年版】選び方と主要機能',
+    description: '中小・独立系マンション管理会社がSaaS導入を検討する際のポイントを解説。AI議事録・引き継ぎ書・タスク管理の機能比較と選定基準を紹介します。',
+    publishedAt: '2026-06-13',
+    category: 'DX・IT化',
+    keywords: ['マンション管理 SaaS', '管理会社 システム', 'マンション管理 DX', '管理会社 効率化'],
+  },
+  {
+    slug: 'riji-kai-ai-gijiroku',
+    title: '理事会議事録をAIで自動作成する方法【2026年版】',
+    description: '音声をアップロードするだけで理事会議事録を自動生成。AI議事録の仕組み・メリット・注意点を解説。作成時間を2時間→50分に短縮できます。',
+    publishedAt: '2026-06-13',
+    category: '議事録',
+    keywords: ['理事会議事録 AI', '議事録 自動作成', '議事録 AI', 'マンション管理 AI'],
+  },
+  {
+    slug: 'kanri-kaisha-ninmu-hikitsugi',
+    title: 'マンション管理会社の担当者交代・引き継ぎをスムーズにする方法',
+    description: '担当者退職のたびに発生する引き継ぎコストを削減する5つの対策。AIによる引き継ぎ書自動生成で「退職翌日に引き継ぎ書90%完成」を実現する方法を解説。',
+    publishedAt: '2026-06-13',
+    category: '業務効率化',
+    keywords: ['マンション管理 引き継ぎ', '担当者交代 引き継ぎ', '引き継ぎ書 自動作成', '管理会社 属人化'],
+  },
 ]
