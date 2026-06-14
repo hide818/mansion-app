@@ -51,6 +51,8 @@ export default async function RootLayout({
     <html lang="ja">
       <head>
         <link rel="apple-touch-icon" href="/icon-192.png" />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-0WJDGSES84" />
+        <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0WJDGSES84');` }} />
       </head>
       <body className="overflow-x-hidden bg-gray-50 text-slate-900 antialiased">
         <LayoutShell
