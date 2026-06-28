@@ -20,7 +20,11 @@ function isPublicPath(pathname: string) {
     pathname === '/help' ||
     pathname === '/promo' ||
     pathname === '/promo/logo' ||
-    pathname.endsWith('.html')
+    pathname.endsWith('.html') ||
+    pathname === '/sitemap.xml' ||
+    pathname === '/robots.txt' ||
+    pathname === '/blog' ||
+    pathname.startsWith('/blog/')
   )
 }
 
