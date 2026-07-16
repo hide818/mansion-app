@@ -142,7 +142,42 @@ export default function LpPage() {
               14日間無料で試す
             </Link>
           </div>
-          <p className="mt-5 text-[13px] text-[#424245]">クレジットカード不要 · 無料期間中はいつでも解約可 · 最短10分で導入</p>
+          <p className="mt-5 text-[13px] text-[#424245]">メールアドレスのみで登録 · 30秒で開始 · クレジットカード不要</p>
+
+          {/* ── HERO UI MOCK ── */}
+          <div className="mx-auto mt-16 max-w-3xl rounded-2xl overflow-hidden border border-[#333] shadow-[0_32px_80px_rgba(0,0,0,0.6)]">
+            <div className="flex items-center gap-1.5 bg-[#1a1a1a] px-4 py-3 border-b border-[#333]">
+              <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
+              <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
+              <span className="h-3 w-3 rounded-full bg-[#28ca41]" />
+              <span className="ml-4 text-[12px] text-[#666]">app.kura-management.com — 全物件 案件一覧</span>
+            </div>
+            <div className="bg-[#111] p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <p className="text-[13px] font-semibold text-white">今日の対応が必要な案件</p>
+                <span className="rounded-full bg-red-500/20 px-3 py-0.5 text-[11px] font-medium text-red-300">期限超過 2件</span>
+              </div>
+              <div className="space-y-2.5">
+                {[
+                  { name: 'グランドパレス丸の内｜修繕積立金見直し', due: '今日', status: '対応中', badge: 'bg-blue-500/20 text-blue-300' },
+                  { name: 'ライオンズ品川｜消防設備点検', due: '昨日', status: '期限超過', badge: 'bg-red-500/20 text-red-300' },
+                  { name: 'パークヒルズ渋谷｜総会議事録', due: '7/18', status: '完了', badge: 'bg-green-500/20 text-green-300' },
+                  { name: 'コスモ新宿｜引き継ぎ書作成', due: '7/20', status: '対応中', badge: 'bg-blue-500/20 text-blue-300' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3">
+                    <div>
+                      <p className="text-[13px] font-medium text-white">{item.name}</p>
+                      <p className="text-[11px] text-[#555]">期限：{item.due}</p>
+                    </div>
+                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${item.badge}`}>{item.status}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 rounded-xl bg-[#0071e3]/10 border border-[#0071e3]/30 p-4">
+                <p className="text-[12px] text-[#2997ff]">🤖 AI議事録が完成しました — パークヒルズ渋谷 第12回理事会（所要時間：48分）</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -415,7 +450,35 @@ export default function LpPage() {
             <p className="mt-2 text-[13px] text-[#6e6e73]">クレジットカード不要 · 無料期間中はいつでも解約可</p>
           </div>
 
-          <div className="mt-14 grid gap-4 sm:grid-cols-3">
+          {/* ROI Calculator */}
+          <div className="mt-12 rounded-2xl bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.06)]">
+            <p className="text-[13px] font-semibold uppercase tracking-widest text-[#0071e3]">費用対効果</p>
+            <h3 className="mt-2 text-[22px] font-bold text-[#1d1d1f]">月額5万円で、何時間分の人件費が節約できるか</h3>
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              <div className="rounded-xl bg-[#f5f5f7] p-5">
+                <p className="text-[13px] text-[#6e6e73]">議事録作成（月2回）</p>
+                <p className="mt-2 text-[20px] font-bold text-[#1d1d1f]">2時間 → 50分</p>
+                <p className="mt-1 text-[13px] font-medium text-[#0071e3]">月2.3時間の節約</p>
+              </div>
+              <div className="rounded-xl bg-[#f5f5f7] p-5">
+                <p className="text-[13px] text-[#6e6e73]">担当者交代の引き継ぎ（年2回）</p>
+                <p className="mt-2 text-[20px] font-bold text-[#1d1d1f]">1ヶ月 → 3日</p>
+                <p className="mt-1 text-[13px] font-medium text-[#0071e3]">月換算20時間以上の節約</p>
+              </div>
+              <div className="rounded-xl bg-[#f5f5f7] p-5">
+                <p className="text-[13px] text-[#6e6e73]">毎日の案件確認・報告</p>
+                <p className="mt-2 text-[20px] font-bold text-[#1d1d1f]">45分 → 10分</p>
+                <p className="mt-1 text-[13px] font-medium text-[#0071e3]">月11時間の節約</p>
+              </div>
+            </div>
+            <div className="mt-6 rounded-xl border border-[#0071e3]/20 bg-[#0071e3]/5 p-5 text-center">
+              <p className="text-[14px] text-[#6e6e73]">担当者5名のチームで合計すると、月間</p>
+              <p className="mt-1 text-[32px] font-bold tracking-tight text-[#1d1d1f]">約165時間 <span className="text-[17px] font-normal text-[#6e6e73]">の節約</span></p>
+              <p className="mt-1 text-[13px] text-[#6e6e73]">時給3,000円換算で <span className="font-semibold text-[#1d1d1f]">月約49万円相当</span> → Kura月額5万円で <span className="font-semibold text-[#0071e3]">約10倍のROI</span></p>
+            </div>
+          </div>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
             {PRICING.map(plan => (
               <div key={plan.name}
                 className={`relative rounded-2xl bg-white p-8 ${plan.primary ? 'ring-2 ring-[#0071e3] shadow-[0_4px_24px_rgba(0,113,227,0.15)]' : 'shadow-[0_2px_16px_rgba(0,0,0,0.06)]'}`}>
