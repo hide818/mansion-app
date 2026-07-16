@@ -141,10 +141,6 @@ export default function LpPage() {
               className="rounded-full bg-[#0071e3] px-8 py-3.5 text-[17px] font-medium text-white hover:bg-[#0077ed] transition-colors">
               14日間無料で試す
             </Link>
-            <Link href="#contact"
-              className="rounded-full border border-[#424245] px-8 py-3.5 text-[17px] font-medium text-white hover:border-[#6e6e73] transition-colors">
-              デモを申し込む
-            </Link>
           </div>
           <p className="mt-5 text-[13px] text-[#424245]">クレジットカード不要 · 無料期間中はいつでも解約可 · 最短10分で導入</p>
         </div>
@@ -381,7 +377,7 @@ export default function LpPage() {
       {/* ── ROI ── */}
       <section className="bg-white px-6 py-24">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-[13px] font-medium uppercase tracking-widest text-[#6e6e73]">実測データ</p>
+          <p className="text-[13px] font-medium uppercase tracking-widest text-[#6e6e73]">削減効果の目安</p>
           <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] text-[#1d1d1f]">
             時間を、取り戻す。
           </h2>
