@@ -181,6 +181,21 @@ export default function LpPage() {
         </div>
       </section>
 
+      {/* ── SOCIAL PROOF ── */}
+      <section className="bg-[#0071e3] px-6 py-5">
+        <div className="mx-auto max-w-5xl flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+          <div className="flex items-center gap-2.5">
+            <svg className="h-5 w-5 text-white/80" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <p className="text-[14px] text-white font-medium">現役マンション管理フロント担当者が設計・開発</p>
+          </div>
+          <div className="flex items-center gap-6 text-[13px] text-white/80">
+            <span>✓ 現場の課題から生まれたSaaS</span>
+            <span>✓ 14日間無料トライアル受付中</span>
+            <span>✓ 導入10分・IT担当者不要</span>
+          </div>
+        </div>
+      </section>
+
       {/* ── STATS ── */}
       <section className="bg-[#f5f5f7]">
         <div className="mx-auto max-w-5xl px-6 py-20">
@@ -211,6 +226,10 @@ export default function LpPage() {
             担当者の退職、議事録作成の負担、法定点検の期限管理。<br className="hidden sm:block" />
             どれも「仕方ない」で片付けてきた問題ですが、解決できます。
           </p>
+          <div className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#fff3cd] px-5 py-2.5 text-[14px] text-[#856404]">
+            <svg className="h-4 w-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/></svg>
+            管理業界では担当者1人あたり平均20棟以上を担当。退職・引き継ぎのコストが経営課題の上位に挙げられています。
+          </div>
         </div>
         <div className="mx-auto mt-16 max-w-5xl grid gap-px sm:grid-cols-3 bg-[#d2d2d7] rounded-2xl overflow-hidden">
           {[
