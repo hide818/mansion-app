@@ -17,6 +17,7 @@ export default function SignupPage() {
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [loadingStep, setLoadingStep] = useState('')
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -29,6 +30,7 @@ export default function SignupPage() {
     if (form.password.length < 8) { setError('パスワードは8文字以上にしてください'); return }
     setLoading(true)
     try {
+      setLoadingStep('アカウントを作成中...')
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -41,12 +43,15 @@ export default function SignupPage() {
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? '登録に失敗しました'); return }
+      setLoadingStep('ログイン中...')
       const { error: signInError } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password })
       if (signInError) { router.push('/login'); return }
+      setLoadingStep('ダッシュボードへ移動中...')
       router.replace('/dashboard')
       router.refresh()
     } finally {
       setLoading(false)
+      setLoadingStep('')
     }
   }
 
@@ -122,7 +127,7 @@ export default function SignupPage() {
 
               <button type="submit" disabled={loading}
                 className="mt-1 w-full rounded-xl bg-blue-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/30 transition hover:bg-blue-400 active:scale-[0.98] disabled:opacity-50">
-                {loading ? '登録中...' : 'アカウントを作成する'}
+                {loading ? (loadingStep || '登録中...') : 'アカウントを作成する'}
               </button>
             </form>
           </div>

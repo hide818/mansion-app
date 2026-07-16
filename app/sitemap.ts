@@ -14,10 +14,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     {
+      url: `${base}`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 1.0,
+    },
+    {
       url: `${base}/lp`,
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 1.0,
+    },
+    {
+      url: `${base}/signup`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.9,
     },
     {
       url: `${base}/blog`,

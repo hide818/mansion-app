@@ -12,6 +12,16 @@ import { ArticleNinmuHikitsugi } from '../posts/kanri-kaisha-ninmu-hikitsugi'
 import { ArticleAnkenKanri } from '../posts/anken-kanri-excel-datsu'
 import { ArticleSogaiJunbi } from '../posts/sogai-junbi-checklist'
 import { ArticleHitorideKanri } from '../posts/kanri-kaisha-hitoride-kanri'
+import { ArticleKanriHiTaino } from '../posts/kanri-hi-taino-taiou'
+import { ArticleChokiShuzen } from '../posts/choki-shuzen-keikaku-minaoshi'
+import { ArticleFrontShigoto } from '../posts/front-tantousha-shigoto'
+import { ArticleKanriReplace } from '../posts/kanri-kaisha-replace'
+import { ArticleJuminClaim } from '../posts/jumin-claim-taiou'
+import { ArticleFrontGetsujigyo } from '../posts/front-getsujigyo'
+import { ArticleSokaiGiketsu } from '../posts/sokai-giketsu'
+import { ArticleDaikiShuzen } from '../posts/daiki-shuzen-susume-kata'
+import { ArticleKanriErabikata } from '../posts/kanri-kaisha-erabi-kata'
+import { ArticleRijiYakuwari } from '../posts/riji-yakuwari'
 import type { Metadata } from 'next'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -28,6 +38,16 @@ const ARTICLES: Record<string, React.FC> = {
   'anken-kanri-excel-datsu': ArticleAnkenKanri,
   'sogai-junbi-checklist': ArticleSogaiJunbi,
   'kanri-kaisha-hitoride-kanri': ArticleHitorideKanri,
+  'kanri-hi-taino-taiou': ArticleKanriHiTaino,
+  'choki-shuzen-keikaku-minaoshi': ArticleChokiShuzen,
+  'front-tantousha-shigoto': ArticleFrontShigoto,
+  'kanri-kaisha-replace': ArticleKanriReplace,
+  'jumin-claim-taiou': ArticleJuminClaim,
+  'front-getsujigyo': ArticleFrontGetsujigyo,
+  'sokai-giketsu': ArticleSokaiGiketsu,
+  'daiki-shuzen-susume-kata': ArticleDaikiShuzen,
+  'kanri-kaisha-erabi-kata': ArticleKanriErabikata,
+  'riji-yakuwari': ArticleRijiYakuwari,
 }
 
 export async function generateStaticParams() {
@@ -60,6 +80,11 @@ const CATEGORY_COLORS: Record<string, string> = {
   '業務効率化': 'bg-emerald-50 text-emerald-700',
   'DX・IT化': 'bg-violet-50 text-violet-700',
   '総会・理事会': 'bg-amber-50 text-amber-700',
+  '管理費・会計': 'bg-red-50 text-red-700',
+  '修繕工事': 'bg-orange-50 text-orange-700',
+  '管理会社': 'bg-sky-50 text-sky-700',
+  '住民対応': 'bg-pink-50 text-pink-700',
+  '管理組合': 'bg-teal-50 text-teal-700',
 }
 
 export default async function BlogPostPage({ params }: Props) {
