@@ -9,6 +9,9 @@ import { ArticleKanriDx } from '../posts/kanri-kaisha-dx-guide'
 import { ArticleKanriKaishaSaaS } from '../posts/kanri-kaisha-saas-hikaku'
 import { ArticleRijiKaiAI } from '../posts/riji-kai-ai-gijiroku'
 import { ArticleNinmuHikitsugi } from '../posts/kanri-kaisha-ninmu-hikitsugi'
+import { ArticleAnkenKanri } from '../posts/anken-kanri-excel-datsu'
+import { ArticleSogaiJunbi } from '../posts/sogai-junbi-checklist'
+import { ArticleHitorideKanri } from '../posts/kanri-kaisha-hitoride-kanri'
 import type { Metadata } from 'next'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -22,6 +25,9 @@ const ARTICLES: Record<string, React.FC> = {
   'kanri-kaisha-saas-hikaku': ArticleKanriKaishaSaaS,
   'riji-kai-ai-gijiroku': ArticleRijiKaiAI,
   'kanri-kaisha-ninmu-hikitsugi': ArticleNinmuHikitsugi,
+  'anken-kanri-excel-datsu': ArticleAnkenKanri,
+  'sogai-junbi-checklist': ArticleSogaiJunbi,
+  'kanri-kaisha-hitoride-kanri': ArticleHitorideKanri,
 }
 
 export async function generateStaticParams() {
@@ -53,6 +59,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   '議事録': 'bg-blue-50 text-blue-700',
   '業務効率化': 'bg-emerald-50 text-emerald-700',
   'DX・IT化': 'bg-violet-50 text-violet-700',
+  '総会・理事会': 'bg-amber-50 text-amber-700',
 }
 
 export default async function BlogPostPage({ params }: Props) {
