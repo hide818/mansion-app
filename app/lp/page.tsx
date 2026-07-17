@@ -107,6 +107,7 @@ export default function LpPage() {
             <Link href="#how" className="hover:text-[#1d1d1f] transition-colors">使い方</Link>
             <Link href="#pricing" className="hover:text-[#1d1d1f] transition-colors">料金</Link>
             <Link href="#faq" className="hover:text-[#1d1d1f] transition-colors">FAQ</Link>
+            <Link href="/blog" className="hover:text-[#1d1d1f] transition-colors">ブログ</Link>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/login" className="hidden text-[13px] text-[#0071e3] hover:underline sm:inline">

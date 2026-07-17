@@ -20,6 +20,12 @@ const CATEGORY_COLORS: Record<string, string> = {
   '議事録': 'bg-blue-50 text-blue-700',
   '業務効率化': 'bg-emerald-50 text-emerald-700',
   'DX・IT化': 'bg-violet-50 text-violet-700',
+  '総会・理事会': 'bg-amber-50 text-amber-700',
+  '管理費・会計': 'bg-red-50 text-red-700',
+  '修繕工事': 'bg-orange-50 text-orange-700',
+  '管理会社': 'bg-sky-50 text-sky-700',
+  '住民対応': 'bg-pink-50 text-pink-700',
+  '管理組合': 'bg-teal-50 text-teal-700',
 }
 
 export default function BlogPage() {
