@@ -135,7 +135,7 @@ export default function LpPage() {
             になった。
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-[19px] leading-relaxed text-[#a1a1a6]">
-            音声をアップロードするだけ。自社フォーマットで議事録を自動生成。宿題・タスクまで自動抽出。
+            音声をアップロードするだけ。自社フォーマットで議事録を自動生成。<br />宿題・タスクまで自動抽出。
           </p>
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link href="/signup"
@@ -229,14 +229,14 @@ export default function LpPage() {
           </p>
           <div className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#fff3cd] px-5 py-2.5 text-[14px] text-[#856404]">
             <svg className="h-4 w-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/></svg>
-            管理業界では担当者1人あたり平均20棟以上を担当。退職・引き継ぎのコストが経営課題の上位に挙げられています。
+            担当者1人あたり平均20棟以上を担当。退職・引き継ぎのコストは経営課題の上位です。
           </div>
         </div>
         <div className="mx-auto mt-16 max-w-5xl grid gap-px sm:grid-cols-3 bg-[#d2d2d7] rounded-2xl overflow-hidden">
           {[
             {
               num: '01',
-              title: '担当者が辞めると、業務が止まる',
+              title: '担当者が辞めると、\n業務が止まる',
               body: '引き継ぎに1〜3ヶ月。対外クレームが多発。前の担当しか知らない情報は永遠に消える。',
             },
             {
@@ -252,7 +252,7 @@ export default function LpPage() {
           ].map(p => (
             <div key={p.num} className="bg-white p-10">
               <p className="text-[13px] font-semibold text-[#0071e3]">{p.num}</p>
-              <h3 className="mt-4 text-[19px] font-semibold text-[#1d1d1f] leading-snug">{p.title}</h3>
+              <h3 className="mt-4 text-[19px] font-semibold text-[#1d1d1f] leading-snug whitespace-pre-line">{p.title}</h3>
               <p className="mt-3 text-[15px] leading-relaxed text-[#6e6e73]">{p.body}</p>
             </div>
           ))}
