@@ -14,6 +14,12 @@ type Props = {
 
 const NO_SHELL_PATHS = ['/', '/login', '/signup', '/privacy', '/terms', '/security', '/lp', '/promo', '/promo/logo']
 
+function isNoShell(pathname: string) {
+  return NO_SHELL_PATHS.includes(pathname) ||
+    pathname.startsWith('/lp/') ||
+    pathname.startsWith('/blog')
+}
+
 function MobileTopBar() {
   return (
     <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-slate-200 bg-white px-4 lg:hidden">
@@ -113,7 +119,7 @@ function ManagerIcon({ active }: { active: boolean }) {
 export default function LayoutShell({ children, sidebar, isAdmin = false }: Props) {
   const pathname = usePathname()
 
-  if (NO_SHELL_PATHS.includes(pathname) || pathname.startsWith('/lp/')) {
+  if (isNoShell(pathname)) {
     return <>{children}</>
   }
 
