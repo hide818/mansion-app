@@ -154,7 +154,8 @@ export default async function BlogPostPage({ params }: Props) {
           <p className="mb-6 text-sm opacity-80">AI議事録・案件管理・引き継ぎ書自動生成を1つにまとめたSaaS。月額¥50,000〜。</p>
           <Link
             href="/signup"
-            className="inline-block rounded-xl bg-white px-6 py-3 text-sm font-bold text-blue-600 hover:bg-blue-50"
+            style={{ color: '#1d4ed8', backgroundColor: '#ffffff' }}
+            className="inline-block rounded-xl px-8 py-3 text-sm font-bold hover:bg-blue-50"
           >
             14日間無料で試してみる →
           </Link>
