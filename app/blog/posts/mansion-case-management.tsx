@@ -445,7 +445,7 @@ export function ArticleMansionCaseManagement() {
         すべてを一度に変更する必要はありません。現在の業務を生かしながら、対応漏れや引き継ぎの負担が大きい部分から改善することが、案件管理を定着させる第一歩です。
       </p>
 
-      <div className="not-prose my-10 rounded-2xl bg-blue-50 border border-blue-100 p-8 text-center">
+      <div className="not-prose my-10 rounded-2xl bg-blue-50 border border-blue-100 p-8">
         <p className="mb-3 text-slate-700">
           修繕対応、理事会の宿題、クレーム、見積取得などの案件が、Excelやメール、共有フォルダに分散していませんか。
         </p>

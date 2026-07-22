@@ -28,8 +28,8 @@ export function TableOfContents() {
 
   return (
     <nav className="mb-10 rounded-xl border border-blue-100 bg-blue-50 p-6">
-      <p className="mb-4 text-sm font-bold text-slate-700 flex items-center gap-2">
-        <span>📋</span>目次
+      <p className="mb-4 text-sm font-bold text-slate-700">
+        目次
       </p>
       <ol className="space-y-1.5 list-none m-0 p-0">
         {headings.map((h) => (

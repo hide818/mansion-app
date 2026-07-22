@@ -456,7 +456,7 @@ export function ArticleMansionManagementDx() {
         管理職にとっても、担当者へ一件ずつ確認するのではなく、案件数、期限切れ、長期間更新されていない案件を一覧で確認できれば、早い段階で支援しやすくなります。
       </p>
 
-      <div className="not-prose my-10 rounded-2xl bg-blue-50 border border-blue-100 p-8 text-center">
+      <div className="not-prose my-10 rounded-2xl bg-blue-50 border border-blue-100 p-8">
         <p className="mb-3 text-slate-700">
           物件・案件・タスク・対応履歴を関連付けることで、案件の現在地と次の対応を確認しやすくなります。
         </p>

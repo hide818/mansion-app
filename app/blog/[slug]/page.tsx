@@ -67,19 +67,19 @@ const CATEGORY_COLORS: Record<string, string> = {
   '管理組合': 'bg-teal-50 text-teal-700',
 }
 
-const CATEGORY_STYLES: Record<string, { bg: string; emoji: string }> = {
-  '議事録':    { bg: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)', emoji: '📋' },
-  '業務効率化': { bg: 'linear-gradient(135deg, #34d399 0%, #059669 100%)', emoji: '⚡' },
-  'DX・IT化':  { bg: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)', emoji: '🚀' },
-  '総会・理事会': { bg: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)', emoji: '🏛️' },
-  '管理費・会計': { bg: 'linear-gradient(135deg, #f87171 0%, #dc2626 100%)', emoji: '💰' },
-  '修繕工事':  { bg: 'linear-gradient(135deg, #fb923c 0%, #c2410c 100%)', emoji: '🔧' },
-  '管理会社':  { bg: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)', emoji: '🏢' },
-  '住民対応':  { bg: 'linear-gradient(135deg, #f472b6 0%, #be185d 100%)', emoji: '👥' },
-  '管理組合':  { bg: 'linear-gradient(135deg, #2dd4bf 0%, #0f766e 100%)', emoji: '🤝' },
+const CATEGORY_STYLES: Record<string, { bg: string }> = {
+  '議事録':    { bg: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' },
+  '業務効率化': { bg: 'linear-gradient(135deg, #34d399 0%, #059669 100%)' },
+  'DX・IT化':  { bg: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)' },
+  '総会・理事会': { bg: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)' },
+  '管理費・会計': { bg: 'linear-gradient(135deg, #f87171 0%, #dc2626 100%)' },
+  '修繕工事':  { bg: 'linear-gradient(135deg, #fb923c 0%, #c2410c 100%)' },
+  '管理会社':  { bg: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)' },
+  '住民対応':  { bg: 'linear-gradient(135deg, #f472b6 0%, #be185d 100%)' },
+  '管理組合':  { bg: 'linear-gradient(135deg, #2dd4bf 0%, #0f766e 100%)' },
 }
 
-const DEFAULT_STYLE = { bg: 'linear-gradient(135deg, #94a3b8 0%, #475569 100%)', emoji: '📄' }
+const DEFAULT_STYLE = { bg: 'linear-gradient(135deg, #94a3b8 0%, #475569 100%)' }
 
 function getReadingMinutes(description: string): number {
   return Math.max(4, Math.min(10, Math.round(description.length / 18)))
@@ -158,11 +158,9 @@ export default async function BlogPostPage({ params }: Props) {
 
       {/* Cover image */}
       <div
-        className="flex h-44 w-full items-center justify-center"
+        className="h-36 w-full"
         style={{ background: categoryStyle.bg }}
-      >
-        <span className="text-7xl drop-shadow-md select-none">{categoryStyle.emoji}</span>
-      </div>
+      />
 
       <main className="mx-auto max-w-3xl px-6 pt-10 pb-16">
         <div className="mb-8">

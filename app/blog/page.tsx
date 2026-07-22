@@ -28,19 +28,19 @@ const CATEGORY_COLORS: Record<string, string> = {
   '管理組合': 'bg-teal-50 text-teal-700',
 }
 
-const CATEGORY_STYLES: Record<string, { bg: string; emoji: string }> = {
-  '議事録':    { bg: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)', emoji: '📋' },
-  '業務効率化': { bg: 'linear-gradient(135deg, #34d399 0%, #059669 100%)', emoji: '⚡' },
-  'DX・IT化':  { bg: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)', emoji: '🚀' },
-  '総会・理事会': { bg: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)', emoji: '🏛️' },
-  '管理費・会計': { bg: 'linear-gradient(135deg, #f87171 0%, #dc2626 100%)', emoji: '💰' },
-  '修繕工事':  { bg: 'linear-gradient(135deg, #fb923c 0%, #c2410c 100%)', emoji: '🔧' },
-  '管理会社':  { bg: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)', emoji: '🏢' },
-  '住民対応':  { bg: 'linear-gradient(135deg, #f472b6 0%, #be185d 100%)', emoji: '👥' },
-  '管理組合':  { bg: 'linear-gradient(135deg, #2dd4bf 0%, #0f766e 100%)', emoji: '🤝' },
+const CATEGORY_STYLES: Record<string, { bg: string }> = {
+  '議事録':    { bg: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' },
+  '業務効率化': { bg: 'linear-gradient(135deg, #34d399 0%, #059669 100%)' },
+  'DX・IT化':  { bg: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)' },
+  '総会・理事会': { bg: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)' },
+  '管理費・会計': { bg: 'linear-gradient(135deg, #f87171 0%, #dc2626 100%)' },
+  '修繕工事':  { bg: 'linear-gradient(135deg, #fb923c 0%, #c2410c 100%)' },
+  '管理会社':  { bg: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)' },
+  '住民対応':  { bg: 'linear-gradient(135deg, #f472b6 0%, #be185d 100%)' },
+  '管理組合':  { bg: 'linear-gradient(135deg, #2dd4bf 0%, #0f766e 100%)' },
 }
 
-const DEFAULT_STYLE = { bg: 'linear-gradient(135deg, #94a3b8 0%, #475569 100%)', emoji: '📄' }
+const DEFAULT_STYLE = { bg: 'linear-gradient(135deg, #94a3b8 0%, #475569 100%)' }
 
 function getReadingMinutes(description: string): number {
   return Math.max(4, Math.min(10, Math.round(description.length / 18)))
@@ -85,11 +85,9 @@ export default function BlogPage() {
               >
                 {/* Gradient thumbnail */}
                 <div
-                  className="flex h-32 items-center justify-center"
+                  className="h-28"
                   style={{ background: style.bg }}
-                >
-                  <span className="text-5xl drop-shadow-sm select-none">{style.emoji}</span>
-                </div>
+                />
 
                 {/* Card content */}
                 <div className="flex flex-col flex-1 p-5">
@@ -121,7 +119,8 @@ export default function BlogPage() {
           <p className="mb-6 text-sm opacity-80">AI議事録・案件管理・引き継ぎ書自動生成を1つにまとめたSaaS</p>
           <Link
             href="/lp"
-            className="inline-block rounded-xl bg-white px-6 py-3 text-sm font-bold text-blue-600 hover:bg-blue-50"
+            style={{ color: '#2563eb', backgroundColor: '#ffffff' }}
+            className="inline-block rounded-xl px-6 py-3 text-sm font-bold hover:bg-blue-50"
           >
             詳細を見る →
           </Link>
