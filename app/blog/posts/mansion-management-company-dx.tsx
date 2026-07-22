@@ -45,7 +45,7 @@ export function ArticleMansionManagementDx() {
         <div className="bg-violet-50 p-5">
           <div className="mb-2 inline-block rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-violet-700">Step 3（DX）</div>
           <div className="mb-1 text-base font-bold text-slate-900">業務プロセスを変革</div>
-          <div className="text-sm text-slate-500">情報をつなぎ・再利用する仕組みへ</div>
+          <div className="text-sm text-slate-500">情報をつなぎ・再利用する</div>
           <div className="mt-3 rounded-lg bg-white/70 p-3 text-xs text-slate-600">例：案件の受付〜完了まで担当者・期限・履歴・資料を一元管理し、理事会報告や引き継ぎにも再利用する</div>
         </div>
       </div>
