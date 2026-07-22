@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   --background: #eef2f7;
@@ -42,6 +43,56 @@ textarea {
   .file\:text-white::file-selector-button {
     color: #ffffff !important;
   }
+}
+
+/* ブログ記事用スタイル */
+.blog-prose h2 {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1rem;
+  color: #0f172a;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.blog-prose h3 {
+  color: #1e293b;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.blog-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.blog-prose th {
+  background-color: #1e3a5f;
+  color: #ffffff;
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.blog-prose td {
+  padding: 0.625rem 0.875rem;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: top;
+  color: #334155;
+}
+
+.blog-prose tr:nth-child(even) td {
+  background-color: #f8fafc;
+}
+
+.blog-prose ul > li::marker {
+  color: #3b82f6;
+}
+
+.blog-prose ol > li::marker {
+  color: #3b82f6;
+  font-weight: 600;
 }
 
 @media print {

@@ -29,28 +29,26 @@ export function ArticleMansionManagementDx() {
       <p>
         経済産業省は、デジタル技術やツールを導入すること自体ではなく、データとデジタル技術を使って業務、組織、サービスなどを変革することをDXの中心に位置付けています。IPAも、既存業務の効率化を目的とするデジタル化と、ビジネスや企業の在り方を変えるDXを区別しています。置き換えると、次のように整理できます。
       </p>
-      <table>
-        <thead>
-          <tr>
-            <th>段階</th>
-            <th>管理会社における例</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>デジタル化</td>
-            <td>紙の議事録をスキャンしてPDFで保存する</td>
-          </tr>
-          <tr>
-            <td>IT化・共有化</td>
-            <td>Excelの案件管理表をクラウド上で共有する</td>
-          </tr>
-          <tr>
-            <td>DX</td>
-            <td>案件の受付から完了までの流れを統一し、担当者・期限・対応履歴・添付資料を関連付け、その情報を理事会報告や引き継ぎにも再利用する</td>
-          </tr>
-        </tbody>
-      </table>
+      <div className="not-prose my-8 grid grid-cols-1 gap-0 overflow-hidden rounded-xl border border-slate-200 sm:grid-cols-3">
+        <div className="border-b border-slate-200 p-5 sm:border-b-0 sm:border-r">
+          <div className="mb-2 inline-block rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-slate-500">Step 1</div>
+          <div className="mb-1 text-base font-bold text-slate-900">デジタル化</div>
+          <div className="text-sm text-slate-500">紙の業務をデータへ変換</div>
+          <div className="mt-3 rounded-lg bg-slate-50 p-3 text-xs text-slate-600">例：紙の議事録をスキャンしてPDFで保存する</div>
+        </div>
+        <div className="border-b border-slate-200 bg-blue-50 p-5 sm:border-b-0 sm:border-r">
+          <div className="mb-2 inline-block rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-blue-600">Step 2</div>
+          <div className="mb-1 text-base font-bold text-slate-900">IT化・共有化</div>
+          <div className="text-sm text-slate-500">情報を組織全体で共有</div>
+          <div className="mt-3 rounded-lg bg-white/70 p-3 text-xs text-slate-600">例：ExcelをクラウドストレージやSaaSで共有する</div>
+        </div>
+        <div className="bg-violet-50 p-5">
+          <div className="mb-2 inline-block rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-violet-700">Step 3（DX）</div>
+          <div className="mb-1 text-base font-bold text-slate-900">業務プロセスを変革</div>
+          <div className="text-sm text-slate-500">情報をつなぎ・再利用する仕組みへ</div>
+          <div className="mt-3 rounded-lg bg-white/70 p-3 text-xs text-slate-600">例：案件の受付〜完了まで担当者・期限・履歴・資料を一元管理し、理事会報告や引き継ぎにも再利用する</div>
+        </div>
+      </div>
       <p>
         たとえば、排水管修繕の見積書をPDF化し、共有フォルダへ保存したとします。
       </p>
@@ -237,37 +235,24 @@ export function ArticleMansionManagementDx() {
       <p>
         物件・案件・タスク・対応履歴は、それぞれ役割が異なります。
       </p>
-      <table>
-        <thead>
-          <tr>
-            <th>項目</th>
-            <th>役割</th>
-            <th>例</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>物件</td>
-            <td>管理対象となるマンション</td>
-            <td>○○マンション</td>
-          </tr>
-          <tr>
-            <td>案件</td>
-            <td>解決・完了させる必要がある出来事</td>
-            <td>エレベーター部品交換</td>
-          </tr>
-          <tr>
-            <td>タスク</td>
-            <td>次に行う具体的な行動</td>
-            <td>再見積依頼、理事長への連絡</td>
-          </tr>
-          <tr>
-            <td>対応履歴</td>
-            <td>これまでに行ったことや判断</td>
-            <td>業者回答、理事会決定、居住者説明</td>
-          </tr>
-        </tbody>
-      </table>
+      <div className="not-prose my-6 space-y-2">
+        {[
+          { label: '物件', color: 'bg-slate-100 text-slate-600', role: '管理対象となるマンション', example: '○○マンション' },
+          { label: '案件', color: 'bg-blue-100 text-blue-700', role: '解決・完了させる必要がある出来事', example: 'エレベーター部品交換' },
+          { label: 'タスク', color: 'bg-emerald-100 text-emerald-700', role: '次に行う具体的な行動', example: '再見積依頼、理事長への連絡' },
+          { label: '対応履歴', color: 'bg-violet-100 text-violet-700', role: 'これまでに行ったことや判断', example: '業者回答、理事会決定、居住者説明' },
+        ].map((item) => (
+          <div key={item.label} className="flex items-start gap-4 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+            <div className={`shrink-0 rounded-lg px-3 py-1.5 text-sm font-bold ${item.color}`} style={{ minWidth: '4.5rem', textAlign: 'center' }}>
+              {item.label}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold text-slate-800">{item.role}</div>
+              <div className="mt-0.5 text-xs text-slate-500">例：{item.example}</div>
+            </div>
+          </div>
+        ))}
+      </div>
       <p>
         案件とタスクを同じものとして管理すると、案件全体の進捗が分かりにくくなります。
       </p>

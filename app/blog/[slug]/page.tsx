@@ -179,15 +179,7 @@ export default async function BlogPostPage({ params }: Props) {
 
         <TableOfContents />
 
-        <div className="prose prose-slate max-w-none
-          prose-h2:mt-10 prose-h2:mb-4 prose-h2:text-xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:border-l-4 prose-h2:border-blue-500 prose-h2:pl-4
-          prose-h3:mt-6 prose-h3:mb-3 prose-h3:text-base prose-h3:font-bold prose-h3:text-slate-800
-          prose-p:leading-relaxed prose-p:text-slate-700
-          prose-li:text-slate-700 prose-li:leading-relaxed
-          prose-strong:text-slate-900
-          prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
-          prose-table:text-sm prose-th:bg-slate-100 prose-th:text-slate-700
-        ">
+        <div className="prose prose-slate prose-lg max-w-none blog-prose">
           <Article />
         </div>
 
