@@ -25,6 +25,7 @@ import { ArticleRijiYakuwari } from '../posts/riji-yakuwari'
 import { ArticleMansionManagementDx } from '../posts/mansion-management-company-dx'
 import { ArticleMansionCaseManagement } from '../posts/mansion-case-management'
 import { ArticleMansionManagementCentralization } from '../posts/mansion-management-centralization'
+import { ArticleMansionManagementPersonalizationPrevention } from '../posts/mansion-management-personalization-prevention'
 import { TableOfContents } from '../components/TableOfContents'
 import type { Metadata } from 'next'
 
@@ -55,6 +56,7 @@ const ARTICLES: Record<string, React.FC> = {
   'mansion-management-company-dx': ArticleMansionManagementDx,
   'mansion-case-management': ArticleMansionCaseManagement,
   'mansion-management-centralization': ArticleMansionManagementCentralization,
+  'mansion-management-personalization-prevention': ArticleMansionManagementPersonalizationPrevention,
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
