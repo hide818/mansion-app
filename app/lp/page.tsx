@@ -135,7 +135,7 @@ export default function LpPage() {
             になった。
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-[19px] leading-relaxed text-[#a1a1a6]">
-            音声をアップロードするだけ。自社フォーマットで議事録を自動生成。<br />宿題・タスクまで自動抽出。
+            音声をアップロードするだけ。<br />自社フォーマットで議事録を自動生成。<br />宿題・タスクまで自動抽出。
           </p>
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link href="/signup"
