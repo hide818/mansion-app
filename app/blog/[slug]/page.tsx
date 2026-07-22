@@ -123,6 +123,11 @@ export default async function BlogPostPage({ params }: Props) {
   const categoryStyle = CATEGORY_STYLES[post.category] ?? DEFAULT_STYLE
   const minutes = getReadingMinutes(post.description)
 
+  const sameCategoryPosts = posts.filter(p => p.category === post.category && p.slug !== slug)
+  const otherPosts = posts.filter(p => p.category !== post.category && p.slug !== slug)
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
+  const relatedPosts = [...sameCategoryPosts, ...otherPosts].slice(0, 3)
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -190,7 +195,7 @@ export default async function BlogPostPage({ params }: Props) {
           <h2 className="mb-3 text-xl font-extrabold">この記事で紹介した業務を自動化する</h2>
           <p className="mb-6 text-sm opacity-80">AI議事録・案件管理・引き継ぎ書自動生成を1つにまとめたSaaS。月額¥50,000〜。</p>
           <Link
-            href="/signup"
+            href={`/signup?utm_source=blog&utm_medium=article&utm_campaign=${slug}&utm_content=bottom_cta`}
             style={{ color: '#1d4ed8', backgroundColor: '#ffffff' }}
             className="inline-block rounded-xl px-8 py-3 text-sm font-bold hover:bg-blue-50"
           >
@@ -198,7 +203,35 @@ export default async function BlogPostPage({ params }: Props) {
           </Link>
         </div>
 
-        <div className="mt-8 border-t border-slate-100 pt-8">
+        {relatedPosts.length > 0 && (
+          <div className="mt-14">
+            <h2 className="mb-5 text-base font-bold text-slate-800">関連記事</h2>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {relatedPosts.map((related) => {
+                const relStyle = CATEGORY_STYLES[related.category] ?? DEFAULT_STYLE
+                return (
+                  <Link
+                    key={related.slug}
+                    href={`/blog/${related.slug}`}
+                    className="group flex flex-col overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
+                  >
+                    <div className="h-20" style={{ background: relStyle.bg }} />
+                    <div className="flex flex-col flex-1 p-4">
+                      <span className={`mb-2 inline-block self-start rounded-full px-2 py-0.5 text-xs font-semibold ${CATEGORY_COLORS[related.category] ?? 'bg-slate-100 text-slate-600'}`}>
+                        {related.category}
+                      </span>
+                      <p className="text-sm font-bold text-slate-900 group-hover:text-blue-700 leading-snug line-clamp-3">
+                        {related.title}
+                      </p>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-10 border-t border-slate-100 pt-8">
           <Link href="/blog" className="text-sm text-slate-500 hover:text-slate-900">
             ← 記事一覧に戻る
           </Link>
