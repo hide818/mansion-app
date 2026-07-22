@@ -22,6 +22,7 @@ import { ArticleSokaiGiketsu } from '../posts/sokai-giketsu'
 import { ArticleDaikiShuzen } from '../posts/daiki-shuzen-susume-kata'
 import { ArticleKanriErabikata } from '../posts/kanri-kaisha-erabi-kata'
 import { ArticleRijiYakuwari } from '../posts/riji-yakuwari'
+import { ArticleMansionManagementDx } from '../posts/mansion-management-company-dx'
 import type { Metadata } from 'next'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -48,6 +49,7 @@ const ARTICLES: Record<string, React.FC> = {
   'daiki-shuzen-susume-kata': ArticleDaikiShuzen,
   'kanri-kaisha-erabi-kata': ArticleKanriErabikata,
   'riji-yakuwari': ArticleRijiYakuwari,
+  'mansion-management-company-dx': ArticleMansionManagementDx,
 }
 
 export async function generateStaticParams() {
