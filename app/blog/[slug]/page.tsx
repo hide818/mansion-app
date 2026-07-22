@@ -26,6 +26,7 @@ import { ArticleMansionManagementDx } from '../posts/mansion-management-company-
 import { ArticleMansionCaseManagement } from '../posts/mansion-case-management'
 import { ArticleMansionManagementCentralization } from '../posts/mansion-management-centralization'
 import { ArticleMansionManagementPersonalizationPrevention } from '../posts/mansion-management-personalization-prevention'
+import { ArticleMansionManagementHandover } from '../posts/mansion-management-handover'
 import { TableOfContents } from '../components/TableOfContents'
 import type { Metadata } from 'next'
 
@@ -57,6 +58,7 @@ const ARTICLES: Record<string, React.FC> = {
   'mansion-case-management': ArticleMansionCaseManagement,
   'mansion-management-centralization': ArticleMansionManagementCentralization,
   'mansion-management-personalization-prevention': ArticleMansionManagementPersonalizationPrevention,
+  'mansion-management-handover': ArticleMansionManagementHandover,
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
