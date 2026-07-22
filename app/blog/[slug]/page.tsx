@@ -24,6 +24,7 @@ import { ArticleKanriErabikata } from '../posts/kanri-kaisha-erabi-kata'
 import { ArticleRijiYakuwari } from '../posts/riji-yakuwari'
 import { ArticleMansionManagementDx } from '../posts/mansion-management-company-dx'
 import { ArticleMansionCaseManagement } from '../posts/mansion-case-management'
+import { TableOfContents } from '../components/TableOfContents'
 import type { Metadata } from 'next'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -54,6 +55,36 @@ const ARTICLES: Record<string, React.FC> = {
   'mansion-case-management': ArticleMansionCaseManagement,
 }
 
+const CATEGORY_COLORS: Record<string, string> = {
+  '議事録': 'bg-blue-50 text-blue-700',
+  '業務効率化': 'bg-emerald-50 text-emerald-700',
+  'DX・IT化': 'bg-violet-50 text-violet-700',
+  '総会・理事会': 'bg-amber-50 text-amber-700',
+  '管理費・会計': 'bg-red-50 text-red-700',
+  '修繕工事': 'bg-orange-50 text-orange-700',
+  '管理会社': 'bg-sky-50 text-sky-700',
+  '住民対応': 'bg-pink-50 text-pink-700',
+  '管理組合': 'bg-teal-50 text-teal-700',
+}
+
+const CATEGORY_STYLES: Record<string, { bg: string; emoji: string }> = {
+  '議事録':    { bg: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)', emoji: '📋' },
+  '業務効率化': { bg: 'linear-gradient(135deg, #34d399 0%, #059669 100%)', emoji: '⚡' },
+  'DX・IT化':  { bg: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)', emoji: '🚀' },
+  '総会・理事会': { bg: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)', emoji: '🏛️' },
+  '管理費・会計': { bg: 'linear-gradient(135deg, #f87171 0%, #dc2626 100%)', emoji: '💰' },
+  '修繕工事':  { bg: 'linear-gradient(135deg, #fb923c 0%, #c2410c 100%)', emoji: '🔧' },
+  '管理会社':  { bg: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)', emoji: '🏢' },
+  '住民対応':  { bg: 'linear-gradient(135deg, #f472b6 0%, #be185d 100%)', emoji: '👥' },
+  '管理組合':  { bg: 'linear-gradient(135deg, #2dd4bf 0%, #0f766e 100%)', emoji: '🤝' },
+}
+
+const DEFAULT_STYLE = { bg: 'linear-gradient(135deg, #94a3b8 0%, #475569 100%)', emoji: '📄' }
+
+function getReadingMinutes(description: string): number {
+  return Math.max(4, Math.min(10, Math.round(description.length / 18)))
+}
+
 export async function generateStaticParams() {
   return posts.map((p) => ({ slug: p.slug }))
 }
@@ -79,18 +110,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  '議事録': 'bg-blue-50 text-blue-700',
-  '業務効率化': 'bg-emerald-50 text-emerald-700',
-  'DX・IT化': 'bg-violet-50 text-violet-700',
-  '総会・理事会': 'bg-amber-50 text-amber-700',
-  '管理費・会計': 'bg-red-50 text-red-700',
-  '修繕工事': 'bg-orange-50 text-orange-700',
-  '管理会社': 'bg-sky-50 text-sky-700',
-  '住民対応': 'bg-pink-50 text-pink-700',
-  '管理組合': 'bg-teal-50 text-teal-700',
-}
-
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params
   const post = posts.find((p) => p.slug === slug)
@@ -98,6 +117,9 @@ export default async function BlogPostPage({ params }: Props) {
 
   const Article = ARTICLES[slug]
   if (!Article) notFound()
+
+  const categoryStyle = CATEGORY_STYLES[post.category] ?? DEFAULT_STYLE
+  const minutes = getReadingMinutes(post.description)
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -134,13 +156,22 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
       </nav>
 
-      <main className="mx-auto max-w-3xl px-6 py-12">
+      {/* Cover image */}
+      <div
+        className="flex h-44 w-full items-center justify-center"
+        style={{ background: categoryStyle.bg }}
+      >
+        <span className="text-7xl drop-shadow-md select-none">{categoryStyle.emoji}</span>
+      </div>
+
+      <main className="mx-auto max-w-3xl px-6 pt-10 pb-16">
         <div className="mb-8">
-          <div className="mb-4 flex items-center gap-3">
+          <div className="mb-4 flex items-center gap-3 flex-wrap">
             <span className={`rounded-full px-3 py-0.5 text-xs font-semibold ${CATEGORY_COLORS[post.category] ?? 'bg-slate-100 text-slate-600'}`}>
               {post.category}
             </span>
             <time className="text-xs text-slate-400">{post.publishedAt}</time>
+            <span className="text-xs text-slate-400">約{minutes}分で読めます</span>
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 leading-snug sm:text-3xl">
             {post.title}
@@ -148,7 +179,17 @@ export default async function BlogPostPage({ params }: Props) {
           <p className="mt-4 text-slate-500 leading-relaxed">{post.description}</p>
         </div>
 
-        <div className="prose prose-slate max-w-none">
+        <TableOfContents />
+
+        <div className="prose prose-slate max-w-none
+          prose-h2:mt-10 prose-h2:mb-4 prose-h2:text-xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:border-l-4 prose-h2:border-blue-500 prose-h2:pl-4
+          prose-h3:mt-6 prose-h3:mb-3 prose-h3:text-base prose-h3:font-bold prose-h3:text-slate-800
+          prose-p:leading-relaxed prose-p:text-slate-700
+          prose-li:text-slate-700 prose-li:leading-relaxed
+          prose-strong:text-slate-900
+          prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
+          prose-table:text-sm prose-th:bg-slate-100 prose-th:text-slate-700
+        ">
           <Article />
         </div>
 
