@@ -7,7 +7,7 @@ import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
-import { createSupabaseServerClient } from '@/lib/supabaseServer'
+import { createSupabaseServerClient, createSupabaseServiceClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import ffmpegStatic from 'ffmpeg-static'
 
@@ -528,8 +528,9 @@ export async function POST(request: Request) {
       .maybeSingle()
     const templateSampleText = templateRow?.sample_text ?? null
 
-    // Supabase Storageから音声ファイルをダウンロード
-    const { data: fileData, error: downloadError } = await supabase.storage
+    // Supabase Storageから音声ファイルをダウンロード（サービスロールで確実に取得）
+    const serviceClient = createSupabaseServiceClient()
+    const { data: fileData, error: downloadError } = await serviceClient.storage
       .from('Kura-files')
       .download(audioStoragePath)
     if (downloadError || !fileData) {
@@ -547,7 +548,7 @@ export async function POST(request: Request) {
     await fs.writeFile(inputPath, Buffer.from(arrayBuffer))
 
     // 処理後にStorageの一時ファイルを削除（エラーは無視）
-    supabase.storage.from('Kura-files').remove([audioStoragePath]).catch(() => {})
+    serviceClient.storage.from('Kura-files').remove([audioStoragePath]).catch(() => {})
 
     const chunkPaths = await splitAudioToMp3Chunks(inputPath, chunkDir)
     const transcriptText = (await transcribeChunks(chunkPaths)).trim()
