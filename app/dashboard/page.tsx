@@ -48,12 +48,12 @@ export default async function DashboardPage() {
   if (currentProfile?.id) {
     const { data: nameData } = await supabase
       .from('profiles')
-      .select('display_name, email')
+      .select('display_name')
       .eq('id', currentProfile.id)
       .eq('company_id', companyId)
       .maybeSingle()
     if (nameData) {
-      userName = (nameData.display_name as string | null) || (nameData.email as string | null) || 'あなた'
+      userName = (nameData.display_name as string | null) || currentProfile.email?.split('@')[0] || 'あなた'
     }
   }
 
