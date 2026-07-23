@@ -16,6 +16,23 @@ type PropertyRow = {
   name: string | null
 }
 
+type PropertyDetail = {
+  name: string | null
+  address: string | null
+  total_units: number | null
+  total_floors: number | null
+  built_year: number | null
+  structure: string | null
+  association_name: string | null
+  president_name: string | null
+  president_phone: string | null
+  contract_start: string | null
+  contract_renewal: string | null
+  cleaning_company: string | null
+  elevator_company: string | null
+  insurance_company: string | null
+}
+
 type RawCaseRow = {
   id: string
   title?: string | null
@@ -269,6 +286,17 @@ export default async function NewHandoverPage({
   const selectedPropertyName =
     properties.find((item) => item.id === selectedPropertyId)?.name ?? ''
 
+  let propertyDetail: PropertyDetail | null = null
+  if (selectedPropertyId) {
+    const { data: detailData } = await supabase
+      .from('properties')
+      .select('name, address, total_units, total_floors, built_year, structure, association_name, president_name, president_phone, contract_start, contract_renewal, cleaning_company, elevator_company, insurance_company')
+      .eq('id', selectedPropertyId)
+      .eq('company_id', companyId)
+      .maybeSingle()
+    propertyDetail = detailData as PropertyDetail | null
+  }
+
   let autoCasesText = '物件を選択すると、自動で表示されます。'
   let autoTasksText = '物件を選択すると、自動で表示されます。'
   let autoComplaintsText = '物件を選択すると、自動で表示されます。'
@@ -312,10 +340,21 @@ export default async function NewHandoverPage({
     autoComplaintsText = buildAutoComplaintsText(complaints)
   }
 
-  const basicInfoTemplate = `物件名：${selectedPropertyName}
-所在地：
-総戸数：
-築年数：`
+  const age = propertyDetail?.built_year
+    ? `${new Date().getFullYear() - propertyDetail.built_year}年（${propertyDetail.built_year}年竣工）`
+    : ''
+
+  const basicInfoTemplate = [
+    `物件名：${propertyDetail?.name ?? selectedPropertyName ?? ''}`,
+    `所在地：${propertyDetail?.address ?? ''}`,
+    `総戸数：${propertyDetail?.total_units ? `${propertyDetail.total_units}戸` : ''}`,
+    `総階数：${propertyDetail?.total_floors ? `${propertyDetail.total_floors}階` : ''}`,
+    `築年数：${age}`,
+    `構造：${propertyDetail?.structure ?? ''}`,
+    `管理組合名：${propertyDetail?.association_name ?? ''}`,
+    `理事長：${propertyDetail?.president_name ?? ''}`,
+    `理事長電話：${propertyDetail?.president_phone ?? ''}`,
+  ].join('\n')
 
   const managementSystemTemplate = `担当フロント：
 管理員：
@@ -350,10 +389,14 @@ export default async function NewHandoverPage({
 理事長：
 理事会：`
 
-  const vendorsTemplate = `清掃会社：
-設備点検：
-消防設備：
-よく使う業者：`
+  const vendorsTemplate = [
+    `清掃会社：${propertyDetail?.cleaning_company ?? ''}`,
+    `EV保守：${propertyDetail?.elevator_company ?? ''}`,
+    `損害保険：${propertyDetail?.insurance_company ?? ''}`,
+    `設備点検：`,
+    `消防設備：`,
+    `よく使う業者：`,
+  ].join('\n')
 
   const historyTemplate = `【過去トラブル・履歴】
 騒音問題：
