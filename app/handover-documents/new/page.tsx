@@ -294,6 +294,19 @@ export default async function NewHandoverPage({
   const selectedPropertyName =
     properties.find((item) => item.id === selectedPropertyId)?.name ?? ''
 
+  // 既存ドキュメントがあれば編集ページへリダイレクト
+  if (selectedPropertyId) {
+    const { data: existing } = await supabase
+      .from('handover_documents')
+      .select('id')
+      .eq('property_id', selectedPropertyId)
+      .eq('company_id', companyId)
+      .maybeSingle()
+    if (existing?.id) {
+      redirect(`/handover-documents/${existing.id}/edit`)
+    }
+  }
+
   let propertyDetail: PropertyDetail | null = null
   if (selectedPropertyId) {
     const { data: detailData } = await supabase
