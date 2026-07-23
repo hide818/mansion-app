@@ -478,31 +478,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '認証が必要です。' }, { status: 401 })
     }
 
-    const formData = await request.formData()
+    const body = await request.json()
 
-    const meetingTypeRaw = String(formData.get('meetingType') ?? '').trim()
-    const propertyName = String(formData.get('propertyName') ?? '').trim()
-    const agendasRaw = String(formData.get('agendas') ?? '[]')
-    const audio = formData.get('audio')
+    const meetingTypeRaw = String(body.meetingType ?? '').trim()
+    const propertyName = String(body.propertyName ?? '').trim()
+    const audioStoragePath = String(body.audioStoragePath ?? '').trim()
+    const audioFileName = String(body.audioFileName ?? 'audio.m4a').trim()
+    const agendas = normalizeAgendaTitles(body.agendas)
 
-    const meetingType =
-      meetingTypeRaw === '理事会' ? '理事会' : '総会'
-
-    let parsedAgendas: unknown = []
-    try {
-      parsedAgendas = JSON.parse(agendasRaw)
-    } catch {
-      return NextResponse.json(
-        { error: '議題データの形式が不正です。' },
-        { status: 400 },
-      )
-    }
-
-    const agendas = normalizeAgendaTitles(parsedAgendas)
+    const meetingType = meetingTypeRaw === '理事会' ? '理事会' : '総会'
 
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
-        { error: 'OPENAI_API_KEY が未設定です。.env.local を確認してください。' },
+        { error: 'OPENAI_API_KEY が未設定です。' },
         { status: 500 },
       )
     }
@@ -521,16 +509,9 @@ export async function POST(request: Request) {
       )
     }
 
-    if (!(audio instanceof File)) {
+    if (!audioStoragePath) {
       return NextResponse.json(
         { error: '音声ファイルを選択してください。' },
-        { status: 400 },
-      )
-    }
-
-    if (audio.size === 0) {
-      return NextResponse.json(
-        { error: '音声ファイルが空です。別のファイルを選択してください。' },
         { status: 400 },
       )
     }
@@ -547,12 +528,26 @@ export async function POST(request: Request) {
       .maybeSingle()
     const templateSampleText = templateRow?.sample_text ?? null
 
+    // Supabase Storageから音声ファイルをダウンロード
+    const { data: fileData, error: downloadError } = await supabase.storage
+      .from('Kura-files')
+      .download(audioStoragePath)
+    if (downloadError || !fileData) {
+      return NextResponse.json(
+        { error: '音声ファイルの取得に失敗しました。再度アップロードしてください。' },
+        { status: 500 },
+      )
+    }
+
     await fs.mkdir(uploadDir, { recursive: true })
 
-    const extension = getSafeExtension(audio.name)
+    const extension = getSafeExtension(audioFileName)
     const inputPath = path.join(uploadDir, `source${extension}`)
-    const arrayBuffer = await audio.arrayBuffer()
+    const arrayBuffer = await fileData.arrayBuffer()
     await fs.writeFile(inputPath, Buffer.from(arrayBuffer))
+
+    // 処理後にStorageの一時ファイルを削除（エラーは無視）
+    supabase.storage.from('Kura-files').remove([audioStoragePath]).catch(() => {})
 
     const chunkPaths = await splitAudioToMp3Chunks(inputPath, chunkDir)
     const transcriptText = (await transcribeChunks(chunkPaths)).trim()

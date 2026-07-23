@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { createSupabaseBrowserClient } from '@/lib/supabase'
 
 type AgendaRow = {
   id: string
@@ -1482,15 +1483,24 @@ function AiMinutesInner() {
     setSelectedItems([])
 
     try {
-      const formData = new FormData()
-      formData.append('meetingType', meetingType)
-      formData.append('propertyName', selectedProperty.name)
-      formData.append('agendas', JSON.stringify(cleanedAgendas))
-      formData.append('audio', audioFile)
+      const supabase = createSupabaseBrowserClient()
+      const ext = audioFile.name.split('.').pop() ?? 'm4a'
+      const storagePath = `audio-tmp/${crypto.randomUUID()}.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from('Kura-files')
+        .upload(storagePath, audioFile, { upsert: false })
+      if (uploadError) throw new Error(`音声ファイルのアップロードに失敗しました: ${uploadError.message}`)
 
       const response = await fetch('/api/ai-minutes', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          meetingType,
+          propertyName: selectedProperty.name,
+          agendas: cleanedAgendas,
+          audioStoragePath: storagePath,
+          audioFileName: audioFile.name,
+        }),
       })
 
       const data = (await response.json()) as MinutesApiResponse
