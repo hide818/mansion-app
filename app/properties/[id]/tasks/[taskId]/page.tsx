@@ -5,6 +5,7 @@ import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { getUserProfile } from '@/lib/getUserProfile'
 import { isValidUuid } from '@/lib/isValidUuid'
 import { canEdit } from '@/lib/permissions'
+import SubmitButton from '@/app/components/SubmitButton'
 
 type Props = {
   params: Promise<{
@@ -481,12 +482,7 @@ export default async function TaskDetailPage({ params, searchParams }: Props) {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <button
-              type="submit"
-              className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800"
-            >
-              保存する
-            </button>
+            <SubmitButton label="保存する" loadingLabel="保存中..." />
           </div>
         </form>
       </section>
@@ -502,12 +498,7 @@ export default async function TaskDetailPage({ params, searchParams }: Props) {
           <input type="hidden" name="task_id" value={taskId} />
           <input type="hidden" name="case_id" value={task.case_id ?? ''} />
 
-          <button
-            type="submit"
-            className="rounded-xl bg-red-600 px-5 py-3 text-sm font-medium text-white hover:bg-red-700"
-          >
-            このタスクを削除
-          </button>
+          <SubmitButton label="このタスクを削除" loadingLabel="削除中..." variant="danger" />
         </form>
       </section>
     </div>

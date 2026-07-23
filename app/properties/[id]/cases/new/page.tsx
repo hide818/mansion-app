@@ -5,6 +5,7 @@ import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { getUserProfile } from '@/lib/getUserProfile'
 import { canEdit } from '@/lib/permissions'
 import { isValidUuid } from '@/lib/isValidUuid'
+import SubmitButton from '@/app/components/SubmitButton'
 
 type Props = {
   params: Promise<{
@@ -18,7 +19,6 @@ type Props = {
 type ProfileOption = {
   id: string
   display_name: string | null
-  email: string | null
 }
 
 async function createCaseAction(formData: FormData) {
@@ -124,7 +124,7 @@ export default async function NewCasePage({ params, searchParams }: Props) {
 
   const { data: profilesData } = await supabase
     .from('profiles')
-    .select('id, display_name, email')
+    .select('id, display_name')
     .eq('company_id', companyId)
     .order('display_name')
 
@@ -213,20 +213,14 @@ export default async function NewCasePage({ params, searchParams }: Props) {
               <option value="">未設定</option>
               {profiles.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.display_name || p.email || p.id}
+                  {p.display_name || p.id}
                 </option>
               ))}
             </select>
           </div>
 
           <div className="flex flex-wrap gap-3 pt-2">
-            <button
-              type="submit"
-              className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800"
-            >
-              保存する
-            </button>
-
+            <SubmitButton label="保存する" loadingLabel="保存中..." />
             <Link
               href={`/properties/${id}/cases`}
               className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"

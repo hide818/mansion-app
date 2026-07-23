@@ -8,6 +8,7 @@ import PropertyTimelineClient from '@/app/components/PropertyTimelineClient'
 import PropertyMemoryAiClient from '@/app/components/PropertyMemoryAiClient'
 import PropertyRepairPlanClient from '@/app/components/PropertyRepairPlanClient'
 import PropertyInfoForm from '@/app/properties/[id]/PropertyInfoForm'
+import SubmitButton from '@/app/components/SubmitButton'
 
 type Props = {
   params: Promise<{
@@ -65,8 +66,6 @@ async function updateMinutesSettingsAction(formData: FormData) {
   const votingRightsTotalCount = String(formData.get('voting_rights_total_count') ?? '').trim()
   const managementCompanyDisplayName = String(formData.get('management_company_display_name') ?? '').trim()
   const defaultChairpersonName = String(formData.get('default_chairperson_name') ?? '').trim()
-  const signaturePerson1 = String(formData.get('signature_person_1') ?? '').trim()
-  const signaturePerson2 = String(formData.get('signature_person_2') ?? '').trim()
   const showSignatureSection = formData.get('show_signature_section') !== '0'
   const closingRemarks = String(formData.get('closing_remarks') ?? '').trim()
 
@@ -78,8 +77,6 @@ async function updateMinutesSettingsAction(formData: FormData) {
       voting_rights_total_count: votingRightsTotalCount || null,
       management_company_display_name: managementCompanyDisplayName || null,
       default_chairperson_name: defaultChairpersonName || null,
-      signature_person_1: signaturePerson1 || null,
-      signature_person_2: signaturePerson2 || null,
       show_signature_section: showSignatureSection,
       closing_remarks: closingRemarks || null,
     })
@@ -166,13 +163,17 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
     .eq('company_id', companyId)
     .maybeSingle<MinutesSettingsRow>()
 
+  const { data: companyData } = await supabase
+    .from('companies')
+    .select('name')
+    .eq('id', companyId)
+    .maybeSingle()
+
   const bylawsArticle = minutesSettings?.bylaws_article ?? null
   const ownersTotalCount = minutesSettings?.owners_total_count ?? null
   const votingRightsTotalCount = minutesSettings?.voting_rights_total_count ?? null
-  const managementCompanyDisplayName = minutesSettings?.management_company_display_name ?? null
+  const managementCompanyDisplayName = minutesSettings?.management_company_display_name ?? companyData?.name ?? null
   const defaultChairpersonName = minutesSettings?.default_chairperson_name ?? null
-  const signaturePerson1 = minutesSettings?.signature_person_1 ?? null
-  const signaturePerson2 = minutesSettings?.signature_person_2 ?? null
   const showSignatureSection = minutesSettings?.show_signature_section ?? true
   const closingRemarks = minutesSettings?.closing_remarks ?? null
 
@@ -501,34 +502,6 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
             </div>
           </div>
 
-          <div className="grid gap-4 md:max-w-md md:grid-cols-2">
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                議事録署名人1
-              </label>
-              <input
-                type="text"
-                name="signature_person_1"
-                defaultValue={signaturePerson1 ?? ''}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                placeholder="例：田中一郎"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                議事録署名人2
-              </label>
-              <input
-                type="text"
-                name="signature_person_2"
-                defaultValue={signaturePerson2 ?? ''}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-                placeholder="例：鈴木花子"
-              />
-            </div>
-          </div>
-
           <div>
             <label className="mb-1.5 block text-sm font-medium text-slate-700">
               署名欄の表示
@@ -569,12 +542,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
           </div>
 
           <div>
-            <button
-              type="submit"
-              className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium !text-white hover:bg-slate-800"
-            >
-              保存する
-            </button>
+            <SubmitButton label="保存する" loadingLabel="保存中..." />
           </div>
         </form>
       </section>

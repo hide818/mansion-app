@@ -282,7 +282,7 @@ export default async function BoardCasesPage({ searchParams }: PageProps) {
 
                       <Link
                         href={`/properties/${item.property_id}/cases/${item.id}/board-settings`}
-                        className="inline-flex h-8 shrink-0 items-center justify-center whitespace-nowrap rounded-md bg-slate-900 px-3 text-sm font-medium text-white transition hover:bg-slate-700"
+                        className="inline-flex h-8 shrink-0 items-center justify-center whitespace-nowrap rounded-md bg-blue-600 px-3 text-sm font-medium text-white transition hover:bg-blue-700"
                       >
                         理事会予定設定
                       </Link>

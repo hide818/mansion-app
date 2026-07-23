@@ -135,25 +135,6 @@ export default function PropertyInfoForm({ propertyId, initial }: Props) {
         </div>
       </div>
 
-      {/* 財務 */}
-      <div className="rounded-2xl border bg-white p-5 shadow-sm">
-        <h3 className="font-bold text-gray-900 mb-4">財務</h3>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <Field label="管理費（月額/戸・円）">
-            <input type="number" value={form.management_fee ?? ''} onChange={(e) => setNum('management_fee', e.target.value)} placeholder="例: 15000" className={inputClass} />
-          </Field>
-          <Field label="修繕積立金（月額/戸・円）">
-            <input type="number" value={form.repair_reserve ?? ''} onChange={(e) => setNum('repair_reserve', e.target.value)} placeholder="例: 8000" className={inputClass} />
-          </Field>
-          <Field label="修繕積立金残高（円）">
-            <input type="number" value={form.reserve_balance ?? ''} onChange={(e) => setNum('reserve_balance', e.target.value)} placeholder="例: 12000000" className={inputClass} />
-          </Field>
-          <Field label="長期修繕計画 次回改定年">
-            <input type="number" value={form.repair_plan_year ?? ''} onChange={(e) => setNum('repair_plan_year', e.target.value)} placeholder="例: 2027" className={inputClass} />
-          </Field>
-        </div>
-      </div>
-
       {/* 契約 */}
       <div className="rounded-2xl border bg-white p-5 shadow-sm">
         <h3 className="font-bold text-gray-900 mb-4">管理委託契約</h3>

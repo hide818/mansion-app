@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { getUserProfile } from '@/lib/getUserProfile'
 import { canEdit } from '@/lib/permissions'
+import SubmitButton from '@/app/components/SubmitButton'
 
 type Props = {
   params: Promise<{ id: string; caseId: string }>
@@ -85,12 +86,7 @@ export default async function NewLogPage({ params }: Props) {
           rows={5}
         />
 
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          保存
-        </button>
+        <SubmitButton label="保存" loadingLabel="保存中..." />
       </form>
 
       <div className="mt-4">

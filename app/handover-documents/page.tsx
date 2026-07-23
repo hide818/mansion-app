@@ -54,7 +54,7 @@ function displayPropertyName(name: string | null) {
 
 function filterButtonClass(active: boolean) {
   if (active) {
-    return 'inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-slate-900 bg-slate-900 px-4 text-sm font-semibold text-white transition'
+    return 'inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-blue-600 bg-blue-600 px-4 text-sm font-semibold text-white transition'
   }
 
   return 'inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'
@@ -127,7 +127,7 @@ export default async function HandoverDocumentsPage({
           <div className="flex flex-wrap gap-3">
             <Link
               href="/handover-documents/new"
-              className="inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-slate-700"
+              className="inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700"
             >
               引き継ぎ書を新規作成
             </Link>

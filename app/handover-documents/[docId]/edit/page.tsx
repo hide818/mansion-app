@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { getUserProfile } from '@/lib/getUserProfile'
 import { canEdit } from '@/lib/permissions'
+import SubmitButton from '@/app/components/SubmitButton'
 
 type Props = {
   params: Promise<{
@@ -383,12 +384,7 @@ export default async function EditHandoverPage({ params, searchParams }: Props) 
         </section>
 
         <div className="flex flex-wrap gap-3">
-          <button
-            type="submit"
-            className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800"
-          >
-            更新する
-          </button>
+          <SubmitButton label="更新する" loadingLabel="更新中..." />
         </div>
       </form>
     </div>

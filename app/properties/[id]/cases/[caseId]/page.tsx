@@ -5,6 +5,7 @@ import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { getUserProfile } from '@/lib/getUserProfile'
 import { isValidUuid } from '@/lib/isValidUuid'
 import { canEdit } from '@/lib/permissions'
+import SubmitButton from '@/app/components/SubmitButton'
 
 type Props = {
   params: Promise<{
@@ -44,7 +45,6 @@ type RawCaseRow = {
 type ProfileOption = {
   id: string
   display_name: string | null
-  email: string | null
 }
 
 type RawTaskRow = {
@@ -209,7 +209,7 @@ async function updateCaseAction(formData: FormData) {
       .eq('property_id', propertyId)
       .eq('company_id', companyId)
       .maybeSingle()
-    if (!existingCase || existingCase.assigned_to !== currentProfile.id) {
+    if (!existingCase || (existingCase.assigned_to !== null && existingCase.assigned_to !== currentProfile.id)) {
       redirect(`/properties/${propertyId}/cases?error=${encodeURIComponent('権限がありません')}`)
     }
   }
@@ -327,14 +327,14 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
 
   const { data: profilesData } = await supabase
     .from('profiles')
-    .select('id, display_name, email')
+    .select('id, display_name')
     .eq('company_id', companyId)
     .order('display_name')
 
   const profiles = (profilesData ?? []) as ProfileOption[]
 
   const profileNameMap = new Map<string, string>(
-    profiles.map((p) => [p.id, p.display_name || p.email || p.id]),
+    profiles.map((p) => [p.id, p.display_name || p.id]),
   )
 
   const { data: property } = await supabase
@@ -436,7 +436,7 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
     ? profiles.find((p) => p.id === assignedToId) ?? null
     : null
   const assignedName = assignedProfile
-    ? (assignedProfile.display_name || assignedProfile.email || '未設定')
+    ? (assignedProfile.display_name || '未設定')
     : '未設定'
 
   return (
@@ -656,19 +656,14 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
                 <option value="">未設定</option>
                 {profiles.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.display_name || p.email || p.id}
+                    {p.display_name || p.id}
                   </option>
                 ))}
               </select>
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <button
-                type="submit"
-                className="inline-flex min-w-[64px] items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium !text-white hover:bg-slate-800"
-              >
-                保存する
-              </button>
+              <SubmitButton label="保存する" loadingLabel="保存中..." />
             </div>
           </form>
         </div>
@@ -738,12 +733,7 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
           <input type="hidden" name="property_id" value={id} />
           <input type="hidden" name="case_id" value={caseId} />
 
-          <button
-            type="submit"
-            className="rounded-xl bg-red-600 px-5 py-3 text-sm font-medium text-white hover:bg-red-700"
-          >
-            この案件を削除
-          </button>
+          <SubmitButton label="この案件を削除" loadingLabel="削除中..." variant="danger" />
         </form>
       </section>
     </div>

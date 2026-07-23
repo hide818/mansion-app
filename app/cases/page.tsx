@@ -92,7 +92,7 @@ function sortCases(rows: CaseRow[], sort: SortKey) {
 
 function sortButtonClass(active: boolean) {
   return active
-    ? 'inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-slate-700'
+    ? 'inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700'
     : 'inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'
 }
 

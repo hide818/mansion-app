@@ -16,7 +16,7 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export default function PushNotificationSetup() {
-  const [status, setStatus] = useState<'idle' | 'unsupported' | 'denied' | 'granted' | 'loading'>('idle')
+  const [status, setStatus] = useState<'idle' | 'unsupported' | 'denied' | 'granted' | 'loading' | null>(null)
 
   useEffect(() => {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
@@ -63,7 +63,7 @@ export default function PushNotificationSetup() {
     }
   }
 
-  if (status === 'unsupported' || status === 'granted') return null
+  if (status === null || status === 'unsupported' || status === 'granted') return null
 
   if (status === 'denied') {
     return (

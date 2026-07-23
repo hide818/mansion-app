@@ -5,6 +5,7 @@ import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { getUserProfile } from '@/lib/getUserProfile'
 import { isValidUuid } from '@/lib/isValidUuid'
 import { canEdit } from '@/lib/permissions'
+import SubmitButton from '@/app/components/SubmitButton'
 
 type Props = {
   params: Promise<{
@@ -259,12 +260,7 @@ export default async function NewTaskPage({ params, searchParams }: Props) {
           </div>
 
           <div className="flex flex-wrap gap-3 pt-2">
-            <button
-              type="submit"
-              className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800"
-            >
-              保存する
-            </button>
+            <SubmitButton label="保存する" loadingLabel="保存中..." />
           </div>
         </form>
       </section>
