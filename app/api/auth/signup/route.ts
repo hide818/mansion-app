@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { Resend } from 'resend'
 
 export const runtime = 'nodejs'
 
@@ -69,6 +70,29 @@ export async function POST(request: NextRequest) {
       await supabaseAdmin.from('companies').delete().eq('id', companyId)
       console.error('profile insert error:', profileError)
       return NextResponse.json({ error: 'プロフィールの作成に失敗しました: ' + profileError.message }, { status: 500 })
+    }
+
+    // オーナーへのサインアップ通知メール
+    const resendKey = process.env.RESEND_API_KEY
+    if (resendKey) {
+      const resend = new Resend(resendKey)
+      const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'noreply@kura-management.com'
+      const toEmail = process.env.CONTACT_TO_EMAIL ?? 'komat_king@i.softbank.jp'
+      await resend.emails.send({
+        from: `Kura <${fromEmail}>`,
+        to: toEmail,
+        subject: `【Kura 新規登録】${companyName}`,
+        html: `
+          <h2 style="color:#1e3a5f;">新規ユーザーが登録しました</h2>
+          <table border="1" cellpadding="8" style="border-collapse:collapse;margin-top:12px;">
+            <tr><th style="background:#f1f5f9;text-align:left;">会社名</th><td>${companyName}</td></tr>
+            <tr><th style="background:#f1f5f9;text-align:left;">担当者名</th><td>${displayName || '未入力'}</td></tr>
+            <tr><th style="background:#f1f5f9;text-align:left;">メール</th><td>${email}</td></tr>
+            <tr><th style="background:#f1f5f9;text-align:left;">登録日時</th><td>${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}</td></tr>
+          </table>
+          <p style="margin-top:16px;color:#666;font-size:13px;">Kura 自動通知</p>
+        `,
+      }).catch(err => console.error('signup notification email error:', err))
     }
 
     return NextResponse.json({ ok: true, companyId })
