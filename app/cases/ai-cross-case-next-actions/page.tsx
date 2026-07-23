@@ -70,12 +70,12 @@ export default async function AiCrossCaseNextActionsPage() {
   if (assignedToIds.length > 0) {
     const { data: profilesData } = await supabase
       .from('profiles')
-      .select('id, display_name, email')
+      .select('id, display_name')
       .eq('company_id', companyId)
       .in('id', assignedToIds)
 
-    for (const p of (profilesData ?? []) as Array<{ id: string; display_name: string | null; email: string | null }>) {
-      assigneeNameMap.set(p.id, p.display_name || p.email || p.id)
+    for (const p of (profilesData ?? []) as Array<{ id: string; display_name: string | null }>) {
+      assigneeNameMap.set(p.id, p.display_name || p.id)
     }
   }
 

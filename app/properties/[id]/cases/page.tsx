@@ -102,18 +102,17 @@ export default async function PropertyCasesPage({ params, searchParams }: Props)
   // 全社プロフィール取得（フィルターバー用 + 担当者名解決用）
   const { data: allProfilesData } = await supabase
     .from('profiles')
-    .select('id, display_name, email')
+    .select('id, display_name')
     .eq('company_id', companyId)
     .order('display_name')
 
   const allProfiles = (allProfilesData ?? []) as Array<{
     id: string
     display_name: string | null
-    email: string | null
   }>
 
   const profileNameMap = new Map<string, string>(
-    allProfiles.map((p) => [p.id, p.display_name || p.email || p.id]),
+    allProfiles.map((p) => [p.id, p.display_name || p.id]),
   )
 
   // assigneeId は canViewAll かつ同一会社プロフィールに存在する場合のみ有効
@@ -174,7 +173,7 @@ export default async function PropertyCasesPage({ params, searchParams }: Props)
 
   const filterBarProfiles = allProfiles.map((p) => ({
     id: p.id,
-    displayName: p.display_name || p.email || p.id,
+    displayName: p.display_name || p.id,
   }))
 
   return (
