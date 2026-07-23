@@ -336,7 +336,7 @@ async function ensureFfmpegAvailable() {
     await execFileAsync(FFMPEG_PATH, ['-version'])
   } catch {
     throw new Error(
-      'ffmpeg が見つかりません。Macのターミナルで brew install ffmpeg を実行してください。',
+      `音声処理エンジン(ffmpeg)の起動に失敗しました。パス: ${FFMPEG_PATH}`,
     )
   }
 }
@@ -543,32 +543,15 @@ export async function POST(request: Request) {
 
     const arrayBuffer = await fileData.arrayBuffer()
     const fileBuffer = Buffer.from(arrayBuffer)
-    const OPENAI_MAX_BYTES = 24 * 1024 * 1024 // 24MB
 
-    let transcriptText: string
-
-    if (fileBuffer.length <= OPENAI_MAX_BYTES) {
-      // 24MB以下: ffmpeg不要、直接OpenAIへ送信
-      const extension = getSafeExtension(audioFileName)
-      const fileName = `audio${extension}`
-      const blob = new Blob([fileBuffer], { type: fileData.type || 'audio/m4a' })
-      const file = new File([blob], fileName)
-      const transcription = await client.audio.transcriptions.create({
-        file,
-        model: 'gpt-4o-transcribe',
-        language: 'ja',
-      })
-      transcriptText = transcription.text?.trim() ?? ''
-    } else {
-      // 24MB超: ffmpegで分割（ローカル開発用）
-      await ensureFfmpegAvailable()
-      await fs.mkdir(uploadDir, { recursive: true })
-      const extension = getSafeExtension(audioFileName)
-      const inputPath = path.join(uploadDir, `source${extension}`)
-      await fs.writeFile(inputPath, fileBuffer)
-      const chunkPaths = await splitAudioToMp3Chunks(inputPath, chunkDir)
-      transcriptText = (await transcribeChunks(chunkPaths)).trim()
-    }
+    // 常にffmpegで分割（OpenAIの23分制限を回避するため）
+    await ensureFfmpegAvailable()
+    await fs.mkdir(uploadDir, { recursive: true })
+    const extension = getSafeExtension(audioFileName)
+    const inputPath = path.join(uploadDir, `source${extension}`)
+    await fs.writeFile(inputPath, fileBuffer)
+    const chunkPaths = await splitAudioToMp3Chunks(inputPath, chunkDir)
+    const transcriptText = (await transcribeChunks(chunkPaths)).trim()
 
     if (!transcriptText) {
       return NextResponse.json(
