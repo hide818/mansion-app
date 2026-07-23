@@ -436,7 +436,7 @@ export default async function TasksPage({
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex shrink-0 flex-col gap-1">
                     {item.property_id && propertyNameMap.has(item.property_id) ? (
                       <Link
                         href={`/properties/${item.property_id}/tasks/${item.id}`}

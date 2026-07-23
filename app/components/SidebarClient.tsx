@@ -110,14 +110,21 @@ export default function SidebarClient({ menuGroups }: SidebarClientProps) {
       {/* ── サイドバー本体 ── */}
       <div className="flex h-full w-full flex-col">
         {/* ブランドヘッダー */}
-        <div className="flex-none bg-[#1e3a5f] px-4 py-4">
-          <Link href="/dashboard" className="block">
-            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-blue-300">
+        <div className="relative flex-none overflow-hidden bg-[#1e3a5f] px-5 pb-4 pt-5">
+          {/* トップアクセントライン */}
+          <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-600" />
+          {/* 背景グロー */}
+          <div className="pointer-events-none absolute -left-6 -top-6 h-28 w-28 rounded-full bg-blue-400/15 blur-2xl" />
+          <div className="pointer-events-none absolute right-0 top-0 h-20 w-20 rounded-full bg-cyan-400/10 blur-xl" />
+
+          <Link href="/dashboard" className="relative block">
+            <span className="inline-block rounded-full border border-blue-400/30 bg-blue-500/20 px-2.5 py-0.5 text-[8px] font-bold uppercase tracking-[0.25em] text-blue-300">
               管理会社専用 AI
-            </p>
-            <h1 className="mt-1 text-[18px] font-extrabold leading-snug tracking-tight text-white">
+            </span>
+            <h1 className="mt-1.5 bg-gradient-to-br from-white via-blue-50 to-blue-200 bg-clip-text text-[34px] font-black leading-none tracking-tight text-transparent">
               Kura
             </h1>
+            <div className="mt-2.5 h-px w-full bg-gradient-to-r from-blue-400/50 via-cyan-400/30 to-transparent" />
           </Link>
           <div className="mt-3">
             <GlobalSearch />

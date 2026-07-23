@@ -162,12 +162,7 @@ export default function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
           href: '/import',
           description: 'ExcelデータをKuraに一括移行（物件・居住者・点検）',
         },
-        {
-          label: 'デモデータ投入',
-          href: '/demo',
-          description: '動作確認用サンプルデータを一括作成',
-        },
-        {
+{
           label: 'ユーザー管理',
           href: '/users',
           description: 'ユーザーと権限管理',
