@@ -140,21 +140,15 @@ async function updateTaskAction(formData: FormData) {
   }
 
   let assignedTo: string | null = null
-  if (!canViewAll) {
-    assignedTo = currentProfile?.id ?? null
-  } else {
-    if (assignedToCandidate) {
-      if (isValidUuid(assignedToCandidate)) {
-        const { data: assigneeProfile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('id', assignedToCandidate)
-          .eq('company_id', companyId)
-          .maybeSingle()
-        if (assigneeProfile) {
-          assignedTo = assignedToCandidate
-        }
-      }
+  if (assignedToCandidate && isValidUuid(assignedToCandidate)) {
+    const { data: assigneeProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', assignedToCandidate)
+      .eq('company_id', companyId)
+      .maybeSingle()
+    if (assigneeProfile) {
+      assignedTo = assignedToCandidate
     }
   }
 

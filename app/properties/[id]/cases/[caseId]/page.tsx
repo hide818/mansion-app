@@ -215,18 +215,14 @@ async function updateCaseAction(formData: FormData) {
   }
 
   let assignedTo: string | null = null
-  if (!canViewAll) {
-    assignedTo = currentProfile?.id ?? null
-  } else {
-    if (assignedToCandidate && isValidUuid(assignedToCandidate)) {
-      const { data: assigneeProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', assignedToCandidate)
-        .eq('company_id', companyId)
-        .maybeSingle()
-      if (assigneeProfile) assignedTo = assignedToCandidate
-    }
+  if (assignedToCandidate && isValidUuid(assignedToCandidate)) {
+    const { data: assigneeProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', assignedToCandidate)
+      .eq('company_id', companyId)
+      .maybeSingle()
+    if (assigneeProfile) assignedTo = assignedToCandidate
   }
 
   const payload: Record<string, string | null> = {
