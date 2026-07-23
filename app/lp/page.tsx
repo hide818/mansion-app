@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import KuraLogo from '@/app/components/KuraLogo'
 import ContactForm from '@/app/components/ContactForm'
 
@@ -145,39 +146,16 @@ export default function LpPage() {
           </div>
           <p className="mt-5 text-[13px] text-[#424245]">メールアドレスのみで登録 · 30秒で開始 · クレジットカード不要</p>
 
-          {/* ── HERO UI MOCK ── */}
-          <div className="mx-auto mt-16 max-w-3xl rounded-2xl overflow-hidden border border-[#333] shadow-[0_32px_80px_rgba(0,0,0,0.6)]">
-            <div className="flex items-center gap-1.5 bg-[#1a1a1a] px-4 py-3 border-b border-[#333]">
-              <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
-              <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
-              <span className="h-3 w-3 rounded-full bg-[#28ca41]" />
-              <span className="ml-4 text-[12px] text-[#666]">app.kura-management.com — 全物件 案件一覧</span>
-            </div>
-            <div className="bg-[#111] p-6">
-              <div className="mb-4 flex items-center justify-between">
-                <p className="text-[13px] font-semibold text-white">今日の対応が必要な案件</p>
-                <span className="rounded-full bg-red-500/20 px-3 py-0.5 text-[11px] font-medium text-red-300">期限超過 2件</span>
-              </div>
-              <div className="space-y-2.5">
-                {[
-                  { name: 'グランドパレス丸の内｜修繕積立金見直し', due: '今日', status: '対応中', badge: 'bg-blue-500/20 text-blue-300' },
-                  { name: 'ライオンズ品川｜消防設備点検', due: '昨日', status: '期限超過', badge: 'bg-red-500/20 text-red-300' },
-                  { name: 'パークヒルズ渋谷｜総会議事録', due: '7/18', status: '完了', badge: 'bg-green-500/20 text-green-300' },
-                  { name: 'コスモ新宿｜引き継ぎ書作成', due: '7/20', status: '対応中', badge: 'bg-blue-500/20 text-blue-300' },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3">
-                    <div>
-                      <p className="text-[13px] font-medium text-white">{item.name}</p>
-                      <p className="text-[11px] text-[#555]">期限：{item.due}</p>
-                    </div>
-                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${item.badge}`}>{item.status}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 rounded-xl bg-[#0071e3]/10 border border-[#0071e3]/30 p-4">
-                <p className="text-[12px] text-[#2997ff]">🤖 AI議事録が完成しました — パークヒルズ渋谷 第12回理事会（所要時間：48分）</p>
-              </div>
-            </div>
+          {/* ── HERO SCREENSHOT ── */}
+          <div className="mx-auto mt-16 max-w-5xl rounded-2xl overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.6)] border border-[#333]">
+            <Image
+              src="/lp-screenshots/hero.png"
+              alt="Kura ダッシュボード — 全物件の案件・タスクをリアルタイム把握"
+              width={2560}
+              height={1425}
+              className="w-full"
+              priority
+            />
           </div>
         </div>
       </section>
@@ -285,23 +263,14 @@ export default function LpPage() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-3xl bg-white p-8 shadow-[0_2px_20px_rgba(0,0,0,0.08)]">
-                <div className="space-y-3">
-                  {[
-                    { name: 'グランドパレス××｜修繕積立金見直し', due: '6/15', status: '対応中', color: 'bg-blue-100 text-blue-700' },
-                    { name: 'ライオンズ△△｜消防設備点検', due: '6/20', status: '未対応', color: 'bg-red-100 text-red-700' },
-                    { name: 'パークヒルズ□□｜管理費督促', due: '6/18', status: '完了', color: 'bg-green-100 text-green-700' },
-                    { name: 'コスモ◎◎｜引き継ぎ書作成', due: '6/25', status: '対応中', color: 'bg-blue-100 text-blue-700' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center justify-between rounded-xl bg-[#f5f5f7] px-4 py-3">
-                      <div>
-                        <p className="text-[13px] font-medium text-[#1d1d1f]">{item.name}</p>
-                        <p className="text-[11px] text-[#6e6e73]">期限 {item.due}</p>
-                      </div>
-                      <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${item.color}`}>{item.status}</span>
-                    </div>
-                  ))}
-                </div>
+              <div className="rounded-3xl overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.08)]">
+                <Image
+                  src="/lp-screenshots/feature-tasks.png"
+                  alt="案件一覧 — 全物件の案件・期限・進捗を一画面で管理"
+                  width={2560}
+                  height={1425}
+                  className="w-full"
+                />
               </div>
             </div>
           </div>
@@ -311,34 +280,14 @@ export default function LpPage() {
         <div className="bg-white px-6 py-24">
           <div className="mx-auto max-w-5xl">
             <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
-              <div className="order-2 lg:order-1 rounded-3xl bg-[#f5f5f7] p-8">
-                <div className="rounded-2xl bg-white p-5 shadow-[0_2px_20px_rgba(0,0,0,0.06)]">
-                  <div className="mb-4 flex items-center justify-between">
-                    <p className="text-[13px] font-semibold text-[#1d1d1f]">第12回 定期総会 議事録</p>
-                    <span className="rounded-full bg-[#d1fae5] px-2.5 py-0.5 text-[11px] font-medium text-[#065f46]">生成完了</span>
-                  </div>
-                  <div className="space-y-2 mb-4">
-                    {[88, 72, 95, 63, 80].map((w, i) => (
-                      <div key={i} className="h-1.5 rounded-full bg-[#e5e5ea]" style={{ width: `${w}%` }} />
-                    ))}
-                  </div>
-                  <div className="rounded-xl bg-[#f0f9ff] border border-[#bae6fd] p-3">
-                    <p className="mb-2 text-[11px] font-semibold text-[#0369a1]">AI自動抽出 · 宿題タスク</p>
-                    {['修繕積立金の見直し案を作成', '消防設備点検の日程調整', '駐車場規約の改訂案提示'].map((t, i) => (
-                      <div key={i} className="flex items-center gap-2 mt-1.5">
-                        <div className="h-1.5 w-1.5 rounded-full bg-[#0071e3] shrink-0" />
-                        <p className="text-[11px] text-[#374151]">{t}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-4 flex items-center justify-between rounded-xl bg-[#f5f5f7] px-3 py-2.5">
-                    <p className="text-[12px] text-[#6e6e73]">作成時間</p>
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-[20px] font-bold text-[#1d1d1f]">50分</span>
-                      <span className="text-[11px] text-[#6e6e73] line-through">2時間</span>
-                    </div>
-                  </div>
-                </div>
+              <div className="order-2 lg:order-1 rounded-3xl overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.08)]">
+                <Image
+                  src="/lp-screenshots/feature-minutes.png"
+                  alt="AI議事録 生成結果 — 総会議事録を自動生成・編集・タスク抽出"
+                  width={2560}
+                  height={1425}
+                  className="w-full"
+                />
               </div>
               <div className="order-1 lg:order-2">
                 <p className="text-[13px] font-semibold text-[#0071e3] uppercase tracking-widest">AI議事録</p>
@@ -386,19 +335,14 @@ export default function LpPage() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-3xl bg-white p-8 shadow-[0_2px_20px_rgba(0,0,0,0.08)]">
-                <p className="text-[13px] font-semibold text-[#1d1d1f] mb-5">引き継ぎ書 — グランドパレス××号室</p>
-                {[
-                  { label: '担当変更履歴', value: '3回（直近：2024年3月）' },
-                  { label: '管理組合の特記事項', value: '駐車場トラブル多発 · 修繕委員会設置中' },
-                  { label: '進行中の案件', value: '修繕積立金改定 · 消防設備更新' },
-                  { label: '重要居住者情報', value: '理事長：山田様（連絡先登録済）' },
-                ].map((row, i) => (
-                  <div key={i} className={`flex gap-4 py-3.5 ${i < 3 ? 'border-b border-[#e5e5ea]' : ''}`}>
-                    <p className="w-36 shrink-0 text-[12px] text-[#6e6e73]">{row.label}</p>
-                    <p className="text-[13px] font-medium text-[#1d1d1f]">{row.value}</p>
-                  </div>
-                ))}
+              <div className="rounded-3xl overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.08)]">
+                <Image
+                  src="/lp-screenshots/feature-handover.png"
+                  alt="AI引き継ぎ書 — 物件を選ぶだけで引き継ぎ書を自動生成"
+                  width={2560}
+                  height={1425}
+                  className="w-full"
+                />
               </div>
             </div>
           </div>
