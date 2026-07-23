@@ -110,7 +110,6 @@ async function updateTaskAction(formData: FormData) {
   const status = String(formData.get('status') ?? 'todo')
   const priority = String(formData.get('priority') ?? 'medium')
   const dueDate = String(formData.get('due_date') ?? '').trim()
-  const assignedToCandidate = String(formData.get('assigned_to') ?? '').trim()
 
   if (!isValidUuid(propertyId)) {
     redirect('/properties')
@@ -139,26 +138,12 @@ async function updateTaskAction(formData: FormData) {
     }
   }
 
-  let assignedTo: string | null = null
-  if (assignedToCandidate && isValidUuid(assignedToCandidate)) {
-    const { data: assigneeProfile } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('id', assignedToCandidate)
-      .eq('company_id', companyId)
-      .maybeSingle()
-    if (assigneeProfile) {
-      assignedTo = assignedToCandidate
-    }
-  }
-
   const { error } = await supabase
     .from('tasks')
     .update({
       status,
       priority,
       due_date: dueDate || null,
-      assigned_to: assignedTo,
     })
     .eq('id', taskId)
     .eq('company_id', companyId)
@@ -395,18 +380,20 @@ export default async function TaskDetailPage({ params, searchParams }: Props) {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">担当者</p>
-          <p className="mt-2 text-lg font-bold text-slate-900">
-            {assigneeName}
-          </p>
-        </div>
+        {canViewAll ? (
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-sm text-slate-500">担当者</p>
+            <p className="mt-2 text-lg font-bold text-slate-900">
+              {assigneeName}
+            </p>
+          </div>
+        ) : null}
       </section>
 
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-bold text-slate-900">タスク情報を更新</h2>
         <p className="mt-2 text-sm text-slate-600">
-          状況・優先度・期限・担当者をこの画面で変更できます。
+          状況・優先度・期限をこの画面で変更できます。
         </p>
 
         <form action={updateTaskAction} className="mt-5 space-y-5">
@@ -455,24 +442,6 @@ export default async function TaskDetailPage({ params, searchParams }: Props) {
               defaultValue={toDateInputValue(task.due_date ?? null)}
               className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
             />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">
-              担当者
-            </label>
-            <select
-              name="assigned_to"
-              defaultValue={task.assigned_to ?? ''}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-            >
-              <option value="">（未設定）</option>
-              {profiles.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.display_name ?? 'ユーザー'}
-                </option>
-              ))}
-            </select>
           </div>
 
           <div className="flex flex-wrap gap-3">

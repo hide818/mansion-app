@@ -325,9 +325,11 @@ export default async function CasesPage({
                         <span className={getDueBadgeClass(dueLevel)}>
                           期限: {formatDate(item.dueDate)}
                         </span>
-                        <span className="rounded-full bg-white px-2 py-1 text-slate-600">
-                          担当者: {item.assignedName || '未設定'}
-                        </span>
+                        {canViewAll ? (
+                          <span className="rounded-full bg-white px-2 py-1 text-slate-600">
+                            担当者: {item.assignedName || '未設定'}
+                          </span>
+                        ) : null}
                         <span className="rounded-full bg-white px-2 py-1 text-slate-600">
                           登録日: {formatDate(item.createdAt)}
                         </span>

@@ -429,9 +429,11 @@ export default async function TasksPage({
                       <span className="rounded-full bg-white px-2 py-1 text-slate-600">
                         案件: {item.case_title || '物件直下'}
                       </span>
-                      <span className="rounded-full bg-white px-2 py-1 text-slate-600">
-                        担当者: {item.assigned_to ? (profileNameMap.get(item.assigned_to) ?? '未設定') : '未設定'}
-                      </span>
+                      {canViewAll ? (
+                        <span className="rounded-full bg-white px-2 py-1 text-slate-600">
+                          担当者: {item.assigned_to ? (profileNameMap.get(item.assigned_to) ?? '未設定') : '未設定'}
+                        </span>
+                      ) : null}
                     </div>
                   </div>
 

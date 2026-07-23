@@ -173,7 +173,6 @@ async function updateCaseAction(formData: FormData) {
   const status = String(formData.get('status') ?? 'todo')
   const dueDate = String(formData.get('due_date') ?? '').trim()
   const dueField = String(formData.get('due_field') ?? '').trim()
-  const assignedToCandidate = String(formData.get('assigned_to') ?? '').trim()
 
   if (!isValidUuid(propertyId)) {
     redirect('/properties')
@@ -214,21 +213,9 @@ async function updateCaseAction(formData: FormData) {
     }
   }
 
-  let assignedTo: string | null = null
-  if (assignedToCandidate && isValidUuid(assignedToCandidate)) {
-    const { data: assigneeProfile } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('id', assignedToCandidate)
-      .eq('company_id', companyId)
-      .maybeSingle()
-    if (assigneeProfile) assignedTo = assignedToCandidate
-  }
-
   const payload: Record<string, string | null> = {
     status,
     [dueField]: dueDate || null,
-    assigned_to: assignedTo,
   }
 
   const { error } = await supabase
@@ -561,12 +548,14 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">担当者</p>
-          <p className="mt-2 text-2xl font-bold text-slate-900">
-            {assignedName}
-          </p>
-        </div>
+        {canViewAll ? (
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-sm text-slate-500">担当者</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">
+              {assignedName}
+            </p>
+          </div>
+        ) : null}
 
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">登録日</p>
@@ -640,24 +629,6 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
               />
             </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">
-                担当者
-              </label>
-              <select
-                name="assigned_to"
-                defaultValue={assignedToId ?? ''}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-              >
-                <option value="">未設定</option>
-                {profiles.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.display_name || p.id}
-                  </option>
-                ))}
-              </select>
-            </div>
-
             <div className="flex flex-wrap gap-3">
               <SubmitButton label="保存する" loadingLabel="保存中..." />
             </div>
@@ -700,9 +671,11 @@ export default async function CaseDetailPage({ params, searchParams }: Props) {
                       <span className="rounded-full bg-white px-2 py-1 text-slate-600">
                         期限: {formatDate(pickTaskDueDate(item))}
                       </span>
-                      <span className="rounded-full bg-white px-2 py-1 text-slate-600">
-                        担当者: {item.assigned_to ? (profileNameMap.get(item.assigned_to) ?? '未設定') : '未設定'}
-                      </span>
+                      {canViewAll ? (
+                        <span className="rounded-full bg-white px-2 py-1 text-slate-600">
+                          担当者: {item.assigned_to ? (profileNameMap.get(item.assigned_to) ?? '未設定') : '未設定'}
+                        </span>
+                      ) : null}
                     </div>
                   </div>
 
