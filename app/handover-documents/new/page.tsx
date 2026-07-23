@@ -5,6 +5,7 @@ import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import { getUserProfile } from '@/lib/getUserProfile'
 import { canEdit } from '@/lib/permissions'
 import SubmitButton from '@/app/components/SubmitButton'
+import PropertySelector from './PropertySelector'
 
 type SearchParams = Promise<{
   propertyId?: string
@@ -472,35 +473,15 @@ ${autoTasksText}`
       ) : null}
 
       <form action={createHandoverAction} className="space-y-6">
+        {/* 保存フォーム用の hidden property_id */}
+        <input type="hidden" name="property_id" value={selectedPropertyId} />
+
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-xl font-bold text-slate-900">対象物件</h2>
-          <div className="mt-4">
-            <label className="mb-2 block text-sm font-medium text-slate-700">
-              物件を選択
-            </label>
-            <select
-              name="property_id"
-              defaultValue={selectedPropertyId}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-500"
-              required
-            >
-              <option value="">選択してください</option>
-              {properties.map((property) => (
-                <option key={property.id} value={property.id}>
-                  {property.name || '無題物件'}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="mt-4">
-            <Link
-              href={selectedPropertyId ? `/handover-documents/new?propertyId=${selectedPropertyId}` : '/handover-documents/new'}
-              className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-            >
-              この物件で再読込
-            </Link>
-          </div>
+          <PropertySelector
+            properties={properties}
+            selectedPropertyId={selectedPropertyId}
+          />
         </section>
 
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
