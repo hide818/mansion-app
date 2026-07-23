@@ -9,10 +9,13 @@ import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
+import ffmpegStatic from 'ffmpeg-static'
 
 export const runtime = 'nodejs'
+export const maxDuration = 300
 
 const execFileAsync = promisify(execFile)
+const FFMPEG_PATH = ffmpegStatic ?? 'ffmpeg'
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -330,7 +333,7 @@ function getSafeExtension(filename: string) {
 
 async function ensureFfmpegAvailable() {
   try {
-    await execFileAsync('ffmpeg', ['-version'])
+    await execFileAsync(FFMPEG_PATH, ['-version'])
   } catch {
     throw new Error(
       'ffmpeg が見つかりません。Macのターミナルで brew install ffmpeg を実行してください。',
@@ -343,7 +346,7 @@ async function splitAudioToMp3Chunks(inputPath: string, outputDir: string) {
 
   const outputPattern = path.join(outputDir, 'chunk-%03d.mp3')
 
-  await execFileAsync('ffmpeg', [
+  await execFileAsync(FFMPEG_PATH, [
     '-i',
     inputPath,
     '-vn',
