@@ -120,15 +120,16 @@ export default async function DashboardPage() {
 
       {/* 初回オンボーディング */}
       {isNewUser && (
-        <section className="rounded-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white p-6 shadow-sm">
-          <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-2xl text-white shadow-lg shadow-blue-500/30">K</div>
-            <div className="flex-1">
-              <h2 className="text-lg font-bold text-slate-900">Kuraへようこそ！ {userName.split('@')[0]} さん</h2>
-              <p className="mt-1 text-sm text-slate-500">3ステップで使い始められます。まず物件を登録してください。</p>
+        <section className="rounded-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white p-4 shadow-sm sm:p-6">
+          <div className="flex items-start gap-3 sm:gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-xl text-white shadow-lg shadow-blue-500/30 sm:h-12 sm:w-12 sm:text-2xl">K</div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-blue-500">Kuraへようこそ！</p>
+              <h2 className="text-base font-bold text-slate-900 sm:text-lg">{userName.split('@')[0]} さん</h2>
+              <p className="mt-1 text-xs text-slate-500 sm:text-sm">3ステップで使い始められます。まず物件を登録してください。</p>
               <div className="mt-4 space-y-3">
                 {[
-                  { step: 1, label: '物件を登録する', desc: '管理している物件を追加', href: '/properties', color: 'bg-blue-600', done: false },
+                  { step: 1, label: '物件を登録する', desc: 'CSVインポートで一括追加', href: '/import', color: 'bg-blue-600', done: false },
                   { step: 2, label: 'CSVで一括インポート', desc: 'ExcelデータをKuraに移行', href: '/import', color: 'bg-slate-600', done: false },
                   { step: 3, label: 'AI議事録を試す', desc: '音声→議事録を体験', href: '/ai-minutes', color: 'bg-green-600', done: false },
                 ].map(s => (
@@ -148,12 +149,12 @@ export default async function DashboardPage() {
       )}
 
       {/* グリーティング */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">{todayLabel()}</p>
-            <h1 className="mt-1 text-2xl font-bold text-slate-900">
-              おはようございます、{userName.split('@')[0]} さん
+            <h1 className="mt-1 text-xl font-bold text-slate-900 sm:text-2xl">
+              おはようございます、<br className="sm:hidden" />{userName.split('@')[0]} さん
             </h1>
             <p className="mt-1 text-sm text-slate-500">
               {overdueTasks.length > 0
