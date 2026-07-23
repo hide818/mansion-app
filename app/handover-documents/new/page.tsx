@@ -104,21 +104,28 @@ async function createHandoverAction(formData: FormData) {
     )
   }
 
-  const { error } = await supabase.from('handover_documents').insert({
-    company_id: companyId,
-    property_id: propertyId,
-    basic_info: basicInfo,
-    management_system: managementSystem,
-    board_info: boardInfo,
-    schedule,
-    rules,
-    directors,
-    vendors,
-    history,
-    cautions,
-    tasks,
-    note,
-  })
+  const { data: upserted, error } = await supabase
+    .from('handover_documents')
+    .upsert(
+      {
+        company_id: companyId,
+        property_id: propertyId,
+        basic_info: basicInfo,
+        management_system: managementSystem,
+        board_info: boardInfo,
+        schedule,
+        rules,
+        directors,
+        vendors,
+        history,
+        cautions,
+        tasks,
+        note,
+      },
+      { onConflict: 'property_id' },
+    )
+    .select('id')
+    .maybeSingle()
 
   if (error) {
     redirect(
@@ -128,7 +135,8 @@ async function createHandoverAction(formData: FormData) {
     )
   }
 
-  redirect(`/handover-documents?propertyId=${propertyId}&created=1`)
+  const docId = upserted?.id
+  redirect(docId ? `/handover-documents/${docId}` : `/handover-documents?propertyId=${propertyId}&created=1`)
 }
 
 function formatDate(value: string | null | undefined) {
