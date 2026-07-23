@@ -1464,6 +1464,12 @@ function AiMinutesInner() {
       return
     }
 
+    const MAX_FILE_SIZE = 300 * 1024 * 1024 // 300MB
+    if (audioFile.size > MAX_FILE_SIZE) {
+      setErrorMessage('音声ファイルが大きすぎます。300MB以下のファイルを使用してください（3時間程度が目安です）。')
+      return
+    }
+
     if (!propertyId || !selectedProperty) {
       setErrorMessage('マンション名を選択してください。')
       return

@@ -357,7 +357,7 @@ async function splitAudioToMp3Chunks(inputPath: string, outputDir: string) {
     '-c:a',
     'libmp3lame',
     '-b:a',
-    '64k',
+    '32k',
     '-f',
     'segment',
     '-segment_time',
