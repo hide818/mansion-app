@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useTransition, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 type Property = { id: string; name: string | null }
@@ -13,13 +13,14 @@ type Props = {
 export default function PropertySelector({ properties, selectedPropertyId }: Props) {
   const router = useRouter()
   const selectRef = useRef<HTMLSelectElement>(null)
-  const [loading, setLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   function handleReload() {
     const id = selectRef.current?.value ?? ''
     if (!id) return
-    setLoading(true)
-    router.push(`/handover-documents/new?propertyId=${encodeURIComponent(id)}`)
+    startTransition(() => {
+      router.push(`/handover-documents/new?propertyId=${encodeURIComponent(id)}`)
+    })
   }
 
   return (
@@ -45,10 +46,10 @@ export default function PropertySelector({ properties, selectedPropertyId }: Pro
       <button
         type="button"
         onClick={handleReload}
-        disabled={loading}
+        disabled={isPending}
         className="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition"
       >
-        {loading ? (
+        {isPending ? (
           <>
             <svg className="h-4 w-4 animate-spin text-slate-500" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
