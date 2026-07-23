@@ -516,8 +516,6 @@ export async function POST(request: Request) {
       )
     }
 
-    await ensureFfmpegAvailable()
-
     // アクティブなフォーマットテンプレートを取得
     const companyId = await getUserCompanyId()
     const { data: templateRow } = await supabase
@@ -540,18 +538,37 @@ export async function POST(request: Request) {
       )
     }
 
-    await fs.mkdir(uploadDir, { recursive: true })
-
-    const extension = getSafeExtension(audioFileName)
-    const inputPath = path.join(uploadDir, `source${extension}`)
-    const arrayBuffer = await fileData.arrayBuffer()
-    await fs.writeFile(inputPath, Buffer.from(arrayBuffer))
-
     // 処理後にStorageの一時ファイルを削除（エラーは無視）
     serviceClient.storage.from('Kura-files').remove([audioStoragePath]).catch(() => {})
 
-    const chunkPaths = await splitAudioToMp3Chunks(inputPath, chunkDir)
-    const transcriptText = (await transcribeChunks(chunkPaths)).trim()
+    const arrayBuffer = await fileData.arrayBuffer()
+    const fileBuffer = Buffer.from(arrayBuffer)
+    const OPENAI_MAX_BYTES = 24 * 1024 * 1024 // 24MB
+
+    let transcriptText: string
+
+    if (fileBuffer.length <= OPENAI_MAX_BYTES) {
+      // 24MB以下: ffmpeg不要、直接OpenAIへ送信
+      const extension = getSafeExtension(audioFileName)
+      const fileName = `audio${extension}`
+      const blob = new Blob([fileBuffer], { type: fileData.type || 'audio/m4a' })
+      const file = new File([blob], fileName)
+      const transcription = await client.audio.transcriptions.create({
+        file,
+        model: 'gpt-4o-transcribe',
+        language: 'ja',
+      })
+      transcriptText = transcription.text?.trim() ?? ''
+    } else {
+      // 24MB超: ffmpegで分割（ローカル開発用）
+      await ensureFfmpegAvailable()
+      await fs.mkdir(uploadDir, { recursive: true })
+      const extension = getSafeExtension(audioFileName)
+      const inputPath = path.join(uploadDir, `source${extension}`)
+      await fs.writeFile(inputPath, fileBuffer)
+      const chunkPaths = await splitAudioToMp3Chunks(inputPath, chunkDir)
+      transcriptText = (await transcribeChunks(chunkPaths)).trim()
+    }
 
     if (!transcriptText) {
       return NextResponse.json(
