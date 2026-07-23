@@ -21,10 +21,10 @@ export default function GlobalSearch() {
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
-  // Cmd+K / Ctrl+K でオープン
+  // Ctrl+F でオープン（ブラウザの検索を上書き）
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); setOpen(o => !o) }
+      if (e.ctrlKey && e.key === 'f') { e.preventDefault(); setOpen(o => !o) }
       if (e.key === 'Escape') setOpen(false)
     }
     window.addEventListener('keydown', onKey)
@@ -62,7 +62,7 @@ export default function GlobalSearch() {
           <circle cx="11" cy="11" r="8" /><path strokeLinecap="round" d="M21 21l-4.35-4.35" />
         </svg>
         <span className="flex-1 text-left text-xs sm:text-sm">検索...</span>
-        <kbd className="hidden rounded bg-slate-200 px-1.5 py-0.5 text-xs lg:block">⌘K</kbd>
+        <kbd className="hidden rounded bg-slate-200 px-1.5 py-0.5 text-xs lg:block">Ctrl+F</kbd>
       </button>
 
       {/* モーダル */}
