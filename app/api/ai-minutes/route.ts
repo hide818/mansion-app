@@ -382,22 +382,18 @@ async function splitAudioToMp3Chunks(inputPath: string, outputDir: string) {
 }
 
 async function transcribeChunks(chunkPaths: string[]) {
-  const transcripts: string[] = []
+  const results = await Promise.all(
+    chunkPaths.map(async (chunkPath) => {
+      const transcription = await client.audio.transcriptions.create({
+        file: createReadStream(chunkPath),
+        model: 'gpt-4o-transcribe',
+        language: 'ja',
+      })
+      return transcription.text?.trim() ?? ''
+    }),
+  )
 
-  for (const chunkPath of chunkPaths) {
-    const transcription = await client.audio.transcriptions.create({
-      file: createReadStream(chunkPath),
-      model: 'gpt-4o-transcribe',
-      language: 'ja',
-    })
-
-    const text = transcription.text?.trim() ?? ''
-    if (text) {
-      transcripts.push(text)
-    }
-  }
-
-  return transcripts.join('\n')
+  return results.filter(Boolean).join('\n')
 }
 
 function safeJsonParseArray(text: string): ExtractedActionItem[] {
