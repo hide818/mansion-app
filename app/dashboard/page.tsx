@@ -169,8 +169,8 @@ export default async function DashboardPage() {
       {/* プッシュ通知セットアップ */}
       <PushNotificationSetup />
 
-      {/* 管理者専用リンク */}
-      {currentProfile?.role === 'admin' && (
+      {/* 管理者専用リンク（オーナーのみ） */}
+      {currentProfile?.role === 'admin' && currentProfile?.email === process.env.OWNER_EMAIL && (
         <section>
           <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400">管理者メニュー</p>
           <div className="grid gap-3 sm:grid-cols-2">

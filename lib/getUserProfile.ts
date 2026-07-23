@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer'
 
 export type UserProfile = {
   id: string
+  email: string | null
   company_id: string | null
   role: 'admin' | 'general' | 'viewer' | null
   can_view_all_data: boolean
@@ -28,6 +29,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
   const role = profile.role
   return {
     id: profile.id,
+    email: user.email ?? null,
     company_id: profile.company_id ?? null,
     role: role === 'admin' || role === 'general' || role === 'viewer' ? role : null,
     can_view_all_data: profile.can_view_all_data ?? false,
