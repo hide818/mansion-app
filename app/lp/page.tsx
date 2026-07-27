@@ -143,6 +143,10 @@ export default function LpPage() {
               className="rounded-full bg-[#0071e3] px-8 py-3.5 text-[17px] font-medium text-white hover:bg-[#0077ed] transition-colors">
               14日間無料で試す
             </Link>
+            <Link href="#contact"
+              className="rounded-full border border-[#424245] px-8 py-3.5 text-[17px] font-medium text-white hover:border-white transition-colors">
+              デモ・資料を申し込む
+            </Link>
           </div>
           <p className="mt-5 text-[13px] text-[#424245]">メールアドレスのみで登録 · 30秒で開始 · クレジットカード不要</p>
 
@@ -502,10 +506,15 @@ export default function LpPage() {
         <div className="mx-auto max-w-lg">
           <div className="text-center">
             <p className="text-[13px] font-medium uppercase tracking-widest text-[#6e6e73]">Contact</p>
-            <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] text-[#1d1d1f]">デモを申し込む</h2>
+            <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] text-[#1d1d1f]">デモ・資料請求</h2>
             <p className="mt-4 text-[17px] text-[#6e6e73]">
-              フォームを送信後、3営業日以内にご連絡します。
+              実際の画面をオンラインデモでご確認いただけます。<br />稟議用の資料もお送りします。
             </p>
+            <div className="mt-5 flex justify-center gap-6 text-[14px] text-[#1d1d1f]">
+              <span>✓ デモ30分・完全無料</span>
+              <span>✓ 稟議資料あり</span>
+              <span>✓ 3営業日以内にご連絡</span>
+            </div>
           </div>
           <div className="mt-10 rounded-2xl bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.06)]">
             <ContactForm />
