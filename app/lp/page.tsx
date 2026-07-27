@@ -463,6 +463,14 @@ export default function LpPage() {
             </div>
           </div>
         </div>
+
+        {/* 全機能リンク */}
+        <div className="bg-[#f5f5f7] px-6 pb-16 text-center">
+          <p className="text-[14px] text-[#6e6e73] mb-3">修繕工事管理・法定点検・クレーム管理・見積比較など、その他の機能も搭載しています。</p>
+          <Link href="/features" className="inline-flex items-center gap-1 text-[15px] font-medium text-[#0071e3] hover:underline">
+            すべての機能を見る →
+          </Link>
+        </div>
       </section>
 
       {/* ── HOW IT WORKS ── */}
