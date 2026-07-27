@@ -112,6 +112,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       locale: 'ja_JP',
       type: 'article',
       publishedTime: post.publishedAt,
+      modifiedTime: post.updatedAt ?? post.publishedAt,
     },
   }
 }
@@ -138,10 +139,21 @@ export default async function BlogPostPage({ params }: Props) {
     headline: post.title,
     description: post.description,
     datePublished: post.publishedAt,
+    dateModified: post.updatedAt ?? post.publishedAt,
+    keywords: post.keywords.join(', '),
+    author: {
+      '@type': 'Organization',
+      name: 'Kura編集部',
+      url: 'https://kura-management.com',
+    },
     publisher: {
       '@type': 'Organization',
       name: 'Kura',
       url: 'https://kura-management.com',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://kura-management.com/favicon.ico',
+      },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
@@ -149,12 +161,28 @@ export default async function BlogPostPage({ params }: Props) {
     },
   }
 
+  const faqJsonLd = post.faqs && post.faqs.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: post.faqs.map(({ q, a }) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: { '@type': 'Answer', text: a },
+    })),
+  } : null
+
   return (
     <div className="min-h-screen bg-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
 
       <nav className="border-b border-slate-100 bg-white">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
