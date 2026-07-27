@@ -9,32 +9,28 @@ export const metadata: Metadata = {
 
 const MAIN_FEATURES = [
   {
-    icon: '📋',
+    label: 'コア機能',
     name: '案件・タスク管理',
-    tag: 'コア機能',
     description: '全物件の案件・タスク・期限・担当者をリアルタイムで一元管理。担当者が頭の中で管理していた業務を見える化します。',
     items: ['物件別・担当者別の案件一覧', '期限アラートと優先度管理', 'ステータス管理（未着手・対応中・完了）', '法定点検スケジュール自動管理'],
   },
   {
-    icon: '🎙️',
+    label: 'AI機能',
     name: 'AI議事録自動生成',
-    tag: 'AI機能',
     description: '総会・理事会の音声をアップロードするだけで議事録を自動生成。宿題・タスクも自動抽出し、案件管理に直接登録します。',
-    items: ['MP3/M4A/WAV対応', '自社フォーマット自動学習・適用', 'タスク自動抽出・案件登録', 'PDF出力・校正・編集に対応'],
+    items: ['MP3 / M4A / WAV 対応', '自社フォーマット自動学習・適用', 'タスク自動抽出・案件登録', 'PDF出力・校正・編集に対応'],
   },
   {
-    icon: '📄',
+    label: 'AI機能',
     name: 'AI引き継ぎ書自動生成',
-    tag: 'AI機能',
     description: '物件を選択するだけで、案件履歴・特記事項・居住者情報・修繕経緯をAIが整理。担当交代のコストを最小化します。',
-    items: ['物件ごとの引き継ぎ書を一括生成', '案件・タスク・クレーム履歴を自動整理', 'Word/PDF出力対応', '担当者交代履歴の記録'],
+    items: ['物件ごとの引き継ぎ書を一括生成', '案件・タスク・クレーム履歴を自動整理', 'Word / PDF 出力対応', '担当者交代履歴の記録'],
   },
 ]
 
-const OTHER_FEATURES = [
+const OTHER_FEATURES: { category: string; items: { name: string; desc: string }[] }[] = [
   {
     category: '物件・居住者管理',
-    icon: '🏢',
     items: [
       { name: '物件管理', desc: '管理棟の基本情報・戸数・所在地を一元管理。物件カード形式で全棟の状況を俯瞰できます。' },
       { name: '居住者管理', desc: '居住者・区分所有者の情報を物件ごとに管理。居住者ポータルから直接連絡を受け取ることも可能です。' },
@@ -43,7 +39,6 @@ const OTHER_FEATURES = [
   },
   {
     category: 'クレーム・トラブル対応',
-    icon: '🔔',
     items: [
       { name: 'クレーム管理', desc: '騒音・ペット・共用部マナー違反などのクレームを物件ごとに記録。対応履歴と結果を一元管理します。' },
       { name: 'アラート通知', desc: '期限超過・未対応案件・法定点検期限をメールで自動通知。見落としを防ぎます。' },
@@ -51,7 +46,6 @@ const OTHER_FEATURES = [
   },
   {
     category: '修繕・工事管理',
-    icon: '🔧',
     items: [
       { name: '修繕工事管理', desc: '大規模修繕から小規模修繕まで、工事ごとの進捗・業者・金額を管理します。' },
       { name: '長期修繕計画管理', desc: '物件ごとの長期修繕計画を管理。修繕積立金の収支シミュレーションも可能です。' },
@@ -60,7 +54,6 @@ const OTHER_FEATURES = [
   },
   {
     category: '見積・収支管理',
-    icon: '💴',
     items: [
       { name: '見積管理', desc: '工事・委託契約の見積書を案件に紐付けて管理。相見積もりの比較もKura上で完結します。' },
       { name: 'AI見積比較', desc: '複数の見積書をアップロードするだけで、AIが項目ごとに比較表を自動作成します。' },
@@ -69,7 +62,6 @@ const OTHER_FEATURES = [
   },
   {
     category: '業者・外部連携',
-    icon: '🤝',
     items: [
       { name: '業者管理', desc: '工事・清掃・点検など取引業者の連絡先・実績を管理。案件から直接業者を参照できます。' },
       { name: 'CSVインポート', desc: '物件・居住者データをCSVで一括インポート。既存データの移行もスムーズです。' },
@@ -77,7 +69,6 @@ const OTHER_FEATURES = [
   },
   {
     category: '分析・管理',
-    icon: '📊',
     items: [
       { name: 'ダッシュボード', desc: '全物件の案件・タスク・アラートをリアルタイムで俯瞰。今日やるべきことが一目でわかります。' },
       { name: 'カレンダー', desc: '理事会・総会・点検・工事の予定をカレンダー形式で管理。物件をまたいだスケジュール確認が可能です。' },
@@ -90,7 +81,7 @@ const OTHER_FEATURES = [
 
 export default function FeaturesPage() {
   return (
-    <div className="min-h-screen bg-[#f5f5f7]">
+    <div className="min-h-screen bg-white">
       {/* Nav */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#e5e5ea]">
         <div className="mx-auto max-w-6xl flex items-center justify-between px-6 py-4">
@@ -108,43 +99,46 @@ export default function FeaturesPage() {
       </nav>
 
       {/* Hero */}
-      <section className="bg-white px-6 py-20 text-center border-b border-[#e5e5ea]">
-        <p className="text-[13px] font-medium uppercase tracking-widest text-[#0071e3] mb-4">Features</p>
-        <h1 className="text-[40px] font-bold tracking-[-0.02em] text-[#1d1d1f] leading-tight mb-6">
-          マンション管理業務に必要な機能を<br className="hidden sm:block" />ワンストップで。
+      <section className="px-6 py-24 text-center border-b border-[#e5e5ea]">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.15em] text-[#0071e3] mb-5">Features</p>
+        <h1 className="text-[42px] font-bold tracking-[-0.025em] text-[#1d1d1f] leading-[1.15] mb-6">
+          マンション管理業務に必要な機能を、<br />ワンストップで。
         </h1>
-        <p className="text-[17px] text-[#6e6e73] max-w-2xl mx-auto leading-relaxed">
+        <p className="text-[17px] text-[#6e6e73] max-w-xl mx-auto leading-relaxed mb-10">
           議事録作成から引き継ぎ書、法定点検管理、クレーム対応まで。
-          フロント担当者の日常業務をすべてKura一つで完結できます。
+          フロント担当者の日常業務をKura一つで完結できます。
         </p>
-        <div className="mt-8 flex justify-center gap-4">
+        <div className="flex justify-center gap-3">
           <Link href="/signup" className="rounded-full bg-[#0071e3] px-8 py-3 text-[15px] font-medium text-white hover:bg-[#0077ed] transition-colors">
             14日間無料で試す
           </Link>
-          <Link href="/demo" className="rounded-full border border-[#d2d2d7] bg-white px-8 py-3 text-[15px] font-medium text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">
+          <Link href="/demo" className="rounded-full border border-[#d2d2d7] px-8 py-3 text-[15px] font-medium text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">
             デモを見る
           </Link>
         </div>
       </section>
 
       {/* Main Features */}
-      <section className="px-6 py-20">
-        <div className="mx-auto max-w-6xl">
-          <p className="text-center text-[13px] font-medium uppercase tracking-widest text-[#6e6e73] mb-2">Core Features</p>
-          <h2 className="text-center text-[28px] font-bold text-[#1d1d1f] mb-12">主要3機能</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <section className="px-6 py-20 bg-[#f5f5f7]">
+        <div className="mx-auto max-w-5xl">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.15em] text-[#6e6e73] mb-2 text-center">Core Features</p>
+          <h2 className="text-[28px] font-bold text-[#1d1d1f] mb-12 text-center">主要3機能</h2>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
             {MAIN_FEATURES.map((f) => (
-              <div key={f.name} className="rounded-2xl bg-white p-8 shadow-sm border border-[#e5e5ea]">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-3xl">{f.icon}</span>
-                  <span className="rounded-full bg-[#e8f0fe] px-3 py-1 text-[11px] font-semibold text-[#0071e3]">{f.tag}</span>
+              <div key={f.name} className="rounded-2xl bg-white p-8 border border-[#e5e5ea]">
+                <div className="flex items-center justify-between mb-5">
+                  <span className="rounded-full bg-[#e8f0fe] px-3 py-1 text-[11px] font-semibold text-[#0071e3] tracking-wide">{f.label}</span>
                 </div>
-                <h3 className="text-[18px] font-bold text-[#1d1d1f] mb-3">{f.name}</h3>
-                <p className="text-[14px] text-[#6e6e73] leading-relaxed mb-5">{f.description}</p>
-                <ul className="space-y-2">
+                <h3 className="text-[17px] font-bold text-[#1d1d1f] mb-3">{f.name}</h3>
+                <p className="text-[13px] text-[#6e6e73] leading-relaxed mb-6">{f.description}</p>
+                <ul className="space-y-2 border-t border-[#e5e5ea] pt-5">
                   {f.items.map((item) => (
                     <li key={item} className="flex items-start gap-2 text-[13px] text-[#1d1d1f]">
-                      <span className="mt-0.5 text-[#0071e3] font-bold">✓</span>
+                      <span className="mt-0.5 shrink-0 text-[#0071e3]">
+                        <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
+                          <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </span>
                       {item}
                     </li>
                   ))}
@@ -156,18 +150,17 @@ export default function FeaturesPage() {
       </section>
 
       {/* Other Features */}
-      <section className="bg-white px-6 py-20 border-t border-[#e5e5ea]">
-        <div className="mx-auto max-w-6xl">
-          <p className="text-center text-[13px] font-medium uppercase tracking-widest text-[#6e6e73] mb-2">All Features</p>
-          <h2 className="text-center text-[28px] font-bold text-[#1d1d1f] mb-12">その他の機能</h2>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+      <section className="px-6 py-20">
+        <div className="mx-auto max-w-5xl">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.15em] text-[#6e6e73] mb-2 text-center">All Features</p>
+          <h2 className="text-[28px] font-bold text-[#1d1d1f] mb-12 text-center">その他の機能</h2>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {OTHER_FEATURES.map((cat) => (
-              <div key={cat.category} className="rounded-2xl border border-[#e5e5ea] bg-[#f5f5f7] p-7">
-                <div className="flex items-center gap-3 mb-5">
-                  <span className="text-2xl">{cat.icon}</span>
-                  <h3 className="text-[16px] font-bold text-[#1d1d1f]">{cat.category}</h3>
-                </div>
-                <div className="space-y-4">
+              <div key={cat.category} className="rounded-2xl border border-[#e5e5ea] p-7">
+                <h3 className="text-[13px] font-bold uppercase tracking-[0.1em] text-[#6e6e73] mb-5 pb-4 border-b border-[#e5e5ea]">
+                  {cat.category}
+                </h3>
+                <div className="space-y-5">
                   {cat.items.map((item) => (
                     <div key={item.name}>
                       <p className="text-[14px] font-semibold text-[#1d1d1f] mb-1">{item.name}</p>
@@ -182,14 +175,12 @@ export default function FeaturesPage() {
       </section>
 
       {/* CTA */}
-      <section className="px-6 py-20 text-center">
-        <div className="mx-auto max-w-2xl">
-          <h2 className="text-[28px] font-bold text-[#1d1d1f] mb-4">全機能を14日間、無料でお試しください。</h2>
-          <p className="text-[16px] text-[#6e6e73] mb-8">クレジットカード不要・登録2分・いつでも解約できます。</p>
-          <Link href="/signup" className="inline-block rounded-full bg-[#0071e3] px-10 py-4 text-[16px] font-medium text-white hover:bg-[#0077ed] transition-colors">
-            無料トライアルを始める →
-          </Link>
-        </div>
+      <section className="bg-[#1d1d1f] px-6 py-20 text-center">
+        <h2 className="text-[28px] font-bold text-white mb-3">全機能を14日間、無料でお試しください。</h2>
+        <p className="text-[15px] text-white/60 mb-8">クレジットカード不要・登録2分・いつでも解約できます。</p>
+        <Link href="/signup" className="inline-block rounded-full bg-[#0071e3] px-10 py-4 text-[15px] font-medium text-white hover:bg-[#0077ed] transition-colors">
+          無料トライアルを始める
+        </Link>
       </section>
     </div>
   )
