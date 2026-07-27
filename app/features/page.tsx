@@ -57,7 +57,6 @@ const OTHER_FEATURES: { category: string; items: { name: string; desc: string }[
     items: [
       { name: '見積管理', desc: '工事・委託契約の見積書を案件に紐付けて管理。相見積もりの比較もKura上で完結します。' },
       { name: 'AI見積比較', desc: '複数の見積書をアップロードするだけで、AIが項目ごとに比較表を自動作成します。' },
-      { name: '収支管理', desc: '管理費・修繕積立金の収支を物件ごとに記録。滞納状況の一覧と督促メールの送信も対応。' },
     ],
   },
   {
