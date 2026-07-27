@@ -174,7 +174,7 @@ export default function LpPage() {
             音声をアップロードするだけ。<br />自社フォーマットで議事録を自動生成。<br />宿題・タスクまで自動抽出。
           </p>
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link href="/demo"
+            <Link href="/signup"
               className="rounded-full bg-[#0071e3] px-8 py-3.5 text-[17px] font-medium text-white hover:bg-[#0077ed] transition-colors">
               まずデモを見る（無料）
             </Link>
@@ -302,7 +302,7 @@ export default function LpPage() {
             </div>
           </div>
           <div className="mt-10 text-center">
-            <Link href="/demo"
+            <Link href="/signup"
               className="inline-block rounded-full bg-[#0071e3] px-8 py-3 text-[15px] font-medium text-white hover:bg-[#0077ed] transition-colors">
               実際の画面をデモで確認する →
             </Link>

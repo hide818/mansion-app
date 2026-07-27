@@ -112,7 +112,7 @@ export default function FeaturesPage() {
           <Link href="/signup" className="rounded-full bg-[#0071e3] px-8 py-3 text-[15px] font-medium text-white hover:bg-[#0077ed] transition-colors">
             14日間無料で試す
           </Link>
-          <Link href="/demo" className="rounded-full border border-[#d2d2d7] px-8 py-3 text-[15px] font-medium text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">
+          <Link href="/signup" className="rounded-full border border-[#d2d2d7] px-8 py-3 text-[15px] font-medium text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">
             デモを見る
           </Link>
         </div>
