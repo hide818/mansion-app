@@ -91,10 +91,45 @@ const jsonLd = {
   featureList: ['案件・タスク管理', 'AI議事録自動生成', 'AI引き継ぎ書自動生成', '居住者管理', 'CSVデータインポート', 'タスクアラートメール'],
 }
 
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Kura',
+  url: 'https://kura-management.com',
+  description: '分譲マンション管理会社向けAI業務管理SaaS',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: { '@type': 'EntryPoint', urlTemplate: 'https://kura-management.com/blog?q={search_term_string}' },
+    'query-input': 'required name=search_term_string',
+  },
+}
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'ホーム', item: 'https://kura-management.com' },
+    { '@type': 'ListItem', position: 2, name: 'サービス紹介', item: 'https://kura-management.com/lp' },
+  ],
+}
+
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Kura',
+  url: 'https://kura-management.com',
+  logo: 'https://kura-management.com/favicon.ico',
+  description: '分譲マンション管理会社向けAI業務管理SaaS。属人化解消・AI議事録・引き継ぎ書自動生成。',
+  sameAs: [],
+}
+
 export default function LpPage() {
   return (
     <div className="min-h-screen bg-white text-[#1d1d1f] antialiased" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
 
       {/* ── NAV ── */}
       <nav className="sticky top-0 z-50 bg-[rgba(255,255,255,0.85)] backdrop-blur-xl border-b border-[#d2d2d7]/60">
@@ -139,16 +174,16 @@ export default function LpPage() {
             音声をアップロードするだけ。<br />自社フォーマットで議事録を自動生成。<br />宿題・タスクまで自動抽出。
           </p>
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link href="/signup"
+            <Link href="/demo"
               className="rounded-full bg-[#0071e3] px-8 py-3.5 text-[17px] font-medium text-white hover:bg-[#0077ed] transition-colors">
+              まずデモを見る（無料）
+            </Link>
+            <Link href="/signup"
+              className="rounded-full border border-[#424245] px-8 py-3.5 text-[17px] font-medium text-white hover:border-white transition-colors">
               14日間無料で試す
             </Link>
-            <Link href="#contact"
-              className="rounded-full border border-[#424245] px-8 py-3.5 text-[17px] font-medium text-white hover:border-white transition-colors">
-              デモ・資料を申し込む
-            </Link>
           </div>
-          <p className="mt-5 text-[13px] text-[#424245]">メールアドレスのみで登録 · 30秒で開始 · クレジットカード不要</p>
+          <p className="mt-5 text-[13px] text-[#424245]">デモは1分で確認可能 · 登録不要 · クレジットカード不要</p>
 
           {/* ── HERO SCREENSHOT ── */}
           <div className="mx-auto mt-16 max-w-5xl rounded-2xl overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.6)] border border-[#333]">
@@ -194,6 +229,83 @@ export default function LpPage() {
                 <p className="mt-1 text-[13px] text-[#6e6e73]">{s.note}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── BEFORE / AFTER ── */}
+      <section className="bg-white px-6 py-20 border-b border-[#e5e5ea]">
+        <div className="mx-auto max-w-5xl">
+          <p className="text-center text-[13px] font-medium uppercase tracking-widest text-[#6e6e73] mb-4">AI議事録 導入前後の変化</p>
+          <h2 className="text-center text-[32px] font-bold tracking-[-0.02em] text-[#1d1d1f] mb-12 leading-tight">
+            毎回2時間かかっていた議事録が、<br className="hidden sm:block" />30〜50分で終わる。
+          </h2>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-[1fr_auto_1fr] items-center">
+            {/* Before */}
+            <div className="rounded-2xl border border-[#fecaca] bg-[#fff5f5] p-7">
+              <p className="text-[12px] font-bold uppercase tracking-widest text-[#dc2626] mb-4">導入前</p>
+              <div className="space-y-3">
+                {[
+                  { step: '1', text: '会議中に手書きメモ', time: '会議中' },
+                  { step: '2', text: '録音を聞き直しながら清書', time: '60〜90分' },
+                  { step: '3', text: '理事長への確認・修正往復', time: '30〜45分' },
+                  { step: '4', text: '宿題・タスクを手動で拾い出す', time: '15〜20分' },
+                ].map(item => (
+                  <div key={item.step} className="flex items-start gap-3">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#dc2626] text-[11px] font-bold text-white">{item.step}</span>
+                    <div className="flex-1">
+                      <p className="text-[14px] font-medium text-[#1d1d1f]">{item.text}</p>
+                      <p className="text-[12px] text-[#dc2626] font-semibold">{item.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-5 rounded-xl bg-[#fecaca] px-4 py-3 text-center">
+                <p className="text-[22px] font-bold text-[#dc2626]">合計 約2時間</p>
+                <p className="text-[12px] text-[#dc2626]/80">月20棟なら 月40時間以上</p>
+              </div>
+            </div>
+
+            {/* Arrow */}
+            <div className="flex justify-center">
+              <div className="flex flex-col items-center gap-1">
+                <svg className="h-10 w-10 text-[#0071e3] sm:rotate-0 rotate-90" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+                <span className="text-[11px] font-bold text-[#0071e3] tracking-wide">Kura導入</span>
+              </div>
+            </div>
+
+            {/* After */}
+            <div className="rounded-2xl border border-[#bbf7d0] bg-[#f0fdf4] p-7">
+              <p className="text-[12px] font-bold uppercase tracking-widest text-[#16a34a] mb-4">導入後</p>
+              <div className="space-y-3">
+                {[
+                  { step: '1', text: 'スマホで録音（会議中）', time: '会議中' },
+                  { step: '2', text: '録音ファイルをアップロード', time: '2〜3分' },
+                  { step: '3', text: 'AIが議事録・タスクを自動生成', time: '10〜15分処理' },
+                  { step: '4', text: '内容を確認・修正して完成', time: '15〜20分' },
+                ].map(item => (
+                  <div key={item.step} className="flex items-start gap-3">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#16a34a] text-[11px] font-bold text-white">{item.step}</span>
+                    <div className="flex-1">
+                      <p className="text-[14px] font-medium text-[#1d1d1f]">{item.text}</p>
+                      <p className="text-[12px] text-[#16a34a] font-semibold">{item.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-5 rounded-xl bg-[#bbf7d0] px-4 py-3 text-center">
+                <p className="text-[22px] font-bold text-[#16a34a]">合計 約30〜50分</p>
+                <p className="text-[12px] text-[#16a34a]/80">月20棟で 月30時間以上の削減</p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-10 text-center">
+            <Link href="/demo"
+              className="inline-block rounded-full bg-[#0071e3] px-8 py-3 text-[15px] font-medium text-white hover:bg-[#0077ed] transition-colors">
+              実際の画面をデモで確認する →
+            </Link>
           </div>
         </div>
       </section>
