@@ -27,6 +27,8 @@ import { ArticleMansionCaseManagement } from '../posts/mansion-case-management'
 import { ArticleMansionManagementCentralization } from '../posts/mansion-management-centralization'
 import { ArticleMansionManagementPersonalizationPrevention } from '../posts/mansion-management-personalization-prevention'
 import { ArticleMansionManagementHandover } from '../posts/mansion-management-handover'
+import { ArticleChokiShuzenKanriKaisha } from '../posts/choki-shuzen-keikaku-kanri-kaisha'
+import { ArticleSokaiKetsugiKanriKaisha } from '../posts/sokai-ketsugi-kanri-kaisha'
 import { TableOfContents } from '../components/TableOfContents'
 import type { Metadata } from 'next'
 
@@ -59,6 +61,8 @@ const ARTICLES: Record<string, React.FC> = {
   'mansion-management-centralization': ArticleMansionManagementCentralization,
   'mansion-management-personalization-prevention': ArticleMansionManagementPersonalizationPrevention,
   'mansion-management-handover': ArticleMansionManagementHandover,
+  'choki-shuzen-keikaku-kanri-kaisha': ArticleChokiShuzenKanriKaisha,
+  'sokai-ketsugi-kanri-kaisha': ArticleSokaiKetsugiKanriKaisha,
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
