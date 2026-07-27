@@ -216,6 +216,19 @@ export default async function BlogPostPage({ params }: Props) {
           <p className="mt-4 text-slate-500 leading-relaxed">{post.description}</p>
         </div>
 
+        {/* 記事冒頭CTA：36秒で離脱するユーザーにも届く */}
+        <div className="mb-8 flex items-center justify-between gap-4 rounded-xl border border-blue-100 bg-blue-50 px-5 py-4">
+          <p className="text-sm text-blue-800 font-medium leading-snug">
+            この記事の課題を解決するSaaS「Kura」— AI議事録・案件管理・引き継ぎ書を1つに
+          </p>
+          <Link
+            href={`/lp?utm_source=blog&utm_medium=article&utm_campaign=${slug}&utm_content=top_cta`}
+            className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700"
+          >
+            無料で試す →
+          </Link>
+        </div>
+
         <TableOfContents />
 
         <div className="prose prose-slate prose-lg max-w-none blog-prose">
@@ -225,9 +238,9 @@ export default async function BlogPostPage({ params }: Props) {
         <div className="mt-16 rounded-2xl bg-blue-600 p-8 text-white text-center">
           <p className="mb-2 text-sm font-semibold opacity-75">Kura — 管理会社専用AI</p>
           <h2 className="mb-3 text-xl font-extrabold">この記事で紹介した業務を自動化する</h2>
-          <p className="mb-6 text-sm opacity-80">AI議事録・案件管理・引き継ぎ書自動生成を1つにまとめたSaaS。月額¥50,000〜。</p>
+          <p className="mb-6 text-sm opacity-80">AI議事録・案件管理・引き継ぎ書自動生成を1つにまとめたSaaS。14日間無料・カード不要。</p>
           <Link
-            href={`/signup?utm_source=blog&utm_medium=article&utm_campaign=${slug}&utm_content=bottom_cta`}
+            href={`/lp?utm_source=blog&utm_medium=article&utm_campaign=${slug}&utm_content=bottom_cta`}
             style={{ color: '#1d4ed8', backgroundColor: '#ffffff' }}
             className="inline-block rounded-xl px-8 py-3 text-sm font-bold hover:bg-blue-50"
           >
