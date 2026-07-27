@@ -139,7 +139,7 @@ export default function LpPage() {
             <span className="text-[17px] font-semibold text-[#1d1d1f] tracking-tight">Kura</span>
           </Link>
           <div className="hidden items-center gap-8 text-[13px] text-[#6e6e73] sm:flex">
-            <Link href="#features" className="hover:text-[#1d1d1f] transition-colors">機能</Link>
+            <Link href="/features" className="hover:text-[#1d1d1f] transition-colors">機能</Link>
             <Link href="#how" className="hover:text-[#1d1d1f] transition-colors">使い方</Link>
             <Link href="#pricing" className="hover:text-[#1d1d1f] transition-colors">料金</Link>
             <Link href="#faq" className="hover:text-[#1d1d1f] transition-colors">FAQ</Link>
@@ -466,9 +466,9 @@ export default function LpPage() {
 
         {/* 全機能リンク */}
         <div className="bg-[#f5f5f7] px-6 pb-16 text-center">
-          <p className="text-[14px] text-[#6e6e73] mb-3">修繕工事管理・法定点検・クレーム管理・見積比較など、その他の機能も搭載しています。</p>
-          <Link href="/features" className="inline-flex items-center gap-1 text-[15px] font-medium text-[#0071e3] hover:underline">
-            すべての機能を見る →
+          <p className="text-[14px] text-[#6e6e73] mb-4">修繕工事管理・法定点検・クレーム管理・見積比較など、さらに多くの機能を搭載しています。</p>
+          <Link href="/features" className="inline-flex items-center gap-2 rounded-full border border-[#0071e3] px-7 py-3 text-[14px] font-medium text-[#0071e3] hover:bg-[#0071e3] hover:text-white transition-colors">
+            全機能の詳細を見る →
           </Link>
         </div>
       </section>
