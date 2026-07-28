@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
     if (resendKey) {
       const resend = new Resend(resendKey)
       const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'noreply@kura-management.com'
-      const toEmail = process.env.CONTACT_TO_EMAIL ?? 'komat_king@i.softbank.jp'
+      const toEmail = process.env.CONTACT_TO_EMAIL ?? 'h.komatsu0818@gmail.com'
       await resend.emails.send({
         from: `Kura <${fromEmail}>`,
         to: toEmail,

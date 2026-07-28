@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     const resend = new Resend(apiKey)
     const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'noreply@kura-management.com'
-    const toEmail = process.env.CONTACT_TO_EMAIL ?? 'komat_king@i.softbank.jp'
+    const toEmail = process.env.CONTACT_TO_EMAIL ?? 'h.komatsu0818@gmail.com'
 
     // オーナーへの通知メール・自動返信メールを並列送信
     await Promise.all([
