@@ -109,7 +109,7 @@ export default function ContactForm() {
         type="submit" disabled={status === 'loading'}
         className="w-full rounded-xl bg-blue-600 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 transition-colors disabled:opacity-50"
       >
-        {status === 'loading' ? '送信中...' : 'デモを申し込む'}
+        {status === 'loading' ? '送信中...' : 'お問い合わせを送信する'}
       </button>
       <p className="text-center text-xs text-slate-400">
         送信後、3営業日以内にご連絡いたします

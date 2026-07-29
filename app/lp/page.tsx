@@ -181,7 +181,7 @@ export default function LpPage() {
             </Link>
             <Link href="#contact"
               className="rounded-full border border-[#424245] px-8 py-3.5 text-[17px] font-medium text-white hover:border-white transition-colors">
-              デモ・資料請求
+              お問い合わせ
             </Link>
           </div>
           <p className="mt-5 text-[13px] text-[#424245]">クレジットカード不要 · 最短10分で使い始められます · いつでも解約</p>
@@ -305,7 +305,7 @@ export default function LpPage() {
           <div className="mt-10 text-center">
             <Link href="/signup"
               className="inline-block rounded-full bg-[#0071e3] px-8 py-3 text-[15px] font-medium text-white hover:bg-[#0077ed] transition-colors">
-              実際の画面をデモで確認する →
+              無料で試してみる →
             </Link>
           </div>
         </div>
@@ -668,14 +668,13 @@ export default function LpPage() {
         <div className="mx-auto max-w-lg">
           <div className="text-center">
             <p className="text-[13px] font-medium uppercase tracking-widest text-[#6e6e73]">Contact</p>
-            <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] text-[#1d1d1f]">デモ・資料請求</h2>
+            <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] text-[#1d1d1f]">お問い合わせ</h2>
             <p className="mt-4 text-[17px] text-[#6e6e73]">
-              実際の画面をオンラインデモでご確認いただけます。<br />稟議用の資料もお送りします。
+              導入のご相談・ご不明点はお気軽にどうぞ。<br />3営業日以内にご返信いたします。
             </p>
             <div className="mt-5 flex justify-center gap-6 text-[14px] text-[#1d1d1f]">
-              <span>✓ デモ30分・完全無料</span>
-              <span>✓ 稟議資料あり</span>
-              <span>✓ 3営業日以内にご連絡</span>
+              <span>✓ 返信まで3営業日以内</span>
+              <span>✓ 無料で相談可能</span>
             </div>
           </div>
           <div className="mt-10 rounded-2xl bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.06)]">
