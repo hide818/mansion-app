@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import KuraLogo from '@/app/components/KuraLogo'
 import ContactForm from '@/app/components/ContactForm'
+import StickyCtaBar from '@/app/components/StickyCtaBar'
 
 export const metadata = {
   title: 'Kura — 担当者が辞めても止まらない管理会社へ',
@@ -176,14 +177,14 @@ export default function LpPage() {
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link href="/signup"
               className="rounded-full bg-[#0071e3] px-8 py-3.5 text-[17px] font-medium text-white hover:bg-[#0077ed] transition-colors">
-              まずデモを見る（無料）
+              14日間無料で始める
             </Link>
-            <Link href="/signup"
+            <Link href="#contact"
               className="rounded-full border border-[#424245] px-8 py-3.5 text-[17px] font-medium text-white hover:border-white transition-colors">
-              14日間無料で試す
+              デモ・資料請求
             </Link>
           </div>
-          <p className="mt-5 text-[13px] text-[#424245]">デモは1分で確認可能 · 登録不要 · クレジットカード不要</p>
+          <p className="mt-5 text-[13px] text-[#424245]">クレジットカード不要 · 最短10分で使い始められます · いつでも解約</p>
 
           {/* ── HERO SCREENSHOT ── */}
           <div className="mx-auto mt-16 max-w-5xl rounded-2xl overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.6)] border border-[#333]">
@@ -528,8 +529,49 @@ export default function LpPage() {
         </div>
       </section>
 
+      {/* ── CONCERNS ── */}
+      <section className="bg-[#f5f5f7] px-6 py-20 border-t border-[#e5e5ea]">
+        <div className="mx-auto max-w-4xl">
+          <p className="text-center text-[13px] font-medium uppercase tracking-widest text-[#6e6e73] mb-3">よくある懸念</p>
+          <h2 className="text-center text-[28px] font-bold text-[#1d1d1f] mb-10">導入前に気になること、全部答えます。</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              {
+                q: 'IT担当者がいないと使えない？',
+                a: '不要です。メールアドレスと会社名だけで登録でき、音声ファイルをドラッグするだけで使い始められます。設定の所要時間は約10分。'
+              },
+              {
+                q: '今使っているExcelやメールと干渉しない？',
+                a: '既存の業務と並行して使えます。データのCSVエクスポートも可能なので、いつでも元のやり方に戻せます。'
+              },
+              {
+                q: '録音の音質が悪くても大丈夫？',
+                a: 'はい。スマートフォンの標準ボイスレコーダーで十分です。多少のノイズや重なり合う発言にも対応しています。'
+              },
+              {
+                q: '途中で解約したい場合は？',
+                a: 'マイページから即日解約できます。違約金・手数料は一切ありません。14日間の無料期間中に解約すれば費用も発生しません。'
+              },
+              {
+                q: '音声・議事録データはどこに保存される？',
+                a: 'ISO27001認定のクラウド基盤（Supabase）に保存されます。通信はすべてTLS暗号化。稟議用セキュリティ資料もご用意しています。'
+              },
+              {
+                q: '管理棟数が多くても追加料金がかかる？',
+                a: '棟数は無制限。50棟・100棟を管理する会社でも、料金は担当者（ユーザー）数のみで決まります。'
+              },
+            ].map(item => (
+              <div key={item.q} className="rounded-2xl bg-white p-6 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+                <p className="text-[15px] font-semibold text-[#1d1d1f] mb-2">{item.q}</p>
+                <p className="text-[14px] leading-relaxed text-[#6e6e73]">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── PRICING ── */}
-      <section id="pricing" className="bg-[#f5f5f7] px-6 py-24">
+      <section id="pricing" className="bg-white px-6 py-24">
         <div className="mx-auto max-w-5xl">
           <div className="text-center">
             <p className="text-[13px] font-medium uppercase tracking-widest text-[#6e6e73]">Pricing</p>
@@ -661,6 +703,7 @@ export default function LpPage() {
         </div>
       </footer>
 
+      <StickyCtaBar />
     </div>
   )
 }
