@@ -44,7 +44,7 @@ export default function Home() {
             href="#contact"
             className="rounded-xl bg-blue-600 px-8 py-3.5 text-base font-bold text-white hover:bg-blue-700 transition shadow-md"
           >
-            デモを申し込む
+            無料で始める
           </a>
           <a
             href="#features"
@@ -264,7 +264,7 @@ function PricingCard({
             : 'bg-blue-600 text-white hover:bg-blue-700'
         }`}
       >
-        デモを申し込む
+        お問い合わせ
       </a>
     </div>
   )
@@ -300,9 +300,9 @@ function ContactSection() {
   return (
     <section id="contact" className="py-20">
       <div className="mx-auto max-w-xl px-6">
-        <h2 className="text-center text-2xl font-bold text-slate-900 mb-3">デモ・お問い合わせ</h2>
+        <h2 className="text-center text-2xl font-bold text-slate-900 mb-3">お問い合わせ</h2>
         <p className="text-center text-slate-500 text-sm mb-10">
-          30分のオンラインデモで、貴社の業務への活用イメージをお見せします。
+          導入のご相談・ご不明点はお気軽にどうぞ。3営業日以内にご返信いたします。
         </p>
 
         {status === 'done' ? (
@@ -344,7 +344,7 @@ function ContactSection() {
                 <p className="text-sm text-red-600">送信に失敗しました。時間をおいて再度お試しください。</p>
               )}
               <button type="submit" disabled={status === 'loading'} className="w-full rounded-xl bg-blue-600 py-3 text-sm font-bold text-white hover:bg-blue-700 transition disabled:opacity-50">
-                {status === 'loading' ? '送信中...' : 'デモを申し込む（無料）'}
+                {status === 'loading' ? '送信中...' : 'お問い合わせを送信する'}
               </button>
               <p className="text-center text-xs text-slate-400">通常1営業日以内にご連絡します</p>
             </form>
