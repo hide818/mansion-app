@@ -33,6 +33,8 @@ import { ArticleKanriKaishaDxTool } from '../posts/kanri-kaisha-dx-tool'
 import { ArticleMansionGijirokuAi } from '../posts/mansion-kanri-gijiroku-ai'
 import { ArticleSokaiGijirokuKakikata } from '../posts/sokai-gijiroku-kakikata'
 import { ArticleSokaiShomenKetsugi } from '../posts/sokai-shomen-ketsugi'
+import { ArticleMansionMizuMoreTaiou } from '../posts/mansion-mizu-more-taiou'
+import { ArticleShuzenTsumitatekinSoba } from '../posts/shuzen-tsumitatekin-soba'
 import { TableOfContents } from '../components/TableOfContents'
 import type { Metadata } from 'next'
 
@@ -71,6 +73,8 @@ const ARTICLES: Record<string, React.FC> = {
   'mansion-kanri-gijiroku-ai': ArticleMansionGijirokuAi,
   'sokai-gijiroku-kakikata': ArticleSokaiGijirokuKakikata,
   'sokai-shomen-ketsugi': ArticleSokaiShomenKetsugi,
+  'mansion-mizu-more-taiou': ArticleMansionMizuMoreTaiou,
+  'shuzen-tsumitatekin-soba': ArticleShuzenTsumitatekinSoba,
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
