@@ -29,7 +29,12 @@ export async function POST(request: NextRequest) {
     // ① companies テーブルに会社レコードを先に作成
     const { error: companyError } = await supabaseAdmin
       .from('companies')
-      .insert({ id: companyId, name: companyName })
+      .insert({
+        id: companyId,
+        name: companyName,
+        plan: 'trial',
+        trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+      })
 
     if (companyError) {
       console.error('company insert error:', companyError)
@@ -167,13 +172,17 @@ export async function POST(request: NextRequest) {
       }
     })()
 
-    // オーナーへのサインアップ通知メール
+    // メール送信（オーナー通知 + ユーザーへのオンボーディング）
     const resendKey = process.env.RESEND_API_KEY
     if (resendKey) {
       const resend = new Resend(resendKey)
       const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'noreply@kura-management.com'
       const toEmail = process.env.CONTACT_TO_EMAIL ?? 'h.komatsu0818@gmail.com'
-      await resend.emails.send({
+      const dashboardUrl = 'https://kura-management.com/dashboard'
+      const minutesUrl = 'https://kura-management.com/ai-minutes'
+
+      // オーナー通知
+      resend.emails.send({
         from: `Kura <${fromEmail}>`,
         to: toEmail,
         subject: `【Kura 新規登録】${companyName}`,
@@ -188,6 +197,95 @@ export async function POST(request: NextRequest) {
           <p style="margin-top:16px;color:#666;font-size:13px;">Kura 自動通知</p>
         `,
       }).catch(err => console.error('signup notification email error:', err))
+
+      // ユーザーへのオンボーディングメール
+      resend.emails.send({
+        from: `Kura <${fromEmail}>`,
+        to: email,
+        subject: `【Kura】${companyName}様、ようこそ。まず3つだけ試してみてください`,
+        html: `
+<!DOCTYPE html>
+<html lang="ja">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;">
+  <div style="max-width:560px;margin:0 auto;padding:32px 16px;">
+
+    <!-- ヘッダー -->
+    <div style="background:#000;border-radius:16px 16px 0 0;padding:32px;text-align:center;">
+      <p style="margin:0;color:#6e6e73;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;">分譲マンション管理会社専用 AI</p>
+      <h1 style="margin:12px 0 0;color:#fff;font-size:28px;font-weight:700;letter-spacing:-0.02em;">Kuraへようこそ</h1>
+      <p style="margin:8px 0 0;color:#a1a1a6;font-size:15px;">${companyName}様</p>
+    </div>
+
+    <!-- メイン -->
+    <div style="background:#fff;padding:32px;border-left:1px solid #e5e5ea;border-right:1px solid #e5e5ea;">
+      <p style="margin:0 0 8px;color:#1d1d1f;font-size:16px;font-weight:600;">14日間の無料トライアルを開始しました。</p>
+      <p style="margin:0 0 24px;color:#6e6e73;font-size:14px;line-height:1.7;">
+        まずは3つだけ試してみてください。どれも5分以内で完了します。
+      </p>
+
+      <!-- Step 1 -->
+      <div style="display:flex;gap:16px;margin-bottom:20px;align-items:flex-start;">
+        <div style="flex-shrink:0;width:32px;height:32px;background:#0071e3;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;text-align:center;line-height:32px;">1</div>
+        <div>
+          <p style="margin:0 0 4px;color:#1d1d1f;font-size:15px;font-weight:600;">ダッシュボードを確認する</p>
+          <p style="margin:0;color:#6e6e73;font-size:13px;line-height:1.6;">
+            サンプルの物件・案件・タスクが入っています。実際の操作感をすぐに体験できます。
+          </p>
+          <a href="${dashboardUrl}" style="display:inline-block;margin-top:10px;background:#0071e3;color:#fff;font-size:13px;font-weight:600;text-decoration:none;padding:8px 18px;border-radius:20px;">ダッシュボードを開く →</a>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid #f0f0f0;margin:4px 0 20px;"></div>
+
+      <!-- Step 2 -->
+      <div style="display:flex;gap:16px;margin-bottom:20px;align-items:flex-start;">
+        <div style="flex-shrink:0;width:32px;height:32px;background:#0071e3;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;text-align:center;line-height:32px;">2</div>
+        <div>
+          <p style="margin:0 0 4px;color:#1d1d1f;font-size:15px;font-weight:600;">AI議事録を1本試す</p>
+          <p style="margin:0;color:#6e6e73;font-size:13px;line-height:1.6;">
+            録音ファイル（MP3・M4A・WAV）をアップロードするだけ。10〜15分で自社フォーマットの議事録が完成します。
+          </p>
+          <a href="${minutesUrl}" style="display:inline-block;margin-top:10px;background:#1d1d1f;color:#fff;font-size:13px;font-weight:600;text-decoration:none;padding:8px 18px;border-radius:20px;">AI議事録を試す →</a>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid #f0f0f0;margin:4px 0 20px;"></div>
+
+      <!-- Step 3 -->
+      <div style="display:flex;gap:16px;margin-bottom:24px;align-items:flex-start;">
+        <div style="flex-shrink:0;width:32px;height:32px;background:#0071e3;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;text-align:center;line-height:32px;">3</div>
+        <div>
+          <p style="margin:0 0 4px;color:#1d1d1f;font-size:15px;font-weight:600;">自社の物件を1棟登録する</p>
+          <p style="margin:0;color:#6e6e73;font-size:13px;line-height:1.6;">
+            実際の物件・案件・タスクを入力すると、Kuraの本当の価値を体感できます。CSVでの一括登録も可能です。
+          </p>
+        </div>
+      </div>
+
+      <!-- サポート -->
+      <div style="background:#f5f5f7;border-radius:12px;padding:16px;">
+        <p style="margin:0 0 4px;color:#1d1d1f;font-size:13px;font-weight:600;">使い方で迷ったら</p>
+        <p style="margin:0;color:#6e6e73;font-size:13px;line-height:1.6;">
+          画面共有しながら15分でご案内することも可能です。お気軽にご連絡ください。<br>
+          <a href="mailto:info@kura-management.com" style="color:#0071e3;text-decoration:none;">info@kura-management.com</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- フッター -->
+    <div style="background:#f5f5f7;border-radius:0 0 16px 16px;border:1px solid #e5e5ea;border-top:none;padding:20px 32px;text-align:center;">
+      <p style="margin:0;color:#6e6e73;font-size:12px;">
+        無料トライアルは登録から14日間です。期間中はいつでも解約でき、費用は一切かかりません。<br>
+        © 2024 Kura · <a href="https://kura-management.com/lp" style="color:#6e6e73;">サービス紹介</a>
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>
+        `,
+      }).catch(err => console.error('onboarding email error:', err))
     }
 
     return NextResponse.json({ ok: true, companyId })
