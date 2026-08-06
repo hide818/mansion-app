@@ -56,6 +56,10 @@ const PRICING = [
 
 const FAQ = [
   {
+    q: '月額5万円は高くないですか？',
+    a: '担当者5名のチームで議事録・引き継ぎ・案件管理の効率化により、月約165時間（時給3,000円換算で月49万円相当）の工数削減が見込めます。月額5万円の投資で約10倍のROIです。14日間無料でお試しいただけるので、まず体験してから判断されることをおすすめします。',
+  },
+  {
     q: 'どんな音声フォーマットに対応していますか？',
     a: 'MP3 / M4A / WAV / OGGに対応しています。ICレコーダー・スマートフォンの録音アプリからそのまま使えます。',
   },
@@ -69,7 +73,7 @@ const FAQ = [
   },
   {
     q: '導入・設定にどのくらい時間がかかりますか？',
-    a: '最短10分で利用開始できます。会社名・メールアドレスを登録し、音声ファイルをアップロードするだけ。IT担当者の対応は不要です。',
+    a: '最短2分で利用開始できます。会社名・メールアドレスを登録するだけ。IT担当者の対応は不要です。',
   },
   {
     q: '管理している物件数が多くても使えますか？',
@@ -174,17 +178,16 @@ export default function LpPage() {
           <p className="mx-auto mt-6 max-w-xl text-[19px] leading-relaxed text-[#a1a1a6]">
             音声をアップロードするだけ。<br />自社フォーマットで議事録を自動生成。<br />宿題・タスクまで自動抽出。
           </p>
-          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link href="/signup"
-              className="rounded-full bg-[#0071e3] px-8 py-3.5 text-[17px] font-medium text-white hover:bg-[#0077ed] transition-colors">
-              14日間無料で始める
-            </Link>
-            <Link href="#contact"
-              className="rounded-full border border-[#424245] px-8 py-3.5 text-[17px] font-medium text-white hover:border-white transition-colors">
-              お問い合わせ
+              className="rounded-full bg-[#0071e3] px-8 py-3.5 text-[17px] font-medium text-white hover:bg-[#0077ed] transition-colors shadow-[0_0_24px_rgba(0,113,227,0.4)]">
+              今すぐ無料で試す →
             </Link>
           </div>
-          <p className="mt-5 text-[13px] text-[#424245]">クレジットカード不要 · 最短10分で使い始められます · いつでも解約</p>
+          <p className="mt-4 text-[13px] text-[#424245]">クレジットカード不要 · 登録2分で使い始められます · 14日間無料 · いつでも解約</p>
+          <p className="mt-2 text-[12px] text-[#424245]">
+            <Link href="#contact" className="underline underline-offset-2 hover:text-[#6e6e73] transition-colors">まずは相談したい方はこちら</Link>
+          </p>
 
           {/* ── HERO SCREENSHOT ── */}
           <div className="mx-auto mt-16 max-w-5xl rounded-2xl overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.6)] border border-[#333]">
@@ -231,6 +234,38 @@ export default function LpPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── SIGNUP FLOW ── */}
+      <section className="bg-white px-6 py-16 border-b border-[#e5e5ea]">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-[13px] font-semibold text-[#0071e3] uppercase tracking-widest">登録から使い始めるまで</p>
+          <h2 className="mt-3 text-[28px] font-bold tracking-[-0.02em] text-[#1d1d1f]">
+            2分で登録、すぐに使えます。
+          </h2>
+          <p className="mt-3 text-[15px] text-[#6e6e73]">IT担当者の対応もシステム設定も不要。メールアドレスだけで今日から使い始められます。</p>
+        </div>
+        <div className="mx-auto mt-10 max-w-3xl grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {[
+            { num: '01', title: 'メールと会社名を入力', desc: 'クレジットカード不要。30秒で完了。', time: '約30秒' },
+            { num: '02', title: '物件・担当者を登録', desc: 'CSVインポートでまとめて登録できます。', time: '約1〜2分' },
+            { num: '03', title: '全機能が使い放題', desc: '14日間、制限なしで全機能をお試しいただけます。', time: 'すぐに開始' },
+          ].map(s => (
+            <div key={s.num} className="relative rounded-2xl border border-[#e5e5ea] bg-white p-6">
+              <span className="absolute -top-3 left-6 rounded-full bg-[#0071e3] px-3 py-0.5 text-[11px] font-semibold text-white">{s.time}</span>
+              <p className="text-[13px] font-bold text-[#6e6e73] mt-2">{s.num}</p>
+              <h3 className="mt-2 text-[15px] font-semibold text-[#1d1d1f]">{s.title}</h3>
+              <p className="mt-1 text-[13px] leading-relaxed text-[#6e6e73]">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-8 text-center">
+          <Link href="/signup"
+            className="inline-block rounded-full bg-[#0071e3] px-8 py-3 text-[15px] font-medium text-white hover:bg-[#0077ed] transition-colors">
+            今すぐ無料で登録する →
+          </Link>
+          <p className="mt-3 text-[12px] text-[#6e6e73]">クレジットカード不要・いつでも解約可能</p>
         </div>
       </section>
 
@@ -307,6 +342,36 @@ export default function LpPage() {
               className="inline-block rounded-full bg-[#0071e3] px-8 py-3 text-[15px] font-medium text-white hover:bg-[#0077ed] transition-colors">
               無料で試してみる →
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOUNDER STORY ── */}
+      <section className="bg-[#f5f5f7] px-6 py-20 border-t border-[#e5e5ea]">
+        <div className="mx-auto max-w-3xl">
+          <div className="rounded-2xl bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.06)] sm:p-10">
+            <p className="text-[12px] font-semibold uppercase tracking-widest text-[#0071e3]">開発者について</p>
+            <h2 className="mt-3 text-[24px] font-bold text-[#1d1d1f] leading-snug">
+              なぜ分譲マンション管理会社の<br className="hidden sm:block" />フロントが、このツールを作ったのか。
+            </h2>
+            <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-[#424245]">
+              <p>
+                私自身、分譲マンション管理会社でフロント担当として勤務していました。担当棟数は最大で20棟超。毎月の総会・理事会が終わるたびに、深夜まで議事録を清書していました。
+              </p>
+              <p>
+                引き継ぎのたびに膨大な口頭説明、退職したら消える過去の経緯、Excelで追いかける法定点検の期限。「これはツールで解決できる」と気づいたのに、使えるものが市場になかった。だからゼロから作りました。
+              </p>
+              <p className="font-medium text-[#1d1d1f]">
+                Kuraは、管理会社の現場で本当に必要なことだけを詰め込んだツールです。
+              </p>
+            </div>
+            <div className="mt-6 flex items-center gap-4 border-t border-[#e5e5ea] pt-6">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#0071e3] text-white text-[18px] font-bold">K</div>
+              <div>
+                <p className="text-[14px] font-semibold text-[#1d1d1f]">Kura 開発者</p>
+                <p className="text-[13px] text-[#6e6e73]">元・分譲マンション管理会社 フロント担当</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -660,6 +725,29 @@ export default function LpPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── FINAL CTA ── */}
+      <section className="bg-black px-6 py-24 text-white text-center">
+        <div className="mx-auto max-w-2xl">
+          <p className="text-[13px] font-medium uppercase tracking-widest text-[#6e6e73]">まずは無料で</p>
+          <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] leading-tight">
+            14日間、全機能を試してみてください。
+          </h2>
+          <p className="mt-5 text-[17px] leading-relaxed text-[#a1a1a6]">
+            議事録1本を実際にAIで作ってみると、<br className="hidden sm:block" />「これは使える」か「うちには合わない」かがすぐわかります。
+          </p>
+          <div className="mt-10">
+            <Link href="/signup"
+              className="inline-block rounded-full bg-[#0071e3] px-10 py-4 text-[18px] font-medium text-white hover:bg-[#0077ed] transition-colors shadow-[0_0_32px_rgba(0,113,227,0.4)]">
+              今すぐ無料で始める →
+            </Link>
+          </div>
+          <p className="mt-5 text-[13px] text-[#424245]">クレジットカード不要 · 登録2分 · いつでも解約</p>
+          <p className="mt-4 text-[13px] text-[#6e6e73]">
+            導入に迷っている場合は<Link href="#contact" className="text-[#2997ff] hover:underline ml-1">お気軽にご相談ください</Link>
+          </p>
         </div>
       </section>
 
