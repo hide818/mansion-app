@@ -35,6 +35,29 @@ import { ArticleSokaiGijirokuKakikata } from '../posts/sokai-gijiroku-kakikata'
 import { ArticleSokaiShomenKetsugi } from '../posts/sokai-shomen-ketsugi'
 import { ArticleMansionMizuMoreTaiou } from '../posts/mansion-mizu-more-taiou'
 import { ArticleShuzenTsumitatekinSoba } from '../posts/shuzen-tsumitatekin-soba'
+import { ArticleSokaiIninjyo } from '../posts/sokai-ininjyo-kakikata'
+import { ArticleKanriKumiaiKessan } from '../posts/kanri-kumiai-kessan'
+import { ArticleRijiChoYakuwari } from '../posts/riji-cho-yakuwari'
+import { ArticleKanriYakusokuKaisei } from '../posts/kanri-yakusoku-kaisei'
+import { ArticleKanriKumiaiYosan } from '../posts/kanri-kumiai-yosan'
+import { ArticlePetTroubleTaiou } from '../posts/pet-trouble-taiou'
+import { ArticleChushajoKanri } from '../posts/chushajo-kanri'
+import { ArticleBousaiKanri } from '../posts/bousai-kanri'
+import { ArticleRijiKaiManual } from '../posts/riji-kai-manual'
+import { ArticleKanriItakuKeiyaku } from '../posts/kanri-itaku-keiyaku'
+import { ArticleElevatorTenken } from '../posts/elevator-tenken'
+import { ArticleKyoyoBuSeiso } from '../posts/kyoyo-bu-seiso'
+import { ArticleSoonClaimTaiou } from '../posts/soon-claim-taiou'
+import { ArticleFrontGyomuChecklist } from '../posts/front-gyomu-checklist'
+import { ArticleKanriKaikei } from '../posts/kanri-kaikei'
+import { ArticleKanriHiNeage } from '../posts/kanri-hi-neage'
+import { ArticleKanriInYakuwari } from '../posts/kanri-in-yakuwari'
+import { ArticleDaikiShuzenGyosha } from '../posts/daiki-shuzen-gyosha'
+import { ArticleRousuiHoken } from '../posts/rousui-hoken'
+import { ArticleRinjiSokai } from '../posts/rinji-sokai'
+import { ArticleAkiyaKanri } from '../posts/akiya-kanri'
+import { ArticleFrontRishoku } from '../posts/front-rishoku'
+import { ArticleDxJirei } from '../posts/dx-jirei'
 import { TableOfContents } from '../components/TableOfContents'
 import type { Metadata } from 'next'
 
@@ -75,30 +98,63 @@ const ARTICLES: Record<string, React.FC> = {
   'sokai-shomen-ketsugi': ArticleSokaiShomenKetsugi,
   'mansion-mizu-more-taiou': ArticleMansionMizuMoreTaiou,
   'shuzen-tsumitatekin-soba': ArticleShuzenTsumitatekinSoba,
+  'sokai-ininjyo-kakikata': ArticleSokaiIninjyo,
+  'kanri-kumiai-kessan': ArticleKanriKumiaiKessan,
+  'riji-cho-yakuwari': ArticleRijiChoYakuwari,
+  'kanri-yakusoku-kaisei': ArticleKanriYakusokuKaisei,
+  'kanri-kumiai-yosan': ArticleKanriKumiaiYosan,
+  'pet-trouble-taiou': ArticlePetTroubleTaiou,
+  'chushajo-kanri': ArticleChushajoKanri,
+  'bousai-kanri': ArticleBousaiKanri,
+  'riji-kai-manual': ArticleRijiKaiManual,
+  'kanri-itaku-keiyaku': ArticleKanriItakuKeiyaku,
+  'elevator-tenken': ArticleElevatorTenken,
+  'kyoyo-bu-seiso': ArticleKyoyoBuSeiso,
+  'soon-claim-taiou': ArticleSoonClaimTaiou,
+  'front-gyomu-checklist': ArticleFrontGyomuChecklist,
+  'kanri-kaikei': ArticleKanriKaikei,
+  'kanri-hi-neage': ArticleKanriHiNeage,
+  'kanri-in-yakuwari': ArticleKanriInYakuwari,
+  'daiki-shuzen-gyosha': ArticleDaikiShuzenGyosha,
+  'rousui-hoken': ArticleRousuiHoken,
+  'rinji-sokai': ArticleRinjiSokai,
+  'akiya-kanri': ArticleAkiyaKanri,
+  'front-rishoku': ArticleFrontRishoku,
+  'dx-jirei': ArticleDxJirei,
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
   '議事録': 'bg-blue-50 text-blue-700',
   '業務効率化': 'bg-emerald-50 text-emerald-700',
   'DX・IT化': 'bg-violet-50 text-violet-700',
+  'DX・テクノロジー': 'bg-violet-50 text-violet-700',
   '総会・理事会': 'bg-amber-50 text-amber-700',
   '管理費・会計': 'bg-red-50 text-red-700',
   '修繕工事': 'bg-orange-50 text-orange-700',
+  '修繕・工事': 'bg-orange-50 text-orange-700',
   '管理会社': 'bg-sky-50 text-sky-700',
+  '管理会社・契約': 'bg-sky-50 text-sky-700',
   '住民対応': 'bg-pink-50 text-pink-700',
   '管理組合': 'bg-teal-50 text-teal-700',
+  '設備管理': 'bg-slate-100 text-slate-700',
+  '規約・法律': 'bg-indigo-50 text-indigo-700',
 }
 
 const CATEGORY_STYLES: Record<string, { bg: string }> = {
   '議事録':    { bg: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' },
   '業務効率化': { bg: 'linear-gradient(135deg, #34d399 0%, #059669 100%)' },
   'DX・IT化':  { bg: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)' },
+  'DX・テクノロジー': { bg: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)' },
   '総会・理事会': { bg: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)' },
   '管理費・会計': { bg: 'linear-gradient(135deg, #f87171 0%, #dc2626 100%)' },
   '修繕工事':  { bg: 'linear-gradient(135deg, #fb923c 0%, #c2410c 100%)' },
+  '修繕・工事': { bg: 'linear-gradient(135deg, #fb923c 0%, #c2410c 100%)' },
   '管理会社':  { bg: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)' },
+  '管理会社・契約': { bg: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)' },
   '住民対応':  { bg: 'linear-gradient(135deg, #f472b6 0%, #be185d 100%)' },
   '管理組合':  { bg: 'linear-gradient(135deg, #2dd4bf 0%, #0f766e 100%)' },
+  '設備管理':  { bg: 'linear-gradient(135deg, #94a3b8 0%, #475569 100%)' },
+  '規約・法律': { bg: 'linear-gradient(135deg, #818cf8 0%, #4338ca 100%)' },
 }
 
 const DEFAULT_STYLE = { bg: 'linear-gradient(135deg, #94a3b8 0%, #475569 100%)' }
