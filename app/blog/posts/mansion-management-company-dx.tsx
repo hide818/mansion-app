@@ -459,6 +459,11 @@ export function ArticleMansionManagementDx() {
         </p>
       </div>
 
+      <p>
+        マンション管理会社のDX推進ガイド（優先順位・費用・ロードマップ）については、
+        <a href="/blog/kanri-kaisha-dx-guide">マンション管理会社のDX推進ガイド【2026年版】</a>で詳しく解説しています。
+      </p>
+
       <h2>マンション管理会社がDXで得られる変化</h2>
 
       <h3>フロント担当者が「探す・思い出す・転記する」時間を減らせる</h3>
