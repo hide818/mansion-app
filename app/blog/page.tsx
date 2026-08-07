@@ -16,31 +16,6 @@ export const metadata: Metadata = {
   },
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  '議事録': 'bg-blue-50 text-blue-700',
-  '業務効率化': 'bg-emerald-50 text-emerald-700',
-  'DX・IT化': 'bg-violet-50 text-violet-700',
-  '総会・理事会': 'bg-amber-50 text-amber-700',
-  '管理費・会計': 'bg-red-50 text-red-700',
-  '修繕工事': 'bg-orange-50 text-orange-700',
-  '管理会社': 'bg-sky-50 text-sky-700',
-  '住民対応': 'bg-pink-50 text-pink-700',
-  '管理組合': 'bg-teal-50 text-teal-700',
-}
-
-const CATEGORY_STYLES: Record<string, { bg: string }> = {
-  '議事録':    { bg: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' },
-  '業務効率化': { bg: 'linear-gradient(135deg, #34d399 0%, #059669 100%)' },
-  'DX・IT化':  { bg: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)' },
-  '総会・理事会': { bg: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)' },
-  '管理費・会計': { bg: 'linear-gradient(135deg, #f87171 0%, #dc2626 100%)' },
-  '修繕工事':  { bg: 'linear-gradient(135deg, #fb923c 0%, #c2410c 100%)' },
-  '管理会社':  { bg: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)' },
-  '住民対応':  { bg: 'linear-gradient(135deg, #f472b6 0%, #be185d 100%)' },
-  '管理組合':  { bg: 'linear-gradient(135deg, #2dd4bf 0%, #0f766e 100%)' },
-}
-
-const DEFAULT_STYLE = { bg: 'linear-gradient(135deg, #94a3b8 0%, #475569 100%)' }
 
 function getReadingMinutes(description: string): number {
   return Math.max(4, Math.min(10, Math.round(description.length / 18)))
@@ -75,7 +50,6 @@ export default function BlogPage() {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {sorted.map((post) => {
-            const style = CATEGORY_STYLES[post.category] ?? DEFAULT_STYLE
             const minutes = getReadingMinutes(post.description)
             return (
               <Link
@@ -83,16 +57,11 @@ export default function BlogPage() {
                 href={`/blog/${post.slug}`}
                 className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-1"
               >
-                {/* Gradient thumbnail */}
-                <div
-                  className="h-28"
-                  style={{ background: style.bg }}
-                />
 
                 {/* Card content */}
                 <div className="flex flex-col flex-1 p-5">
                   <div className="mb-3 flex items-center gap-2 flex-wrap">
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${CATEGORY_COLORS[post.category] ?? 'bg-slate-100 text-slate-600'}`}>
+                    <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold bg-slate-100 text-slate-600">
                       {post.category}
                     </span>
                     <time className="text-xs text-slate-400">{post.publishedAt}</time>
