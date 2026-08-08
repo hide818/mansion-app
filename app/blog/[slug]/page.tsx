@@ -307,7 +307,22 @@ export default async function BlogPostPage({ params }: Props) {
           <Article />
         </div>
 
-        <div className="mt-16 rounded-2xl bg-blue-600 p-8 text-white text-center">
+        {/* テンプレートDL CTA */}
+        <div className="mt-14 rounded-2xl border border-amber-200 bg-amber-50 p-6 flex flex-col sm:flex-row items-center gap-5">
+          <div className="flex-1">
+            <p className="text-xs font-semibold text-amber-700 mb-1">【無料配布中】</p>
+            <p className="text-base font-bold text-slate-800 leading-snug">総会議事録テンプレート</p>
+            <p className="text-sm text-slate-600 mt-1">区分所有法対応・定足数確認欄・採決記録付き。すぐ使える実用フォーマット。</p>
+          </div>
+          <Link
+            href="/templates?utm_source=blog&utm_medium=article_cta&utm_campaign=template"
+            className="shrink-0 rounded-xl bg-amber-500 px-6 py-3 text-sm font-bold text-white hover:bg-amber-400 transition-colors whitespace-nowrap"
+          >
+            無料でDL →
+          </Link>
+        </div>
+
+        <div className="mt-6 rounded-2xl bg-blue-600 p-8 text-white text-center">
           <p className="mb-2 text-sm font-semibold opacity-75">Kura — 管理会社専用AI</p>
           <h2 className="mb-3 text-xl font-extrabold">この記事で紹介した業務を自動化する</h2>
           <p className="mb-6 text-sm opacity-80">AI議事録・案件管理・引き継ぎ書自動生成を1つにまとめたSaaS。14日間無料・カード不要。</p>

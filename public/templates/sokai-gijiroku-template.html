@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>総会議事録テンプレート｜Kura</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    font-size: 10pt;
+    color: #111;
+    line-height: 1.7;
+    background: #fff;
+  }
+  .page { max-width: 700px; margin: 0 auto; padding: 20px; }
+  h1.title {
+    text-align: center;
+    font-size: 16pt;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    border-bottom: 2px solid #111;
+    padding-bottom: 8px;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 10pt;
+    margin-bottom: 20px;
+    color: #555;
+  }
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 9.5pt;
+  }
+  .info-table th {
+    background: #f0f0f0;
+    border: 1px solid #999;
+    padding: 5px 8px;
+    text-align: left;
+    width: 30%;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  .info-table td {
+    border: 1px solid #999;
+    padding: 5px 8px;
+    min-height: 22px;
+  }
+  .quorum-box {
+    border: 1px solid #555;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    background: #fafafa;
+    font-size: 9.5pt;
+  }
+  .quorum-box .label { font-weight: bold; margin-bottom: 6px; }
+  .quorum-row { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 4px; }
+  .quorum-row span { min-width: 120px; }
+  .quorum-row .field { border-bottom: 1px solid #555; min-width: 60px; display: inline-block; }
+  .section-title {
+    font-size: 11pt;
+    font-weight: bold;
+    border-left: 4px solid #111;
+    padding-left: 8px;
+    margin: 18px 0 8px;
+  }
+  .agenda-block {
+    border: 1px solid #bbb;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .agenda-header {
+    background: #ebebeb;
+    padding: 5px 10px;
+    font-weight: bold;
+    font-size: 9.5pt;
+    border-bottom: 1px solid #bbb;
+  }
+  .agenda-body { padding: 8px 10px; font-size: 9.5pt; }
+  .agenda-body .row { display: flex; gap: 6px; margin-bottom: 5px; align-items: flex-start; }
+  .agenda-body .row-label { font-weight: bold; white-space: nowrap; min-width: 70px; }
+  .agenda-body .row-val { flex: 1; border-bottom: 1px solid #aaa; min-height: 18px; }
+  .vote-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+    font-size: 9pt;
+  }
+  .vote-table th {
+    background: #f0f0f0;
+    border: 1px solid #aaa;
+    padding: 4px 8px;
+    text-align: center;
+  }
+  .vote-table td {
+    border: 1px solid #aaa;
+    padding: 4px 8px;
+    text-align: center;
+    min-width: 60px;
+  }
+  .result-row { display: flex; gap: 10px; align-items: center; margin-top: 6px; font-size: 9.5pt; }
+  .result-row .decision {
+    border: 1px solid #555;
+    padding: 2px 10px;
+    font-weight: bold;
+  }
+  .sign-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 9.5pt;
+  }
+  .sign-table th {
+    background: #f0f0f0;
+    border: 1px solid #999;
+    padding: 5px 8px;
+    text-align: left;
+    font-weight: bold;
+  }
+  .sign-table td {
+    border: 1px solid #999;
+    padding: 5px 8px;
+    min-height: 24px;
+  }
+  .sign-table .seal-col {
+    width: 60px;
+    text-align: center;
+    height: 50px;
+    vertical-align: middle;
+    color: #888;
+    font-size: 8pt;
+  }
+  .footer-note {
+    margin-top: 28px;
+    font-size: 8pt;
+    color: #777;
+    border-top: 1px solid #ddd;
+    padding-top: 8px;
+    text-align: center;
+  }
+  .print-only { display: block; }
+  @media screen {
+    body { background: #e8e8e8; }
+    .page {
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+      margin: 20px auto;
+      padding: 32px 36px;
+    }
+    .print-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: #0071e3; color: #fff;
+      text-align: center; padding: 10px;
+      font-family: sans-serif; font-size: 13px; z-index: 99;
+    }
+    .print-bar button {
+      background: #fff; color: #0071e3;
+      border: none; border-radius: 6px;
+      padding: 4px 14px; font-weight: bold;
+      cursor: pointer; margin-left: 12px; font-size: 13px;
+    }
+    body { padding-top: 44px; }
+  }
+  @media print { .print-bar { display: none !important; } }
+</style>
+</head>
+<body>
+<div class="print-bar print-only">
+  このテンプレートをご活用ください。印刷またはPDF保存してお使いいただけます。
+  <button onclick="window.print()">印刷 / PDF保存</button>
+  <span style="margin-left:20px;opacity:0.8;font-size:11px;">提供：Kura（kura-management.com）</span>
+</div>
+
+<div class="page">
+
+<h1 class="title">第　　回　定期総会　議事録</h1>
+<p class="subtitle">（　　　　　マンション管理組合）</p>
+
+<table class="info-table">
+  <tr>
+    <th>開催日時</th>
+    <td>令和　　年　　月　　日（　　）　　時　　分 〜 　　時　　分</td>
+  </tr>
+  <tr>
+    <th>開催場所</th>
+    <td></td>
+  </tr>
+  <tr>
+    <th>議長</th>
+    <td>理事長　　　　　　　　　　　　　　　　　　　（氏名）</td>
+  </tr>
+  <tr>
+    <th>議事録署名人</th>
+    <td>
+      ①　　　　　　　　　　　　　　　　　　　　　（氏名）<br>
+      ②　　　　　　　　　　　　　　　　　　　　　（氏名）
+    </td>
+  </tr>
+  <tr>
+    <th>書記</th>
+    <td></td>
+  </tr>
+</table>
+
+<div class="quorum-box">
+  <div class="label">■ 出席状況・定足数確認</div>
+  <div class="quorum-row">
+    <span>総区分所有者数：<span class="field">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> 名</span>
+    <span>議決権総数：<span class="field">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> 個</span>
+  </div>
+  <div class="quorum-row">
+    <span>出席者数（本人）：<span class="field">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> 名</span>
+    <span>委任状：<span class="field">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> 通</span>
+    <span>議決権行使書：<span class="field">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> 通</span>
+  </div>
+  <div class="quorum-row">
+    <span>合計出席議決権数：<span class="field">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> 個（総議決権の<span class="field">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>%）</span>
+  </div>
+  <div style="margin-top:6px">
+    議長は、定足数（総議決権の過半数）を満たすことを確認し、本総会が適法に成立したことを宣言した。
+  </div>
+</div>
+
+<div class="section-title">審議事項</div>
+
+<!-- 第1号議案 -->
+<div class="agenda-block">
+  <div class="agenda-header">第１号議案：令和　　年度　事業報告・収支決算報告の承認</div>
+  <div class="agenda-body">
+    <div class="row"><div class="row-label">【提案内容】</div><div class="row-val"></div></div>
+    <div class="row"><div class="row-label">【質疑応答】</div><div class="row-val"></div></div>
+    <table class="vote-table">
+      <tr><th>賛成</th><th>反対</th><th>棄権</th><th>決議種別</th></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>普通決議</td></tr>
+    </table>
+    <div class="result-row">
+      決議結果：<span class="decision">可　決 ／ 否　決</span>
+    </div>
+  </div>
+</div>
+
+<!-- 第2号議案 -->
+<div class="agenda-block">
+  <div class="agenda-header">第２号議案：令和　　年度　事業計画・収支予算案の承認</div>
+  <div class="agenda-body">
+    <div class="row"><div class="row-label">【提案内容】</div><div class="row-val"></div></div>
+    <div class="row"><div class="row-label">【質疑応答】</div><div class="row-val"></div></div>
+    <table class="vote-table">
+      <tr><th>賛成</th><th>反対</th><th>棄権</th><th>決議種別</th></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>普通決議</td></tr>
+    </table>
+    <div class="result-row">
+      決議結果：<span class="decision">可　決 ／ 否　決</span>
+    </div>
+  </div>
+</div>
+
+<!-- 第3号議案（役員改選） -->
+<div class="agenda-block">
+  <div class="agenda-header">第３号議案：役員の選任</div>
+  <div class="agenda-body">
+    <div class="row"><div class="row-label">【提案内容】</div><div class="row-val">以下の通り役員を選任する。</div></div>
+    <div style="margin:6px 0; padding-left:8px; font-size:9pt;">
+      理事長：　　　　　　　　　　／　副理事長：　　　　　　　　　　<br>
+      理事：　　　　　　　　　　　　　　　　　　　　　　　　　　　　<br>
+      監事：
+    </div>
+    <div class="row"><div class="row-label">【質疑応答】</div><div class="row-val"></div></div>
+    <table class="vote-table">
+      <tr><th>賛成</th><th>反対</th><th>棄権</th><th>決議種別</th></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>普通決議</td></tr>
+    </table>
+    <div class="result-row">
+      決議結果：<span class="decision">可　決 ／ 否　決</span>
+    </div>
+  </div>
+</div>
+
+<!-- 追加議案スペース -->
+<div class="agenda-block">
+  <div class="agenda-header">第４号議案：　　　　　　　　　　　　　　　　　　　　　　</div>
+  <div class="agenda-body">
+    <div class="row"><div class="row-label">【提案内容】</div><div class="row-val"></div></div>
+    <div class="row"><div class="row-label">【質疑応答】</div><div class="row-val"></div></div>
+    <table class="vote-table">
+      <tr><th>賛成</th><th>反対</th><th>棄権</th><th>決議種別</th></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>普通決議 ／ 特別決議</td></tr>
+    </table>
+    <div class="result-row">
+      決議結果：<span class="decision">可　決 ／ 否　決</span>
+    </div>
+  </div>
+</div>
+
+<div class="section-title">その他（報告事項・質疑応答）</div>
+<div style="border:1px solid #bbb; min-height:60px; padding:8px 10px; font-size:9.5pt; margin-bottom:16px;"></div>
+
+<div class="section-title">閉会</div>
+<table class="info-table" style="margin-bottom:20px">
+  <tr>
+    <th>閉会宣言</th>
+    <td>議長は、上記の審議をもって全議案の審議を終了し、　　時　　分に閉会を宣言した。</td>
+  </tr>
+  <tr>
+    <th>次回総会予定</th>
+    <td>令和　　年　　月ごろ（予定）</td>
+  </tr>
+</table>
+
+<p style="font-size:9.5pt; margin-bottom:10px;">
+  以上、本総会の議事の経過および結果を明確にするため、本議事録を作成し、出席した議長および議事録署名人が記名押印する。
+</p>
+<p style="text-align:right; font-size:9.5pt; margin-bottom:16px;">令和　　年　　月　　日</p>
+
+<table class="sign-table">
+  <tr>
+    <th style="width:15%">役職</th>
+    <th style="width:30%">氏名</th>
+    <th style="width:15%">印</th>
+  </tr>
+  <tr>
+    <td>議長（理事長）</td>
+    <td></td>
+    <td class="seal-col">（印）</td>
+  </tr>
+  <tr>
+    <td>議事録署名人①</td>
+    <td></td>
+    <td class="seal-col">（印）</td>
+  </tr>
+  <tr>
+    <td>議事録署名人②</td>
+    <td></td>
+    <td class="seal-col">（印）</td>
+  </tr>
+</table>
+
+<div class="footer-note">
+  このテンプレートは Kura（kura-management.com）が無料提供しています。<br>
+  AI議事録・案件管理・引き継ぎ書作成をまとめて自動化する管理会社向けSaaSです。14日間無料トライアル実施中。
+</div>
+
+</div>
+</body>
+</html>
