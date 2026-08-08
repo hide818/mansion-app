@@ -48,7 +48,7 @@ export default function ContactForm() {
           </svg>
         </div>
         <p className="text-lg font-bold text-green-800">お問い合わせを受け付けました</p>
-        <p className="mt-2 text-sm text-green-600">3営業日以内にご連絡いたします。</p>
+        <p className="mt-2 text-sm text-green-600">内容を確認のうえ、原則3営業日以内にメールでご連絡いたします。</p>
       </div>
     )
   }
@@ -112,7 +112,7 @@ export default function ContactForm() {
         {status === 'loading' ? '送信中...' : 'お問い合わせを送信する'}
       </button>
       <p className="text-center text-xs text-slate-400">
-        送信後、3営業日以内にご連絡いたします
+        送信後、原則3営業日以内にメールでご連絡いたします
       </p>
     </form>
   )

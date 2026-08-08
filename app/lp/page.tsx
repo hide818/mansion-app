@@ -3,15 +3,16 @@ import Image from 'next/image'
 import KuraLogo from '@/app/components/KuraLogo'
 import ContactForm from '@/app/components/ContactForm'
 import StickyCtaBar from '@/app/components/StickyCtaBar'
+import LpMobileNav from '@/app/components/LpMobileNav'
 
 export const metadata = {
   title: 'Kura — 担当者が辞めても止まらない管理会社へ',
-  description: '分譲マンション管理会社向けAI業務管理SaaS。総会議事録を2時間→50分に。案件タスク管理・AI議事録・引き継ぎ書自動生成で属人化を解消。月額¥50,000〜・棟数無制限。',
+  description: '総会議事録の作成を2時間から50分へ。案件・タスク管理、AI議事録、引き継ぎ書作成を支援する、分譲マンション管理会社向けAI業務管理SaaS。',
   keywords: '分譲マンション管理,管理会社,議事録,AI,属人化,引き継ぎ,タスク管理,SaaS,分譲マンション,管理業務,DX',
   alternates: { canonical: 'https://kura-management.com/lp' },
   openGraph: {
     title: 'Kura — 担当者が辞めても止まらない管理会社へ',
-    description: '総会議事録が2時間→50分に。分譲マンション管理会社専用AI業務管理SaaS。',
+    description: '総会議事録の作成が2時間から50分に。分譲マンション管理会社専用AI業務管理SaaS。',
     url: 'https://kura-management.com/lp',
     siteName: 'Kura',
     locale: 'ja_JP',
@@ -20,7 +21,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Kura — 担当者が辞めても止まらない管理会社へ',
-    description: '総会議事録が2時間→50分に。分譲マンション管理会社専用AI業務管理SaaS。',
+    description: '総会議事録の作成が2時間から50分に。分譲マンション管理会社専用AI業務管理SaaS。',
   },
 }
 
@@ -57,7 +58,7 @@ const PRICING = [
 const FAQ = [
   {
     q: '月額5万円は高くないですか？',
-    a: '担当者5名のチームで議事録・引き継ぎ・案件管理の効率化により、月約165時間（時給3,000円換算で月49万円相当）の工数削減が見込めます。月額5万円の投資で約10倍のROIです。14日間無料でお試しいただけるので、まず体験してから判断されることをおすすめします。',
+    a: '担当者5名のチームで議事録作成・日次確認を改善した場合の試算例では、月約70時間（時給3,000円換算で月21万円相当）の削減余地があります。スタータープランの月額5万円と比較すると、約4.2倍相当の費用対効果が見込める計算です（※試算条件：月2回議事録作成・月20営業日勤務・時給3,000円）。14日間無料でお試しいただけるので、まず体験してから判断されることをおすすめします。',
   },
   {
     q: 'どんな音声フォーマットに対応していますか？',
@@ -78,6 +79,22 @@ const FAQ = [
   {
     q: '管理している物件数が多くても使えますか？',
     a: 'すべてのプランで棟数は無制限です。50棟・100棟を管理する会社でも追加料金なしでご利用いただけます。料金はご利用人数（担当者数）に応じたプランで決まります。',
+  },
+  {
+    q: '今使っているExcelやメールと干渉しない？',
+    a: '既存の業務と並行して使えます。データのCSVエクスポートも可能なので、いつでも元のやり方に戻せます。',
+  },
+  {
+    q: '録音の音質が悪くても大丈夫？',
+    a: 'はい。スマートフォンの標準ボイスレコーダーで十分です。多少のノイズや重なり合う発言にも対応しています。',
+  },
+  {
+    q: '途中で解約したい場合は？',
+    a: 'マイページから即日解約できます。違約金・手数料は一切ありません。14日間の無料期間中に解約すれば費用も発生しません。',
+  },
+  {
+    q: '電話やオンライン面談は必要ですか？',
+    a: '必要ありません。導入前のご質問やご相談は、お問い合わせフォームから受け付けています。内容を確認のうえ、原則3営業日以内にメールで回答します。電話窓口は設けていません。',
   },
 ]
 
@@ -148,6 +165,7 @@ export default function LpPage() {
             <Link href="#how" className="hover:text-[#1d1d1f] transition-colors">使い方</Link>
             <Link href="#pricing" className="hover:text-[#1d1d1f] transition-colors">料金</Link>
             <Link href="#faq" className="hover:text-[#1d1d1f] transition-colors">FAQ</Link>
+            <Link href="#contact" className="hover:text-[#1d1d1f] transition-colors">お問い合わせ</Link>
             <Link href="/blog" className="hover:text-[#1d1d1f] transition-colors">ブログ</Link>
           </div>
           <div className="flex items-center gap-3">
@@ -158,6 +176,7 @@ export default function LpPage() {
               className="rounded-full bg-[#0071e3] px-4 py-1.5 text-[13px] font-medium text-white hover:bg-[#0077ed] transition-colors">
               無料で試す
             </Link>
+            <LpMobileNav />
           </div>
         </div>
       </nav>
@@ -165,28 +184,42 @@ export default function LpPage() {
       {/* ── HERO ── */}
       <section className="bg-black text-white">
         <div className="mx-auto max-w-5xl px-6 pb-24 pt-20 text-center lg:pb-32 lg:pt-28">
-          <p className="mb-5 text-[13px] font-medium text-[#6e6e73] tracking-widest uppercase">
+          <p className="mb-5 text-[13px] font-medium text-[#8e8e93] tracking-widest uppercase">
             分譲マンション管理会社専用 AI
           </p>
-          <h1 className="text-[56px] font-bold leading-[1.07] tracking-[-0.025em] text-white lg:text-[72px]">
-            総会議事録が、<br />
+          <h1 className="text-[48px] font-bold leading-[1.1] tracking-[-0.025em] text-white lg:text-[68px]">
+            総会議事録の作成が、<br />
             <span className="bg-gradient-to-r from-[#2997ff] to-[#5e5ce6] bg-clip-text text-transparent">
-              50分
+              2時間→50分
             </span>
-            になった。
+            に。
           </h1>
-          <p className="mx-auto mt-6 max-w-xl text-[19px] leading-relaxed text-[#a1a1a6]">
-            音声をアップロードするだけ。<br />自社フォーマットで議事録を自動生成。<br />宿題・タスクまで自動抽出。
+          <p className="mx-auto mt-6 max-w-xl text-[18px] leading-relaxed text-[#a1a1a6]">
+            会議音声をアップロードするだけ。<br />
+            自社フォーマットに沿った議事録の下書きを生成し、<br />
+            決定事項と宿題・タスクまで整理します。
           </p>
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link href="/signup"
               className="rounded-full bg-[#0071e3] px-8 py-3.5 text-[17px] font-medium text-white hover:bg-[#0077ed] transition-colors shadow-[0_0_24px_rgba(0,113,227,0.4)]">
-              今すぐ無料で試す →
+              今すぐ14日間無料で試す →
+            </Link>
+            <Link href="#contact"
+              className="rounded-full border border-[#424245] px-8 py-3.5 text-[17px] font-medium text-white hover:border-[#6e6e73] transition-colors">
+              導入前に質問する
             </Link>
           </div>
-          <p className="mt-4 text-[13px] text-[#424245]">クレジットカード不要 · 登録2分で使い始められます · 14日間無料 · いつでも解約</p>
-          <p className="mt-2 text-[12px] text-[#424245]">
-            <Link href="#contact" className="underline underline-offset-2 hover:text-[#6e6e73] transition-colors">まずは相談したい方はこちら</Link>
+          <div className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-[13px] text-[#8e8e93]">
+            <span>クレジットカード不要</span>
+            <span>登録2分</span>
+            <span>14日間無料</span>
+            <span>いつでも解約可能</span>
+          </div>
+          <p className="mt-2 text-[12px] text-[#636366]">
+            導入前のご質問は<Link href="#contact" className="underline underline-offset-2 hover:text-[#8e8e93] transition-colors">お問い合わせフォーム</Link>から受け付けています
+          </p>
+          <p className="mt-2 text-[11px] text-[#48484a]">
+            ※所要時間は、議題数・録音品質・自社フォーマット・確認修正量によって異なります。
           </p>
 
           {/* ── HERO SCREENSHOT ── */}
@@ -223,7 +256,7 @@ export default function LpPage() {
         <div className="mx-auto max-w-5xl px-6 py-20">
           <div className="grid grid-cols-1 gap-12 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-[#d2d2d7]">
             {[
-              { num: '50分', label: '総会議事録1回あたり', note: '従来は2時間' },
+              { num: '50分', label: '総会議事録の作成時間（目安）', note: '従来は約2時間' },
               { num: '0件', label: '法定点検の期限漏れ', note: '自動アラートで管理' },
               { num: '10分', label: '初期設定から利用開始', note: 'IT担当者不要' },
             ].map(s => (
@@ -269,92 +302,15 @@ export default function LpPage() {
         </div>
       </section>
 
-      {/* ── BEFORE / AFTER ── */}
-      <section className="bg-white px-6 py-20 border-b border-[#e5e5ea]">
-        <div className="mx-auto max-w-5xl">
-          <p className="text-center text-[13px] font-medium uppercase tracking-widest text-[#6e6e73] mb-4">AI議事録 導入前後の変化</p>
-          <h2 className="text-center text-[32px] font-bold tracking-[-0.02em] text-[#1d1d1f] mb-12 leading-tight">
-            毎回2時間かかっていた議事録が、<br className="hidden sm:block" />30〜50分で終わる。
-          </h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-[1fr_auto_1fr] items-center">
-            {/* Before */}
-            <div className="rounded-2xl border border-[#fecaca] bg-[#fff5f5] p-7">
-              <p className="text-[12px] font-bold uppercase tracking-widest text-[#dc2626] mb-4">導入前</p>
-              <div className="space-y-3">
-                {[
-                  { step: '1', text: '会議中に手書きメモ', time: '会議中' },
-                  { step: '2', text: '録音を聞き直しながら清書', time: '60〜90分' },
-                  { step: '3', text: '理事長への確認・修正往復', time: '30〜45分' },
-                  { step: '4', text: '宿題・タスクを手動で拾い出す', time: '15〜20分' },
-                ].map(item => (
-                  <div key={item.step} className="flex items-start gap-3">
-                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#dc2626] text-[11px] font-bold text-white">{item.step}</span>
-                    <div className="flex-1">
-                      <p className="text-[14px] font-medium text-[#1d1d1f]">{item.text}</p>
-                      <p className="text-[12px] text-[#dc2626] font-semibold">{item.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-5 rounded-xl bg-[#fecaca] px-4 py-3 text-center">
-                <p className="text-[22px] font-bold text-[#dc2626]">合計 約2時間</p>
-                <p className="text-[12px] text-[#dc2626]/80">月20棟なら 月40時間以上</p>
-              </div>
-            </div>
-
-            {/* Arrow */}
-            <div className="flex justify-center">
-              <div className="flex flex-col items-center gap-1">
-                <svg className="h-10 w-10 text-[#0071e3] sm:rotate-0 rotate-90" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-                <span className="text-[11px] font-bold text-[#0071e3] tracking-wide">Kura導入</span>
-              </div>
-            </div>
-
-            {/* After */}
-            <div className="rounded-2xl border border-[#bbf7d0] bg-[#f0fdf4] p-7">
-              <p className="text-[12px] font-bold uppercase tracking-widest text-[#16a34a] mb-4">導入後</p>
-              <div className="space-y-3">
-                {[
-                  { step: '1', text: 'スマホで録音（会議中）', time: '会議中' },
-                  { step: '2', text: '録音ファイルをアップロード', time: '2〜3分' },
-                  { step: '3', text: 'AIが議事録・タスクを自動生成', time: '10〜15分処理' },
-                  { step: '4', text: '内容を確認・修正して完成', time: '15〜20分' },
-                ].map(item => (
-                  <div key={item.step} className="flex items-start gap-3">
-                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#16a34a] text-[11px] font-bold text-white">{item.step}</span>
-                    <div className="flex-1">
-                      <p className="text-[14px] font-medium text-[#1d1d1f]">{item.text}</p>
-                      <p className="text-[12px] text-[#16a34a] font-semibold">{item.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-5 rounded-xl bg-[#bbf7d0] px-4 py-3 text-center">
-                <p className="text-[22px] font-bold text-[#16a34a]">合計 約30〜50分</p>
-                <p className="text-[12px] text-[#16a34a]/80">月20棟で 月30時間以上の削減</p>
-              </div>
-            </div>
-          </div>
-          <div className="mt-10 text-center">
-            <Link href="/signup"
-              className="inline-block rounded-full bg-[#0071e3] px-8 py-3 text-[15px] font-medium text-white hover:bg-[#0077ed] transition-colors">
-              無料で試してみる →
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* ── FOUNDER STORY ── */}
-      <section className="bg-[#f5f5f7] px-6 py-20 border-t border-[#e5e5ea]">
+      <section className="bg-[#f5f5f7] px-6 py-16 border-t border-[#e5e5ea]">
         <div className="mx-auto max-w-3xl">
           <div className="rounded-2xl bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.06)] sm:p-10">
             <p className="text-[12px] font-semibold uppercase tracking-widest text-[#0071e3]">開発者について</p>
-            <h2 className="mt-3 text-[24px] font-bold text-[#1d1d1f] leading-snug">
+            <h2 className="mt-3 text-[22px] font-bold text-[#1d1d1f] leading-snug">
               なぜ分譲マンション管理会社の<br className="hidden sm:block" />フロントが、このツールを作ったのか。
             </h2>
-            <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-[#424245]">
+            <div className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#424245]">
               <p>
                 私自身、分譲マンション管理会社でフロント担当として勤務していました。担当棟数は最大で20棟超。毎月の総会・理事会が終わるたびに、深夜まで議事録を清書していました。
               </p>
@@ -387,10 +343,6 @@ export default function LpPage() {
             担当者の退職、議事録作成の負担、法定点検の期限管理。<br className="hidden sm:block" />
             どれも「仕方ない」で片付けてきた問題ですが、解決できます。
           </p>
-          <div className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#fff3cd] px-5 py-2.5 text-[14px] text-[#856404]">
-            <svg className="h-4 w-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/></svg>
-            担当者1人あたり平均20棟以上を担当。退職・引き継ぎのコストは経営課題の上位です。
-          </div>
         </div>
         <div className="mx-auto mt-16 max-w-5xl grid gap-px sm:grid-cols-3 bg-[#d2d2d7] rounded-2xl overflow-hidden">
           {[
@@ -445,14 +397,19 @@ export default function LpPage() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-3xl overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.08)]">
-                <Image
-                  src="/lp-screenshots/feature-tasks.png"
-                  alt="案件一覧 — 全物件の案件・期限・進捗を一画面で管理"
-                  width={2560}
-                  height={1425}
-                  className="w-full"
-                />
+              <div>
+                <div className="rounded-3xl overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.08)]">
+                  <Image
+                    src="/lp-screenshots/feature-tasks.png"
+                    alt="案件一覧 — 全物件の案件・期限・進捗を一画面で管理"
+                    width={2560}
+                    height={1425}
+                    className="w-full"
+                  />
+                </div>
+                <p className="mt-3 text-center text-[13px] text-[#6e6e73]">
+                  実際の案件、期限、担当者、進捗を物件横断で確認できます。
+                </p>
               </div>
             </div>
           </div>
@@ -462,14 +419,19 @@ export default function LpPage() {
         <div className="bg-white px-6 py-24">
           <div className="mx-auto max-w-5xl">
             <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
-              <div className="order-2 lg:order-1 rounded-3xl overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.08)]">
-                <Image
-                  src="/lp-screenshots/feature-minutes.png"
-                  alt="AI議事録 生成結果 — 総会議事録を自動生成・編集・タスク抽出"
-                  width={2560}
-                  height={1425}
-                  className="w-full"
-                />
+              <div className="order-2 lg:order-1">
+                <div className="rounded-3xl overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.08)]">
+                  <Image
+                    src="/lp-screenshots/feature-minutes.png"
+                    alt="AI議事録 生成結果 — 総会議事録を自動生成・編集・タスク抽出"
+                    width={2560}
+                    height={1425}
+                    className="w-full"
+                  />
+                </div>
+                <p className="mt-3 text-center text-[13px] text-[#6e6e73]">
+                  音声から議事録の下書きを生成し、決定事項と宿題を整理します。
+                </p>
               </div>
               <div className="order-1 lg:order-2">
                 <p className="text-[13px] font-semibold text-[#0071e3] uppercase tracking-widest">AI議事録</p>
@@ -489,6 +451,9 @@ export default function LpPage() {
                     </li>
                   ))}
                 </ul>
+                <p className="mt-4 text-[12px] text-[#8e8e93]">
+                  ※所要時間は議題数・録音品質・確認修正量によって異なります。
+                </p>
               </div>
             </div>
           </div>
@@ -504,7 +469,7 @@ export default function LpPage() {
                   物件を選ぶだけ。<br />担当交代が事故らない。
                 </h2>
                 <p className="mt-5 text-[17px] leading-relaxed text-[#6e6e73]">
-                  物件を選択するだけで、案件履歴・特記事項・居住者情報・修繕経緯をAIが整理。担当交代のコストを最小化し、情報の蒸発を防ぎます。
+                  物件を選択するだけで、案件履歴・特記事項・居住者情報・修繕経緯をAIが整理。担当交代時の情報収集期間を短縮し、着任後の確認漏れを防ぎます。
                 </p>
                 <ul className="mt-8 space-y-3">
                   {['物件選択だけで自動生成', '特記事項・過去経緯をAIが整理', 'Word/PDF出力', '随時追記・バージョン管理'].map(item => (
@@ -517,14 +482,19 @@ export default function LpPage() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-3xl overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.08)]">
-                <Image
-                  src="/lp-screenshots/feature-handover.png"
-                  alt="AI引き継ぎ書 — 物件を選ぶだけで引き継ぎ書を自動生成"
-                  width={2560}
-                  height={1425}
-                  className="w-full"
-                />
+              <div>
+                <div className="rounded-3xl overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.08)]">
+                  <Image
+                    src="/lp-screenshots/feature-handover.png"
+                    alt="AI引き継ぎ書 — 物件を選ぶだけで引き継ぎ書を自動生成"
+                    width={2560}
+                    height={1425}
+                    className="w-full"
+                  />
+                </div>
+                <p className="mt-3 text-center text-[13px] text-[#6e6e73]">
+                  物件に蓄積した案件・対応履歴から、引き継ぎ書の下書きを作成します。
+                </p>
               </div>
             </div>
           </div>
@@ -542,7 +512,7 @@ export default function LpPage() {
       {/* ── HOW IT WORKS ── */}
       <section id="how" className="bg-black px-6 py-24 text-white">
         <div className="mx-auto max-w-4xl text-center">
-          <p className="text-[13px] font-medium uppercase tracking-widest text-[#6e6e73]">How it works</p>
+          <p className="text-[13px] font-medium uppercase tracking-widest text-[#8e8e93]">How it works</p>
           <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] leading-tight">
             たった3ステップ。
           </h2>
@@ -555,83 +525,11 @@ export default function LpPage() {
             { step: '03', title: '議事録＋タスクが完成', desc: '確認・修正してそのままPDF出力。宿題タスクは案件管理に自動登録。' },
           ].map(s => (
             <div key={s.step} className="bg-[#1d1d1f] p-10">
-              <p className="text-[32px] font-bold text-[#2d2d2d]">{s.step}</p>
+              <p className="text-[32px] font-bold text-[#0071e3]">{s.step}</p>
               <h3 className="mt-4 text-[19px] font-semibold text-white">{s.title}</h3>
-              <p className="mt-3 text-[15px] leading-relaxed text-[#6e6e73]">{s.desc}</p>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#a1a1a6]">{s.desc}</p>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* ── ROI ── */}
-      <section className="bg-white px-6 py-24">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-[13px] font-medium uppercase tracking-widest text-[#6e6e73]">削減効果の目安</p>
-          <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] text-[#1d1d1f]">
-            時間を、取り戻す。
-          </h2>
-          <div className="mt-14 flex items-center justify-center gap-8">
-            <div className="text-center">
-              <p className="text-[64px] font-bold text-[#6e6e73] line-through tracking-tight leading-none">2時間</p>
-              <p className="mt-3 text-[13px] text-[#6e6e73]">従来の議事録作成時間</p>
-            </div>
-            <svg className="h-8 w-8 shrink-0 text-[#0071e3]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-            <div className="text-center">
-              <p className="text-[64px] font-bold text-[#1d1d1f] tracking-tight leading-none">50分</p>
-              <p className="mt-3 text-[13px] text-[#6e6e73]">Kura使用時</p>
-            </div>
-          </div>
-          <p className="mt-10 text-[17px] text-[#6e6e73] leading-relaxed">
-            月2回の総会・理事会があれば、月あたり<span className="font-semibold text-[#1d1d1f]">3時間20分</span>を節約。<br />
-            担当者が10名なら年間で<span className="font-semibold text-[#1d1d1f]">400時間以上</span>を取り戻せます。
-          </p>
-          <Link href="/signup"
-            className="mt-10 inline-flex rounded-full bg-[#0071e3] px-8 py-3.5 text-[17px] font-medium text-white hover:bg-[#0077ed] transition-colors">
-            14日間無料で試す
-          </Link>
-        </div>
-      </section>
-
-      {/* ── CONCERNS ── */}
-      <section className="bg-[#f5f5f7] px-6 py-20 border-t border-[#e5e5ea]">
-        <div className="mx-auto max-w-4xl">
-          <p className="text-center text-[13px] font-medium uppercase tracking-widest text-[#6e6e73] mb-3">よくある懸念</p>
-          <h2 className="text-center text-[28px] font-bold text-[#1d1d1f] mb-10">導入前に気になること、全部答えます。</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              {
-                q: 'IT担当者がいないと使えない？',
-                a: '不要です。メールアドレスと会社名だけで登録でき、音声ファイルをドラッグするだけで使い始められます。設定の所要時間は約10分。'
-              },
-              {
-                q: '今使っているExcelやメールと干渉しない？',
-                a: '既存の業務と並行して使えます。データのCSVエクスポートも可能なので、いつでも元のやり方に戻せます。'
-              },
-              {
-                q: '録音の音質が悪くても大丈夫？',
-                a: 'はい。スマートフォンの標準ボイスレコーダーで十分です。多少のノイズや重なり合う発言にも対応しています。'
-              },
-              {
-                q: '途中で解約したい場合は？',
-                a: 'マイページから即日解約できます。違約金・手数料は一切ありません。14日間の無料期間中に解約すれば費用も発生しません。'
-              },
-              {
-                q: '音声・議事録データはどこに保存される？',
-                a: 'ISO27001認定のクラウド基盤（Supabase）に保存されます。通信はすべてTLS暗号化。稟議用セキュリティ資料もご用意しています。'
-              },
-              {
-                q: '管理棟数が多くても追加料金がかかる？',
-                a: '棟数は無制限。50棟・100棟を管理する会社でも、料金は担当者（ユーザー）数のみで決まります。'
-              },
-            ].map(item => (
-              <div key={item.q} className="rounded-2xl bg-white p-6 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-                <p className="text-[15px] font-semibold text-[#1d1d1f] mb-2">{item.q}</p>
-                <p className="text-[14px] leading-relaxed text-[#6e6e73]">{item.a}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -645,32 +543,40 @@ export default function LpPage() {
             <p className="mt-2 text-[13px] text-[#6e6e73]">クレジットカード不要 · 無料期間中はいつでも解約可</p>
           </div>
 
-          {/* ROI Calculator */}
-          <div className="mt-12 rounded-2xl bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.06)]">
-            <p className="text-[13px] font-semibold uppercase tracking-widest text-[#0071e3]">費用対効果</p>
-            <h3 className="mt-2 text-[22px] font-bold text-[#1d1d1f]">月額5万円で、何時間分の人件費が節約できるか</h3>
+          {/* ROI Trial Calculation */}
+          <div className="mt-12 rounded-2xl bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.06)] border border-[#e5e5ea]">
+            <div className="flex items-center gap-2 mb-2">
+              <p className="text-[13px] font-semibold uppercase tracking-widest text-[#0071e3]">導入効果（試算例）</p>
+              <span className="rounded-full bg-[#f5f5f7] px-2.5 py-0.5 text-[11px] font-medium text-[#6e6e73]">担当者5名の場合</span>
+            </div>
+            <h3 className="text-[20px] font-bold text-[#1d1d1f]">月約70時間・約21万円相当の削減余地</h3>
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               <div className="rounded-xl bg-[#f5f5f7] p-5">
-                <p className="text-[13px] text-[#6e6e73]">議事録作成（月2回）</p>
-                <p className="mt-2 text-[20px] font-bold text-[#1d1d1f]">2時間 → 50分</p>
-                <p className="mt-1 text-[13px] font-medium text-[#0071e3]">月2.3時間の節約</p>
+                <p className="text-[12px] font-semibold text-[#6e6e73] uppercase tracking-wide">議事録作成</p>
+                <p className="mt-2 text-[18px] font-bold text-[#1d1d1f]">2時間 → 50分</p>
+                <p className="mt-1 text-[12px] text-[#6e6e73]">（120分−50分）×月2回×5名</p>
+                <p className="mt-1 text-[13px] font-semibold text-[#0071e3]">月約11.7時間の削減余地</p>
               </div>
               <div className="rounded-xl bg-[#f5f5f7] p-5">
-                <p className="text-[13px] text-[#6e6e73]">担当者交代の引き継ぎ（年2回）</p>
-                <p className="mt-2 text-[20px] font-bold text-[#1d1d1f]">1ヶ月 → 3日</p>
-                <p className="mt-1 text-[13px] font-medium text-[#0071e3]">月換算20時間以上の節約</p>
+                <p className="text-[12px] font-semibold text-[#6e6e73] uppercase tracking-wide">日次の案件確認・報告</p>
+                <p className="mt-2 text-[18px] font-bold text-[#1d1d1f]">45分 → 10分</p>
+                <p className="mt-1 text-[12px] text-[#6e6e73]">（45分−10分）×月20日×5名</p>
+                <p className="mt-1 text-[13px] font-semibold text-[#0071e3]">月約58.3時間の削減余地</p>
               </div>
               <div className="rounded-xl bg-[#f5f5f7] p-5">
-                <p className="text-[13px] text-[#6e6e73]">毎日の案件確認・報告</p>
-                <p className="mt-2 text-[20px] font-bold text-[#1d1d1f]">45分 → 10分</p>
-                <p className="mt-1 text-[13px] font-medium text-[#0071e3]">月11時間の節約</p>
+                <p className="text-[12px] font-semibold text-[#6e6e73] uppercase tracking-wide">AI引き継ぎ書</p>
+                <p className="mt-2 text-[15px] font-bold text-[#1d1d1f] leading-snug">担当交代時の情報収集期間を短縮</p>
+                <p className="mt-2 text-[12px] text-[#6e6e73]">着任後の確認漏れを防ぐ定性的な効果（月間削減時間の合計には含みません）</p>
               </div>
             </div>
             <div className="mt-6 rounded-xl border border-[#0071e3]/20 bg-[#0071e3]/5 p-5 text-center">
-              <p className="text-[14px] text-[#6e6e73]">担当者5名のチームで合計すると、月間</p>
-              <p className="mt-1 text-[32px] font-bold tracking-tight text-[#1d1d1f]">約165時間 <span className="text-[17px] font-normal text-[#6e6e73]">の節約</span></p>
-              <p className="mt-1 text-[13px] text-[#6e6e73]">時給3,000円換算で <span className="font-semibold text-[#1d1d1f]">月約49万円相当</span> → Kura月額5万円で <span className="font-semibold text-[#0071e3]">約10倍のROI</span></p>
+              <p className="text-[14px] text-[#424245]">担当者5名で利用した場合の削減余地（試算例）</p>
+              <p className="mt-1 text-[32px] font-bold tracking-tight text-[#1d1d1f]">約70時間 <span className="text-[17px] font-normal text-[#6e6e73]">/ 月</span></p>
+              <p className="mt-1 text-[14px] text-[#424245]">時給3,000円換算で <span className="font-semibold text-[#1d1d1f]">月約21万円相当</span> → スタータープラン月額5万円と比較すると <span className="font-semibold text-[#0071e3]">約4.2倍相当</span></p>
             </div>
+            <p className="mt-4 text-[11px] text-[#8e8e93] leading-relaxed">
+              ※担当者5名、月2回の議事録作成、月20営業日、時給3,000円で計算した試算例です。実際の削減時間や費用対効果は利用状況によって異なり、導入効果を保証するものではありません。
+            </p>
           </div>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -711,13 +617,14 @@ export default function LpPage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section id="faq" className="bg-white px-6 py-24">
+      <section id="faq" className="bg-[#f5f5f7] px-6 py-24">
         <div className="mx-auto max-w-2xl">
           <div className="text-center">
             <p className="text-[13px] font-medium uppercase tracking-widest text-[#6e6e73]">FAQ</p>
             <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] text-[#1d1d1f]">よくある質問</h2>
+            <p className="mt-4 text-[17px] text-[#6e6e73]">導入前の疑問にすべてお答えします。</p>
           </div>
-          <div className="mt-14 divide-y divide-[#e5e5ea]">
+          <div className="mt-14 divide-y divide-[#d2d2d7]">
             {FAQ.map(item => (
               <div key={item.q} className="py-6">
                 <p className="text-[17px] font-semibold text-[#1d1d1f]">{item.q}</p>
@@ -731,23 +638,24 @@ export default function LpPage() {
       {/* ── FINAL CTA ── */}
       <section className="bg-black px-6 py-24 text-white text-center">
         <div className="mx-auto max-w-2xl">
-          <p className="text-[13px] font-medium uppercase tracking-widest text-[#6e6e73]">まずは無料で</p>
+          <p className="text-[13px] font-medium uppercase tracking-widest text-[#8e8e93]">まずは無料で</p>
           <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] leading-tight">
             14日間、全機能を試してみてください。
           </h2>
           <p className="mt-5 text-[17px] leading-relaxed text-[#a1a1a6]">
             議事録1本を実際にAIで作ってみると、<br className="hidden sm:block" />「これは使える」か「うちには合わない」かがすぐわかります。
           </p>
-          <div className="mt-10">
+          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link href="/signup"
-              className="inline-block rounded-full bg-[#0071e3] px-10 py-4 text-[18px] font-medium text-white hover:bg-[#0077ed] transition-colors shadow-[0_0_32px_rgba(0,113,227,0.4)]">
+              className="rounded-full bg-[#0071e3] px-10 py-4 text-[18px] font-medium text-white hover:bg-[#0077ed] transition-colors shadow-[0_0_32px_rgba(0,113,227,0.4)]">
               今すぐ無料で始める →
             </Link>
+            <Link href="#contact"
+              className="rounded-full border border-[#424245] px-10 py-4 text-[18px] font-medium text-white hover:border-[#6e6e73] transition-colors">
+              導入前に質問する
+            </Link>
           </div>
-          <p className="mt-5 text-[13px] text-[#424245]">クレジットカード不要 · 登録2分 · いつでも解約</p>
-          <p className="mt-4 text-[13px] text-[#6e6e73]">
-            導入に迷っている場合は<Link href="#contact" className="text-[#2997ff] hover:underline ml-1">お気軽にご相談ください</Link>
-          </p>
+          <p className="mt-5 text-[13px] text-[#8e8e93]">クレジットカード不要 · 登録2分 · いつでも解約</p>
         </div>
       </section>
 
@@ -757,13 +665,28 @@ export default function LpPage() {
           <div className="text-center">
             <p className="text-[13px] font-medium uppercase tracking-widest text-[#6e6e73]">Contact</p>
             <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] text-[#1d1d1f]">お問い合わせ</h2>
-            <p className="mt-4 text-[17px] text-[#6e6e73]">
-              導入のご相談・ご不明点はお気軽にどうぞ。<br />3営業日以内にご返信いたします。
+            <p className="mt-4 text-[16px] text-[#424245] leading-relaxed">
+              導入前のご質問、料金、機能、運用方法について、<br className="hidden sm:block" />お問い合わせフォームから受け付けています。<br />
+              内容を確認のうえ、原則3営業日以内にメールで回答します。
             </p>
-            <div className="mt-5 flex justify-center gap-6 text-[14px] text-[#1d1d1f]">
-              <span>✓ 返信まで3営業日以内</span>
-              <span>✓ 無料で相談可能</span>
+            <div className="mt-5 grid grid-cols-1 gap-2 text-[13px] sm:grid-cols-2">
+              {[
+                '導入前の質問だけでも送信可能',
+                '24時間フォームから受付',
+                '原則3営業日以内に回答',
+                '回答はメールで送付',
+              ].map(item => (
+                <div key={item} className="flex items-center justify-center gap-1.5 text-[#424245]">
+                  <svg className="h-4 w-4 shrink-0 text-[#0071e3]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                  {item}
+                </div>
+              ))}
             </div>
+            <p className="mt-4 text-[13px] text-[#6e6e73]">
+              お問い合わせ内容を正確に記録し、確実に回答するため、ご相談はフォームにて承っています。
+            </p>
           </div>
           <div className="mt-10 rounded-2xl bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.06)]">
             <ContactForm />
