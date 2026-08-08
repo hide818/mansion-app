@@ -188,11 +188,11 @@ export default function LpPage() {
             分譲マンション管理会社専用 AI
           </p>
           <h1 className="text-[48px] font-bold leading-[1.1] tracking-[-0.025em] text-white lg:text-[68px]">
-            総会議事録の作成が、<br />
+            総会議事録の作成が<br />
             <span className="bg-gradient-to-r from-[#2997ff] to-[#5e5ce6] bg-clip-text text-transparent">
               2時間→50分
             </span>
-            に。
+            に
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-[18px] leading-relaxed text-[#a1a1a6]">
             会議音声をアップロードするだけ。<br />
@@ -639,7 +639,7 @@ export default function LpPage() {
       <section className="bg-black px-6 py-24 text-white text-center">
         <div className="mx-auto max-w-2xl">
           <p className="text-[13px] font-medium uppercase tracking-widest text-[#8e8e93]">まずは無料で</p>
-          <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] leading-tight">
+          <h2 className="mt-4 text-[28px] sm:text-[36px] lg:text-[40px] font-bold tracking-[-0.02em] leading-tight whitespace-nowrap">
             14日間、全機能を試してみてください。
           </h2>
           <p className="mt-5 text-[17px] leading-relaxed text-[#a1a1a6]">
