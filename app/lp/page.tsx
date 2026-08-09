@@ -192,8 +192,9 @@ export default function LpPage() {
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#4ABDA0] mb-7">
                 分譲マンション管理会社専用 AI
               </p>
-              <h1 className="text-[38px] font-bold leading-[1.1] tracking-[-0.03em] text-white lg:text-[50px]">
-                理事会・総会の後処理を<br />
+              <h1 className="text-[34px] font-bold leading-[1.2] tracking-[-0.03em] text-white lg:text-[52px]">
+                理事会・総会の<br />
+                後処理を<br />
                 <span className="text-[#4ABDA0]">2時間から50分へ</span>
               </h1>
               <p className="mt-6 text-[16px] leading-[1.75] text-[#C2D4DE] max-w-[420px]">
@@ -675,8 +676,8 @@ export default function LpPage() {
             <p className="text-[13px] font-medium uppercase tracking-widest text-[#546471]">Contact</p>
             <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] text-[#1C2B38]">お問い合わせ</h2>
             <p className="mt-4 text-[16px] text-[#374955] leading-relaxed">
-              導入前のご質問、料金、機能、運用方法について、お問い合わせフォームから受け付けています。
-              内容を確認のうえ、原則3営業日以内にメールで回答します。
+              導入前のご質問やご相談は、フォームからお問い合わせください。<br />
+              原則3営業日以内にメールでご回答します。
             </p>
             <div className="mt-5 grid grid-cols-1 gap-2 text-[13px] sm:grid-cols-2">
               {[
@@ -693,9 +694,6 @@ export default function LpPage() {
                 </div>
               ))}
             </div>
-            <p className="mt-4 text-[13px] text-[#546471]">
-              お問い合わせ内容を正確に記録し、確実に回答するため、ご相談はフォームにて承っています。
-            </p>
           </div>
           <div className="mt-10 rounded-2xl bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.06)]">
             <ContactForm />
