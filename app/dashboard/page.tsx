@@ -172,34 +172,6 @@ export default async function DashboardPage() {
       {/* プッシュ通知セットアップ */}
       <PushNotificationSetup />
 
-      {/* 管理者専用リンク（オーナーのみ） */}
-      {currentProfile?.role === 'admin' && currentProfile?.email === process.env.OWNER_EMAIL && (
-        <section>
-          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400">管理者メニュー</p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Link href="/admin"
-              className="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-[#070E1C] p-5 shadow-sm transition hover:border-blue-400">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-500/20">
-                <svg className="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
-              </div>
-              <div>
-                <p className="font-bold text-white">Kura Admin</p>
-                <p className="text-xs text-slate-400 mt-0.5">会社管理・利用状況・統計</p>
-              </div>
-            </Link>
-            <Link href="/leads"
-              className="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-purple-400 hover:shadow-md">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-50 group-hover:bg-purple-100">
-                <svg className="h-6 w-6 text-purple-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" /></svg>
-              </div>
-              <div>
-                <p className="font-bold text-slate-800">見込み顧客リスト</p>
-                <p className="text-xs text-slate-400 mt-0.5">お問い合わせ管理・ステータス</p>
-              </div>
-            </Link>
-          </div>
-        </section>
-      )}
 
       {/* 3本柱クイックアクション */}
       <section>
