@@ -306,7 +306,6 @@ export default function LpPage() {
               autoPlay
               muted
               loop
-              controls
               playsInline
               className="w-full"
               preload="auto"
