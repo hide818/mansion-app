@@ -476,7 +476,50 @@ export default function LpPage() {
               </div>
             ))}
           </div>
-          <p className="mt-8 text-[12px] text-[#546471]">稟議用のセキュリティ資料をご希望の場合は<a href="#contact" className="text-[#4ABDA0] hover:underline">お問い合わせ</a>ください。</p>
+          <p className="mt-8 text-[12px] text-[#546471]">セキュリティ詳細・全機能・料金をまとめた資料は<Link href="/brochure" className="text-[#4ABDA0] hover:underline">サービス資料ページ</Link>からPDFで保存できます。</p>
+        </div>
+      </section>
+
+      {/* ── 資料ダウンロード ── */}
+      <section className="bg-[#F6F3EC] border-t border-[#D4CFC5] px-6 py-14">
+        <div className="mx-auto max-w-5xl">
+          <div className="rounded-2xl bg-white border border-[#D4CFC5] shadow-[0_2px_16px_rgba(0,0,0,0.06)] overflow-hidden">
+            <div className="grid lg:grid-cols-[3fr_2fr]">
+              <div className="p-8 sm:p-10">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#1A6B4A] mb-3">Service Document</p>
+                <h2 className="text-[22px] font-bold text-[#1C2B38] leading-snug">
+                  稟議・上申にご活用ください。
+                </h2>
+                <p className="mt-3 text-[15px] leading-[1.75] text-[#546471]">
+                  機能・セキュリティ・料金をまとめたサービス資料をPDFで提供しています。上長への説明・社内承認にそのままお使いいただけます。
+                </p>
+                <div className="mt-5 space-y-2 text-[13px] text-[#374955]">
+                  {[
+                    '全機能一覧（スマートフォン対応・居住者ポータル・月次レポートAIなど）',
+                    'セキュリティ詳細（ISO27001認定・AI学習非利用・データ分離）',
+                    '料金プラン比較・導入ステップ',
+                  ].map(item => (
+                    <div key={item} className="flex items-start gap-2">
+                      <svg className="h-4 w-4 shrink-0 mt-0.5 text-[#1A6B4A]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-col items-center justify-center gap-4 bg-[#F6F3EC] p-8 sm:p-10 border-t lg:border-t-0 lg:border-l border-[#D4CFC5]">
+                <Link
+                  href="/brochure"
+                  className="w-full text-center rounded-full bg-[#1A6B4A] px-8 py-3.5 text-[15px] font-medium text-white hover:bg-[#155C3E] transition-colors"
+                >
+                  サービス資料を見る →
+                </Link>
+                <p className="text-[12px] text-[#9DB5BF] text-center">ブラウザの印刷機能からPDF保存できます</p>
+                <p className="text-[12px] text-[#9DB5BF] text-center">登録不要・メールアドレス不要</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

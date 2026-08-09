@@ -16,6 +16,7 @@ function isPublicPath(pathname: string) {
     pathname === '/api/demo' ||
     pathname === '/api/invitations/accept' ||
     pathname === '/api/stripe/webhook' ||
+    pathname === '/trial-expired' ||
     pathname === '/join' ||
     pathname === '/help' ||
     pathname === '/promo' ||
@@ -93,6 +94,38 @@ export async function middleware(request: NextRequest) {
     // ルートアクセスは未ログインならLPへ
     url.pathname = pathname === '/' ? '/lp' : '/login'
     return NextResponse.redirect(url)
+  }
+
+  // トライアル期限チェック（期限切れページ・決済・APIは除外）
+  if (
+    pathname !== '/trial-expired' &&
+    !pathname.startsWith('/api/stripe') &&
+    !pathname.startsWith('/settings/billing') &&
+    !pathname.startsWith('/api/')
+  ) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('company_id')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.company_id) {
+      const { data: company } = await supabase
+        .from('companies')
+        .select('plan, trial_ends_at')
+        .eq('id', profile.company_id)
+        .single()
+
+      if (
+        company?.plan === 'trial' &&
+        company?.trial_ends_at &&
+        new Date(company.trial_ends_at) < new Date()
+      ) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/trial-expired'
+        return NextResponse.redirect(url)
+      }
+    }
   }
 
   return supabaseResponse
