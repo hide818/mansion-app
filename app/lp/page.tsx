@@ -303,10 +303,13 @@ export default function LpPage() {
           <div className="rounded-2xl overflow-hidden shadow-[0_4px_32px_rgba(0,0,0,0.12)]">
             <video
               src="/kura-demo.mp4"
+              autoPlay
+              muted
+              loop
               controls
               playsInline
               className="w-full"
-              preload="metadata"
+              preload="auto"
             />
           </div>
         </div>
