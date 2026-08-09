@@ -192,7 +192,7 @@ export default function LpPage() {
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#4ABDA0] mb-7">
                 分譲マンション管理会社専用 AI
               </p>
-              <h1 className="text-[44px] font-bold leading-[1.08] tracking-[-0.03em] text-white lg:text-[58px]" style={{textWrap: 'balance'}}>
+              <h1 className="text-[38px] font-bold leading-[1.1] tracking-[-0.03em] text-white lg:text-[50px]">
                 理事会・総会の後処理を<br />
                 <span className="text-[#4ABDA0]">2時間から50分へ</span>
               </h1>
@@ -486,7 +486,7 @@ export default function LpPage() {
           <div className="rounded-2xl bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.06)] sm:p-10">
             <p className="text-[12px] font-semibold uppercase tracking-widest text-[#1A6B4A]">開発者について</p>
             <h2 className="mt-3 text-[22px] font-bold text-[#1C2B38] leading-snug">
-              なぜ分譲マンション管理会社の<br className="hidden sm:block" />フロントが、このツールを作ったのか。
+              なぜ分譲マンション管理会社のフロントが、このツールを作ったのか。
             </h2>
             <div className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#374955]">
               <p>
@@ -652,7 +652,7 @@ export default function LpPage() {
             14日間、全機能を試してみてください。
           </h2>
           <p className="mt-5 text-[17px] leading-relaxed text-[#C2D4DE]">
-            議事録1本を実際にAIで作ってみると、<br className="hidden sm:block" />「これは使える」か「うちには合わない」かがすぐわかります。
+            議事録1本を実際にAIで作ってみると、「これは使える」か「うちには合わない」かがすぐわかります。
           </p>
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link href="/signup"
@@ -675,7 +675,7 @@ export default function LpPage() {
             <p className="text-[13px] font-medium uppercase tracking-widest text-[#546471]">Contact</p>
             <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] text-[#1C2B38]">お問い合わせ</h2>
             <p className="mt-4 text-[16px] text-[#374955] leading-relaxed">
-              導入前のご質問、料金、機能、運用方法について、<br className="hidden sm:block" />お問い合わせフォームから受け付けています。<br />
+              導入前のご質問、料金、機能、運用方法について、お問い合わせフォームから受け付けています。
               内容を確認のうえ、原則3営業日以内にメールで回答します。
             </p>
             <div className="mt-5 grid grid-cols-1 gap-2 text-[13px] sm:grid-cols-2">
