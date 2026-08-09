@@ -185,7 +185,7 @@ export default function LpPage() {
       {/* ── HERO ── */}
       <section className="bg-[#0D1C2E] text-white overflow-hidden">
         <div className="mx-auto max-w-6xl px-6 pt-16 lg:pt-24">
-          <div className="grid lg:grid-cols-[3fr_2fr] gap-10 lg:gap-16 items-end">
+          <div className="grid lg:grid-cols-[1fr_1fr] gap-10 lg:gap-12 items-center">
 
             {/* Left: Text + CTA */}
             <div className="pb-16 lg:pb-24">
@@ -208,9 +208,9 @@ export default function LpPage() {
               </p>
             </div>
 
-            {/* Right: Screenshot — bleeds to bottom edge */}
-            <div className="relative lg:self-end">
-              <div className="rounded-tl-xl rounded-tr-xl overflow-hidden border-t border-l border-r border-[#1F3447] shadow-[0_-12px_60px_rgba(0,0,0,0.5)]">
+            {/* Right: Screenshot */}
+            <div className="relative">
+              <div className="rounded-xl overflow-hidden border border-[#1F3447] shadow-[0_-12px_60px_rgba(0,0,0,0.5)]">
                 <Image
                   src="/lp-screenshots/hero.png"
                   alt="Kura ダッシュボード — 全物件の案件・タスクをリアルタイム把握"
