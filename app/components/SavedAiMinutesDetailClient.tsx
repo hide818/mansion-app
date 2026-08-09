@@ -538,7 +538,7 @@ async function createBoardFormalPdf({
   pdf.save(`${fileNameBase}.pdf`)
 }
 
-function createStandardWordBlob({
+async function createStandardWordBlob({
   propertyName,
   meetingType,
   title,
@@ -558,67 +558,45 @@ function createStandardWordBlob({
   termLabel: string
   createdAt: string | null
   minutes: string
-}) {
-  const html = `
-<html xmlns:o="urn:schemas-microsoft-com:office:office"
-      xmlns:w="urn:schemas-microsoft-com:office:word"
-      xmlns="http://www.w3.org/TR/REC-html40">
-<head>
-<meta charset="utf-8">
-<title>${title || '議事録'}</title>
-<style>
-body {
-  font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
-  color: #111827;
-  line-height: 1.8;
-  font-size: 11pt;
-}
-h1 {
-  font-size: 18pt;
-  margin-bottom: 8pt;
-}
-h2 {
-  font-size: 13pt;
-  margin-top: 18pt;
-  margin-bottom: 8pt;
-}
-.meta {
-  margin-bottom: 14pt;
-}
-.meta p {
-  margin: 2pt 0;
-}
-.minutes {
-  white-space: pre-wrap;
-}
-</style>
-</head>
-<body>
-  <h1>${propertyName} ${formatMeetingType(meetingType)} 議事録</h1>
-  <div class="meta">
-    <p>タイトル: ${title || 'タイトル未設定'}</p>
-    ${officialTitle ? `<p>正式タイトル: ${officialTitle}</p>` : ''}
-    ${heldOn ? `<p>開催日: ${heldOn}</p>` : ''}
-    ${meetingNumber ? `<p>開催回数: ${meetingNumber}</p>` : ''}
-    ${termLabel ? `<p>期別: ${termLabel}</p>` : ''}
-    <p>作成日時: ${formatDateTime(createdAt)}</p>
-  </div>
-  <h2>議事録本文</h2>
-  <div class="minutes">${(minutes || '議事録本文はありません。')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\n/g, '<br>')}</div>
-</body>
-</html>
-  `.trim()
+}): Promise<Blob> {
+  const { Document, Packer, Paragraph, TextRun, HeadingLevel } = await import('docx')
 
-  return new Blob(['\ufeff', html], {
-    type: 'application/msword;charset=utf-8',
+  function para(text: string, opts: { bold?: boolean; heading?: typeof HeadingLevel[keyof typeof HeadingLevel]; size?: number } = {}) {
+    return new Paragraph({
+      heading: opts.heading,
+      children: [new TextRun({ text, bold: opts.bold ?? false, size: opts.size ?? 22, font: 'Meiryo' })],
+    })
+  }
+
+  const metaLines: string[] = [
+    `タイトル: ${title || 'タイトル未設定'}`,
+    ...(officialTitle ? [`正式タイトル: ${officialTitle}`] : []),
+    ...(heldOn ? [`開催日: ${heldOn}`] : []),
+    ...(meetingNumber ? [`開催回数: ${meetingNumber}`] : []),
+    ...(termLabel ? [`期別: ${termLabel}`] : []),
+    `作成日時: ${formatDateTime(createdAt)}`,
+  ]
+
+  const minutesLines = (minutes || '議事録本文はありません。').split('\n')
+
+  const doc = new Document({
+    sections: [{
+      children: [
+        para(`${propertyName} ${formatMeetingType(meetingType)} 議事録`, { bold: true, size: 36 }),
+        new Paragraph({ children: [] }),
+        ...metaLines.map(line => para(line)),
+        new Paragraph({ children: [] }),
+        para('議事録本文', { bold: true, size: 28 }),
+        new Paragraph({ children: [] }),
+        ...minutesLines.map(line => para(line)),
+      ],
+    }],
   })
+
+  return Packer.toBlob(doc)
 }
 
-function createBoardFormalWordBlob({
+async function createBoardFormalWordBlob({
   propertyName,
   meetingTerm,
   meetingRound,
@@ -652,149 +630,94 @@ function createBoardFormalWordBlob({
   signaturePerson2?: string
   showSignatureSection?: boolean
   closingRemarks?: string
-}) {
-  const titleLine =
-    meetingTerm && meetingRound
-      ? `第${meetingTerm}期第${meetingRound}回理事会議事録`
-      : '理事会議事録'
+}): Promise<Blob> {
+  const {
+    Document, Packer, Paragraph, Table, TableRow, TableCell,
+    TextRun, AlignmentType, WidthType, ShadingType, PageBreak,
+  } = await import('docx')
 
-  const headingLine =
-    meetingTerm && meetingRound
-      ? `第${meetingTerm}期第${meetingRound}回理事会`
-      : '理事会'
-
+  const titleLine = meetingTerm && meetingRound ? `第${meetingTerm}期第${meetingRound}回理事会議事録` : '理事会議事録'
+  const headingLine = meetingTerm && meetingRound ? `第${meetingTerm}期第${meetingRound}回理事会` : '理事会'
   const openLine = chairpersonName.trim()
     ? `定刻、${chairpersonName}理事長を議長に選任し、直ちに審議に入った。`
     : '定刻、理事長を議長に選任し、直ちに審議に入った。'
-
-  const closeLine = buildBoardFormalCloseText({
-    meetingTerm,
-    meetingRound,
-  })
-
-  const regulationLine = buildBoardFormalRegulationText({
-    propertyName,
-    bylawsArticle,
-  })
-
+  const closeLine = buildBoardFormalCloseText({ meetingTerm, meetingRound })
+  const regulationLine = buildBoardFormalRegulationText({ propertyName, bylawsArticle })
   const signatureDateText = formatDateOnly(signatureDate || heldOn)
 
-  const html = `
-<html xmlns:o="urn:schemas-microsoft-com:office:office"
-      xmlns:w="urn:schemas-microsoft-com:office:word"
-      xmlns="http://www.w3.org/TR/REC-html40">
-<head>
-<meta charset="utf-8">
-<title>${titleLine}</title>
-<style>
-body {
-  font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
-  color: #111827;
-  line-height: 1.9;
-  font-size: 11pt;
-}
-.page-break {
-  page-break-after: always;
-}
-.cover {
-  text-align: center;
-  padding-top: 180pt;
-}
-.cover h1 {
-  font-size: 24pt;
-  margin-bottom: 24pt;
-}
-.cover h2 {
-  font-size: 18pt;
-  margin-bottom: 24pt;
-}
-.heading {
-  font-size: 18pt;
-  font-weight: bold;
-  margin-bottom: 16pt;
-}
-.info-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 16pt;
-}
-.info-table td {
-  border: 1px solid #475569;
-  padding: 8pt 10pt;
-  vertical-align: top;
-}
-.info-table .label {
-  width: 120pt;
-  font-weight: bold;
-}
-.minutes {
-  white-space: pre-wrap;
-}
-.signature-line {
-  margin-top: 20pt;
-}
-.signature-row {
-  margin-top: 18pt;
-}
-</style>
-</head>
-<body>
-  <div class="cover page-break">
-    <h1>${titleLine}</h1>
-    <h2>${propertyName}管理組合</h2>
-    <div>${formatDateOnly(heldOn)}</div>
-  </div>
+  function p(text: string, opts: { bold?: boolean; center?: boolean; size?: number } = {}) {
+    return new Paragraph({
+      alignment: opts.center ? AlignmentType.CENTER : AlignmentType.LEFT,
+      children: [new TextRun({ text, bold: opts.bold ?? false, size: opts.size ?? 22, font: 'Meiryo' })],
+    })
+  }
 
-  <div class="heading">${headingLine}</div>
+  function infoCell(text: string, isLabel: boolean) {
+    return new TableCell({
+      width: isLabel ? { size: 2200, type: WidthType.DXA } : { size: 0, type: WidthType.AUTO },
+      shading: isLabel ? { type: ShadingType.CLEAR, fill: 'F1F5F9' } : undefined,
+      children: [new Paragraph({
+        children: [new TextRun({ text, bold: isLabel, size: 20, font: 'Meiryo' })],
+      })],
+    })
+  }
 
-  <table class="info-table">
-    <tr>
-      <td class="label">開催日時</td>
-      <td>${formatDateOnly(heldOn)}</td>
-    </tr>
-    <tr>
-      <td class="label">開催場所</td>
-      <td>${meetingPlace || ''}</td>
-    </tr>
-    <tr>
-      <td class="label">出席者</td>
-      <td>${attendeesText || ''}</td>
-    </tr>
-    ${absenteeText ? `<tr><td class="label">欠席者</td><td>${absenteeText}</td></tr>` : ''}
-    <tr>
-      <td class="label">管理会社</td>
-      <td>${managementCompanyDisplay || ''}</td>
-    </tr>
-  </table>
+  const infoRows = [
+    ['開催日時', formatDateOnly(heldOn)],
+    ['開催場所', meetingPlace],
+    ['出席者', attendeesText],
+    ...(absenteeText ? [['欠席者', absenteeText]] : []),
+    ['管理会社', managementCompanyDisplay],
+  ].map(([label, val]) => new TableRow({ children: [infoCell(label, true), infoCell(val, false)] }))
 
-  <p>${openLine}</p>
+  const minutesLines = (minutes || '議事録本文はありません。').split('\n')
 
-  <div class="minutes">${(minutes || '議事録本文はありません。')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\n/g, '<br>')}</div>
+  const closingRemarksParas = closingRemarks
+    ? closingRemarks.split('\n').map(line => p(line))
+    : []
 
-  <p>${closeLine}</p>
-  <p>${regulationLine}</p>
-  ${closingRemarks ? `<p style="white-space:pre-wrap;">${closingRemarks.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>` : ''}
-  <p>${signatureDateText}</p>
-  <p>${propertyName}管理組合</p>
+  const signatureParas = showSignatureSection ? [
+    new Paragraph({ children: [] }),
+    p('議長　　　　　　　　　　　　印'),
+    p(`議事録署名人${signaturePerson1 ? `　${signaturePerson1}` : ''}　　　　　　　　印`),
+    p(`議事録署名人${signaturePerson2 ? `　${signaturePerson2}` : ''}　　　　　　　　印`),
+  ] : []
 
-  ${showSignatureSection ? `
-  <div class="signature-line">
-    <div class="signature-row">議長　　　　　　　　　　　　印</div>
-    <div class="signature-row">議事録署名人${signaturePerson1 ? `　${signaturePerson1.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}` : ''}　　　　　　　　印</div>
-    <div class="signature-row">議事録署名人${signaturePerson2 ? `　${signaturePerson2.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}` : ''}　　　　　　　　印</div>
-  </div>
-  ` : ''}
-</body>
-</html>
-  `.trim()
-
-  return new Blob(['\ufeff', html], {
-    type: 'application/msword;charset=utf-8',
+  const doc = new Document({
+    sections: [{
+      children: [
+        new Paragraph({ children: [] }),
+        new Paragraph({ children: [] }),
+        new Paragraph({ children: [] }),
+        new Paragraph({ children: [] }),
+        p(titleLine, { bold: true, center: true, size: 48 }),
+        new Paragraph({ children: [] }),
+        p(`${propertyName}管理組合`, { bold: true, center: true, size: 36 }),
+        new Paragraph({ children: [] }),
+        p(formatDateOnly(heldOn), { center: true, size: 28 }),
+        new Paragraph({ children: [new PageBreak()] }),
+        p(headingLine, { bold: true, size: 36 }),
+        new Paragraph({ children: [] }),
+        new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: infoRows }),
+        new Paragraph({ children: [] }),
+        p(openLine),
+        new Paragraph({ children: [] }),
+        ...minutesLines.map(line => p(line)),
+        new Paragraph({ children: [] }),
+        p(closeLine),
+        new Paragraph({ children: [] }),
+        p(regulationLine),
+        new Paragraph({ children: [] }),
+        ...closingRemarksParas,
+        ...(closingRemarksParas.length > 0 ? [new Paragraph({ children: [] })] : []),
+        p(signatureDateText),
+        p(`${propertyName}管理組合`),
+        ...signatureParas,
+      ],
+    }],
   })
+
+  return Packer.toBlob(doc)
 }
 
 function downloadBlob(blob: Blob, fileName: string) {
@@ -1205,7 +1128,7 @@ export default function SavedAiMinutesDetailClient({
 
       const blob =
         minutesLayoutType === 'board_formal'
-          ? createBoardFormalWordBlob({
+          ? await createBoardFormalWordBlob({
               propertyName,
               meetingTerm: safeMeetingTerm,
               meetingRound: safeMeetingRound,
@@ -1223,7 +1146,7 @@ export default function SavedAiMinutesDetailClient({
               showSignatureSection: templateShowSignatureSection,
               closingRemarks: templateClosingRemarks,
             })
-          : createStandardWordBlob({
+          : await createStandardWordBlob({
               propertyName,
               meetingType,
               title,
@@ -1235,7 +1158,7 @@ export default function SavedAiMinutesDetailClient({
               minutes: currentMinutes,
             })
 
-      downloadBlob(blob, `${fileNameBase}.doc`)
+      downloadBlob(blob, `${fileNameBase}.docx`)
     } catch (error) {
       console.error(error)
       alert('Wordダウンロードに失敗しました。')

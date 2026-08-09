@@ -302,23 +302,38 @@ export default function HandoverExportButtons({
     }
   }
 
-  function handleDownloadWord() {
+  async function handleDownloadWord() {
     try {
       setIsExportingWord(true)
       setMessage('Wordファイルを作成中です...')
 
-      const rtf = buildRtfDocument({
-        propertyName,
-        address,
-        content,
+      const { Document, Packer, Paragraph, TextRun } = await import('docx')
+
+      const contentLines = content.split('\n')
+
+      const doc = new Document({
+        sections: [{
+          children: [
+            new Paragraph({
+              children: [new TextRun({ text: '引き継ぎ書', bold: true, size: 48, font: 'Meiryo' })],
+            }),
+            new Paragraph({ children: [] }),
+            new Paragraph({ children: [new TextRun({ text: `物件名: ${propertyName}`, size: 22, font: 'Meiryo' })] }),
+            new Paragraph({ children: [new TextRun({ text: `住所: ${address}`, size: 22, font: 'Meiryo' })] }),
+            new Paragraph({ children: [] }),
+            ...contentLines.map(line =>
+              new Paragraph({ children: [new TextRun({ text: line, size: 22, font: 'Meiryo' })] })
+            ),
+          ],
+        }],
       })
 
-      const blob = new Blob([rtf], { type: 'application/rtf' })
+      const blob = await Packer.toBlob(doc)
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
 
       link.href = url
-      link.download = `${fileBaseName}.rtf`
+      link.download = `${fileBaseName}.docx`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
