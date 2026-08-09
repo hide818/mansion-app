@@ -15,6 +15,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       name: body.name,
       budget_amount: body.budget_amount ?? null,
       account_category_id: body.account_category_id ?? null,
+      account_category_text: body.account_category_text ?? null,
       contractor: body.contractor ?? null,
       scheduled_date: body.scheduled_date ?? null,
       status: body.status,

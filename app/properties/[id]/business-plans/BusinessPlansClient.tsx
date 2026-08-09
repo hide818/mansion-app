@@ -10,6 +10,7 @@ type Plan = {
   name: string
   budget_amount: number | null
   account_category_id: string | null
+  account_category_text: string | null
   account_categories: { name: string } | null
   contractor: string | null
   scheduled_date: string | null
@@ -32,7 +33,14 @@ function fmt(n: number | null) {
 
 function fmtDate(s: string | null) {
   if (!s) return '―'
-  return s.slice(0, 7).replace('-', '年') + '月'
+  const parts = s.slice(0, 10).split('-')
+  if (parts.length === 3) return `${parts[0]}年${parts[1]}月${parts[2]}日`
+  return s
+}
+
+function getCategoryLabel(plan: Plan): string {
+  if (plan.account_category_text) return plan.account_category_text
+  return plan.account_categories?.name ?? '―'
 }
 
 const currentYear = new Date().getFullYear()
@@ -43,6 +51,8 @@ type FormState = {
   name: string
   budget_amount: string
   account_category_id: string
+  account_category_text: string
+  account_input_mode: 'select' | 'text'
   contractor: string
   scheduled_date: string
   status: Plan['status']
@@ -55,6 +65,8 @@ const EMPTY_FORM: FormState = {
   name: '',
   budget_amount: '',
   account_category_id: '',
+  account_category_text: '',
+  account_input_mode: 'select',
   contractor: '',
   scheduled_date: '',
   status: '未着手',
@@ -77,7 +89,7 @@ export default function BusinessPlansClient({
   const [selectedYear, setSelectedYear] = useState<number>(currentYear)
   const [showForm, setShowForm] = useState(false)
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null)
-  const [form, setForm] = useState(EMPTY_FORM)
+  const [form, setForm] = useState<FormState>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const printRef = useRef<HTMLDivElement>(null)
@@ -99,8 +111,10 @@ export default function BusinessPlansClient({
       name: plan.name,
       budget_amount: plan.budget_amount?.toString() ?? '',
       account_category_id: plan.account_category_id ?? '',
+      account_category_text: plan.account_category_text ?? '',
+      account_input_mode: plan.account_category_text ? 'text' : 'select',
       contractor: plan.contractor ?? '',
-      scheduled_date: plan.scheduled_date?.slice(0, 7) ?? '',
+      scheduled_date: plan.scheduled_date?.slice(0, 10) ?? '',
       status: plan.status,
       actual_amount: plan.actual_amount?.toString() ?? '',
       notes: plan.notes ?? '',
@@ -119,9 +133,10 @@ export default function BusinessPlansClient({
       fiscal_year: form.fiscal_year,
       name: form.name.trim(),
       budget_amount: form.budget_amount ? parseInt(form.budget_amount) : null,
-      account_category_id: form.account_category_id || null,
+      account_category_id: form.account_input_mode === 'select' ? (form.account_category_id || null) : null,
+      account_category_text: form.account_input_mode === 'text' ? (form.account_category_text.trim() || null) : null,
       contractor: form.contractor.trim() || null,
-      scheduled_date: form.scheduled_date ? form.scheduled_date + '-01' : null,
+      scheduled_date: form.scheduled_date || null,
       status: form.status,
       actual_amount: form.actual_amount ? parseInt(form.actual_amount) : null,
       notes: form.notes.trim() || null,
@@ -153,143 +168,164 @@ export default function BusinessPlansClient({
     if (res.ok) setPlans(prev => prev.filter(p => p.id !== id))
   }
 
-  async function handlePrint() {
-    const { default: html2canvas } = await import('html2canvas')
-    const { jsPDF } = await import('jspdf')
-    if (!printRef.current) return
-
-    const canvas = await html2canvas(printRef.current, { scale: 2, useCORS: true })
-    const imgData = canvas.toDataURL('image/png')
-    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
-    const pageW = pdf.internal.pageSize.getWidth()
-    const pageH = pdf.internal.pageSize.getHeight()
-    const imgH = (canvas.height * pageW) / canvas.width
-
-    if (imgH <= pageH) {
-      pdf.addImage(imgData, 'PNG', 0, 0, pageW, imgH)
-    } else {
-      let y = 0
-      while (y < canvas.height) {
-        const sliceH = Math.min((pageH * canvas.width) / pageW, canvas.height - y)
-        const sliceCanvas = document.createElement('canvas')
-        sliceCanvas.width = canvas.width
-        sliceCanvas.height = sliceH
-        const ctx = sliceCanvas.getContext('2d')!
-        ctx.drawImage(canvas, 0, -y)
-        if (y > 0) pdf.addPage()
-        pdf.addImage(sliceCanvas.toDataURL('image/png'), 'PNG', 0, 0, pageW, (sliceH * pageW) / canvas.width)
-        y += sliceH
-      }
-    }
-    pdf.save(`事業計画_${propertyName}_${selectedYear}年度.pdf`)
+  function handlePrint() {
+    window.print()
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 space-y-6">
-      {/* ヘッダー */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <Link href={`/properties/${propertyId}`} className="text-xs text-blue-600 hover:underline">← {propertyName}</Link>
-          <h1 className="mt-1 text-2xl font-bold text-slate-900">事業計画進捗管理</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={handlePrint} className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
-            PDF出力
-          </button>
-          <button onClick={openAdd} className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-            ＋ 追加
-          </button>
-        </div>
+    <>
+      <style>{`
+        @media print {
+          body > * { display: none !important; }
+          #business-plan-print { display: block !important; }
+          .no-print { display: none !important; }
+        }
+        #business-plan-print { display: none; }
+        @media print {
+          #business-plan-print { display: block; }
+        }
+      `}</style>
+
+      {/* 印刷専用レイアウト */}
+      <div id="business-plan-print" style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+        <h2 style={{ fontSize: '16px', marginBottom: '4px' }}>{propertyName}｜{selectedYear}年度 事業計画進捗報告</h2>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+          <thead>
+            <tr style={{ background: '#f1f5f9' }}>
+              {['計画名', '勘定科目', '予算', '実績', '施工会社', '実施時期', '状況', '備考'].map(h => (
+                <th key={h} style={{ border: '1px solid #cbd5e1', padding: '6px 8px', textAlign: 'left' }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map(plan => (
+              <tr key={plan.id}>
+                <td style={{ border: '1px solid #e2e8f0', padding: '6px 8px' }}>{plan.name}</td>
+                <td style={{ border: '1px solid #e2e8f0', padding: '6px 8px' }}>{getCategoryLabel(plan)}</td>
+                <td style={{ border: '1px solid #e2e8f0', padding: '6px 8px', textAlign: 'right' }}>{fmt(plan.budget_amount)}</td>
+                <td style={{ border: '1px solid #e2e8f0', padding: '6px 8px', textAlign: 'right' }}>{fmt(plan.actual_amount)}</td>
+                <td style={{ border: '1px solid #e2e8f0', padding: '6px 8px' }}>{plan.contractor ?? '―'}</td>
+                <td style={{ border: '1px solid #e2e8f0', padding: '6px 8px' }}>{fmtDate(plan.scheduled_date)}</td>
+                <td style={{ border: '1px solid #e2e8f0', padding: '6px 8px' }}>{plan.status}</td>
+                <td style={{ border: '1px solid #e2e8f0', padding: '6px 8px' }}>{plan.notes ?? ''}</td>
+              </tr>
+            ))}
+            <tr style={{ fontWeight: 'bold', background: '#f8fafc' }}>
+              <td colSpan={2} style={{ border: '1px solid #e2e8f0', padding: '6px 8px' }}>合計</td>
+              <td style={{ border: '1px solid #e2e8f0', padding: '6px 8px', textAlign: 'right' }}>{fmt(totalBudget || null)}</td>
+              <td style={{ border: '1px solid #e2e8f0', padding: '6px 8px', textAlign: 'right' }}>{fmt(totalActual || null)}</td>
+              <td colSpan={4} style={{ border: '1px solid #e2e8f0', padding: '6px 8px' }} />
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      {/* 年度切替 */}
-      <div className="flex gap-2 flex-wrap">
-        {FISCAL_YEARS.map(y => (
-          <button
-            key={y}
-            onClick={() => setSelectedYear(y)}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${selectedYear === y ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
-          >
-            {y}年度
-          </button>
-        ))}
-      </div>
-
-      {/* サマリー */}
-      <div className="grid grid-cols-3 gap-4">
-        {[
-          { label: '計画件数', value: `${filtered.length}件` },
-          { label: '予算合計', value: fmt(totalBudget || null) },
-          { label: `完了 / 実績`, value: `${completedCount}件 / ${fmt(totalActual || null)}` },
-        ].map(({ label, value }) => (
-          <div key={label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p className="text-xs text-slate-500">{label}</p>
-            <p className="mt-1 text-lg font-bold text-slate-900">{value}</p>
+      <div className="mx-auto max-w-5xl px-4 py-8 space-y-6 no-print" ref={printRef}>
+        {/* ヘッダー */}
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <Link href={`/properties/${propertyId}`} className="text-xs text-blue-600 hover:underline">← {propertyName}</Link>
+            <h1 className="mt-1 text-2xl font-bold text-slate-900">事業計画進捗管理</h1>
           </div>
-        ))}
-      </div>
-
-      {/* テーブル（PDF印刷対象） */}
-      <div ref={printRef} className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100 bg-slate-50">
-          <p className="text-sm font-bold text-slate-700">{propertyName}｜{selectedYear}年度 事業計画</p>
-        </div>
-        {filtered.length === 0 ? (
-          <div className="p-10 text-center text-sm text-slate-400">
-            {selectedYear}年度の事業計画がまだありません。<br />「＋ 追加」から登録してください。
+          <div className="flex items-center gap-2">
+            <button onClick={handlePrint} className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
+              PDF出力
+            </button>
+            <button onClick={openAdd} className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+              ＋ 追加
+            </button>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-100 bg-slate-50 text-xs text-slate-500">
-                  <th className="px-4 py-3 text-left font-semibold">計画名</th>
-                  <th className="px-4 py-3 text-left font-semibold">勘定科目</th>
-                  <th className="px-4 py-3 text-right font-semibold">予算</th>
-                  <th className="px-4 py-3 text-right font-semibold">実績</th>
-                  <th className="px-4 py-3 text-left font-semibold">施工会社</th>
-                  <th className="px-4 py-3 text-left font-semibold">実施時期</th>
-                  <th className="px-4 py-3 text-left font-semibold">状況</th>
-                  <th className="px-4 py-3 text-left font-semibold print:hidden">操作</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {filtered.map(plan => (
-                  <tr key={plan.id} className="hover:bg-slate-50 transition">
-                    <td className="px-4 py-3 font-medium text-slate-800">
-                      {plan.name}
-                      {plan.notes && <p className="mt-0.5 text-xs text-slate-400 font-normal">{plan.notes}</p>}
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">{plan.account_categories?.name ?? '―'}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-slate-700">{fmt(plan.budget_amount)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-slate-700">{fmt(plan.actual_amount)}</td>
-                    <td className="px-4 py-3 text-slate-600">{plan.contractor ?? '―'}</td>
-                    <td className="px-4 py-3 text-slate-600">{fmtDate(plan.scheduled_date)}</td>
-                    <td className="px-4 py-3">
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_COLORS[plan.status]}`}>
-                        {plan.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 print:hidden">
-                      <div className="flex gap-3">
-                        <button onClick={() => openEdit(plan)} className="text-xs text-blue-600 hover:underline">編集</button>
-                        <button onClick={() => handleDelete(plan.id)} className="text-xs text-red-400 hover:underline">削除</button>
-                      </div>
-                    </td>
+        </div>
+
+        {/* 年度切替 */}
+        <div className="flex gap-2 flex-wrap">
+          {FISCAL_YEARS.map(y => (
+            <button
+              key={y}
+              onClick={() => setSelectedYear(y)}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${selectedYear === y ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+            >
+              {y}年度
+            </button>
+          ))}
+        </div>
+
+        {/* サマリー */}
+        <div className="grid grid-cols-3 gap-4">
+          {[
+            { label: '計画件数', value: `${filtered.length}件` },
+            { label: '予算合計', value: fmt(totalBudget || null) },
+            { label: `完了 / 実績`, value: `${completedCount}件 / ${fmt(totalActual || null)}` },
+          ].map(({ label, value }) => (
+            <div key={label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="text-xs text-slate-500">{label}</p>
+              <p className="mt-1 text-lg font-bold text-slate-900">{value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* テーブル */}
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100 bg-slate-50">
+            <p className="text-sm font-bold text-slate-700">{propertyName}｜{selectedYear}年度 事業計画</p>
+          </div>
+          {filtered.length === 0 ? (
+            <div className="p-10 text-center text-sm text-slate-400">
+              {selectedYear}年度の事業計画がまだありません。<br />「＋ 追加」から登録してください。
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 bg-slate-50 text-xs text-slate-500">
+                    <th className="px-4 py-3 text-left font-semibold">計画名</th>
+                    <th className="px-4 py-3 text-left font-semibold">勘定科目</th>
+                    <th className="px-4 py-3 text-right font-semibold">予算</th>
+                    <th className="px-4 py-3 text-right font-semibold">実績</th>
+                    <th className="px-4 py-3 text-left font-semibold">施工会社</th>
+                    <th className="px-4 py-3 text-left font-semibold">実施時期</th>
+                    <th className="px-4 py-3 text-left font-semibold">状況</th>
+                    <th className="px-4 py-3 text-left font-semibold">操作</th>
                   </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr className="border-t-2 border-slate-200 bg-slate-50 font-semibold">
-                  <td colSpan={2} className="px-4 py-3 text-sm text-slate-700">合計</td>
-                  <td className="px-4 py-3 text-right tabular-nums text-slate-800">{fmt(totalBudget || null)}</td>
-                  <td className="px-4 py-3 text-right tabular-nums text-slate-800">{fmt(totalActual || null)}</td>
-                  <td colSpan={4} className="px-4 py-3 print:hidden" />
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        )}
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {filtered.map(plan => (
+                    <tr key={plan.id} className="hover:bg-slate-50 transition">
+                      <td className="px-4 py-3 font-medium text-slate-800">
+                        {plan.name}
+                        {plan.notes && <p className="mt-0.5 text-xs text-slate-400 font-normal">{plan.notes}</p>}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">{getCategoryLabel(plan)}</td>
+                      <td className="px-4 py-3 text-right tabular-nums text-slate-700">{fmt(plan.budget_amount)}</td>
+                      <td className="px-4 py-3 text-right tabular-nums text-slate-700">{fmt(plan.actual_amount)}</td>
+                      <td className="px-4 py-3 text-slate-600">{plan.contractor ?? '―'}</td>
+                      <td className="px-4 py-3 text-slate-600">{fmtDate(plan.scheduled_date)}</td>
+                      <td className="px-4 py-3">
+                        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_COLORS[plan.status]}`}>
+                          {plan.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-3">
+                          <button onClick={() => openEdit(plan)} className="text-xs text-blue-600 hover:underline">編集</button>
+                          <button onClick={() => handleDelete(plan.id)} className="text-xs text-red-400 hover:underline">削除</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-slate-200 bg-slate-50 font-semibold">
+                    <td colSpan={2} className="px-4 py-3 text-sm text-slate-700">合計</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-slate-800">{fmt(totalBudget || null)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-slate-800">{fmt(totalActual || null)}</td>
+                    <td colSpan={4} className="px-4 py-3" />
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 追加・編集フォーム（モーダル） */}
@@ -317,19 +353,43 @@ export default function BusinessPlansClient({
                   className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-400 focus:outline-none" />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">勘定科目</label>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-2">勘定科目</label>
+                <div className="flex gap-3 mb-2">
+                  <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                    <input type="radio" checked={form.account_input_mode === 'select'} onChange={() => setForm(f => ({ ...f, account_input_mode: 'select' }))} />
+                    リストから選択
+                  </label>
+                  <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                    <input type="radio" checked={form.account_input_mode === 'text'} onChange={() => setForm(f => ({ ...f, account_input_mode: 'text' }))} />
+                    直接入力
+                  </label>
+                </div>
+                {form.account_input_mode === 'select' ? (
                   <select value={form.account_category_id} onChange={e => setForm(f => ({ ...f, account_category_id: e.target.value }))}
                     className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-400 focus:outline-none">
                     <option value="">未分類</option>
                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
-                </div>
+                ) : (
+                  <input type="text" value={form.account_category_text} onChange={e => setForm(f => ({ ...f, account_category_text: e.target.value }))}
+                    placeholder="例：修繕費"
+                    className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-400 focus:outline-none" />
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 mb-1">実施時期</label>
-                  <input type="month" value={form.scheduled_date} onChange={e => setForm(f => ({ ...f, scheduled_date: e.target.value }))}
+                  <input type="date" value={form.scheduled_date} onChange={e => setForm(f => ({ ...f, scheduled_date: e.target.value }))}
                     className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-400 focus:outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">状況</label>
+                  <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value as Plan['status'] }))}
+                    className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-400 focus:outline-none">
+                    {['未着手', '進行中', '完了', '延期'].map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
                 </div>
               </div>
 
@@ -348,20 +408,11 @@ export default function BusinessPlansClient({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">施工会社</label>
-                  <input type="text" value={form.contractor} onChange={e => setForm(f => ({ ...f, contractor: e.target.value }))}
-                    placeholder="〇〇建設株式会社"
-                    className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-400 focus:outline-none" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">状況</label>
-                  <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value as Plan['status'] }))}
-                    className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-400 focus:outline-none">
-                    {['未着手', '進行中', '完了', '延期'].map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">施工会社</label>
+                <input type="text" value={form.contractor} onChange={e => setForm(f => ({ ...f, contractor: e.target.value }))}
+                  placeholder="〇〇建設株式会社"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-400 focus:outline-none" />
               </div>
 
               <div>
@@ -383,6 +434,6 @@ export default function BusinessPlansClient({
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }

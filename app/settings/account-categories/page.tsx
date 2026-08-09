@@ -79,7 +79,6 @@ export default function AccountCategoriesPage() {
             type="text"
             value={newName}
             onChange={e => setNewName(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleAdd()}
             placeholder="例：修繕費、管理委託費、設備費"
             className="flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
           />

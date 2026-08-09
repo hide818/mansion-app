@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
   const body = await request.json()
-  const { property_id, fiscal_year, name, budget_amount, account_category_id, contractor, scheduled_date, status, actual_amount, notes } = body
+  const { property_id, fiscal_year, name, budget_amount, account_category_id, account_category_text, contractor, scheduled_date, status, actual_amount, notes } = body
 
   if (!property_id || !fiscal_year || !name?.trim()) {
     return NextResponse.json({ error: '物件・年度・計画名は必須です' }, { status: 400 })
@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
       name: name.trim(),
       budget_amount: budget_amount || null,
       account_category_id: account_category_id || null,
+      account_category_text: account_category_text || null,
       contractor: contractor?.trim() || null,
       scheduled_date: scheduled_date || null,
       status: status || '未着手',
