@@ -172,6 +172,51 @@ export default function BusinessPlansClient({
     window.print()
   }
 
+  function handleDownloadWord() {
+    const rows = filtered.map(plan => `
+      <tr>
+        <td style="border:1px solid #ccc;padding:6px 8px">${plan.name}${plan.notes ? `<br><small style="color:#666">${plan.notes}</small>` : ''}</td>
+        <td style="border:1px solid #ccc;padding:6px 8px">${getCategoryLabel(plan)}</td>
+        <td style="border:1px solid #ccc;padding:6px 8px;text-align:right">${fmt(plan.budget_amount)}</td>
+        <td style="border:1px solid #ccc;padding:6px 8px;text-align:right">${fmt(plan.actual_amount)}</td>
+        <td style="border:1px solid #ccc;padding:6px 8px">${plan.contractor ?? '―'}</td>
+        <td style="border:1px solid #ccc;padding:6px 8px">${fmtDate(plan.scheduled_date)}</td>
+        <td style="border:1px solid #ccc;padding:6px 8px">${plan.status}</td>
+      </tr>`).join('')
+
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>
+  body { font-family: "MS Gothic", "Meiryo", sans-serif; font-size: 11pt; margin: 20mm; }
+  h2 { font-size: 14pt; margin-bottom: 4px; }
+  p { font-size: 10pt; color: #666; margin: 0 0 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+  th { background: #f1f5f9; border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
+  tfoot td { font-weight: bold; background: #f8fafc; border: 1px solid #ccc; padding: 6px 8px; }
+</style></head><body>
+<h2>${propertyName}｜${selectedYear}年度 事業計画進捗報告</h2>
+<table>
+  <thead><tr>
+    <th>計画名</th><th>勘定科目</th><th>予算</th><th>実績</th><th>施工会社</th><th>実施時期</th><th>状況</th>
+  </tr></thead>
+  <tbody>${rows}</tbody>
+  <tfoot><tr>
+    <td colspan="2">合計</td>
+    <td style="text-align:right">${fmt(totalBudget || null)}</td>
+    <td style="text-align:right">${fmt(totalActual || null)}</td>
+    <td colspan="3"></td>
+  </tr></tfoot>
+</table>
+</body></html>`
+
+    const blob = new Blob(['﻿', html], { type: 'application/msword;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `事業計画_${propertyName}_${selectedYear}年度.doc`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <>
       <style>{`
@@ -228,6 +273,9 @@ export default function BusinessPlansClient({
             <h1 className="mt-1 text-2xl font-bold text-slate-900">事業計画進捗管理</h1>
           </div>
           <div className="flex items-center gap-2">
+            <button onClick={handleDownloadWord} className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
+              Word出力
+            </button>
             <button onClick={handlePrint} className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
               PDF出力
             </button>
