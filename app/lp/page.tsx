@@ -502,7 +502,7 @@ export default function LpPage() {
 
         {/* 全機能リンク */}
         <div className="bg-[#f5f5f7] px-6 pb-16 text-center">
-          <p className="text-[14px] text-[#6e6e73] mb-4">修繕工事管理・法定点検・クレーム管理・見積比較など、さらに多くの機能を搭載しています。</p>
+          <p className="text-[14px] text-[#6e6e73] mb-4">事業計画進捗管理・修繕工事管理・法定点検・クレーム管理・見積比較など、さらに多くの機能を搭載しています。</p>
           <Link href="/features" className="inline-flex items-center gap-2 rounded-full border border-[#0071e3] px-7 py-3 text-[14px] font-medium text-[#0071e3] hover:bg-[#0071e3] hover:text-white transition-colors">
             全機能の詳細を見る →
           </Link>

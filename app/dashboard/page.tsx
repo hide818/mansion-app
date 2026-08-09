@@ -420,6 +420,7 @@ export default async function DashboardPage() {
                 { href: '/help', label: '使い方ガイド' },
                 { href: '/ai-minutes/records', label: '保存済み議事録' },
                 { href: '/handover-documents', label: '引き継ぎ書一覧' },
+                { href: '/properties', label: '事業計画を確認する' },
                 { href: '/manager', label: '危険案件ダッシュボード' },
                 { href: '/settings/minutes-template', label: '議事録フォーマット設定' },
               ].map(({ href, label }) => (
