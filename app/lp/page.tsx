@@ -32,7 +32,7 @@ const PRICING = [
     price: '¥50,000',
     period: '/ 月（税抜）',
     badge: null,
-    sub: '担当者5名まで・棟数無制限',
+    sub: '1名あたり月10,000円・棟数無制限',
     features: ['全機能が利用可能', '棟数無制限', 'ユーザー5名まで', 'メールサポート'],
     primary: false,
   },
@@ -41,7 +41,7 @@ const PRICING = [
     price: '¥98,000',
     period: '/ 月（税抜）',
     badge: 'おすすめ',
-    sub: '担当者15名まで・棟数無制限',
+    sub: '1名あたり月6,534円・棟数無制限',
     features: ['全機能が利用可能', '棟数無制限', 'ユーザー15名まで', 'メール・チャットサポート'],
     primary: true,
   },
@@ -189,16 +189,14 @@ export default function LpPage() {
             分譲マンション管理会社専用 AI
           </p>
           <h1 className="text-[48px] font-bold leading-[1.1] tracking-[-0.025em] text-white lg:text-[68px]">
-            総会議事録の作成が<br />
+            理事会・総会の後処理を、<br />
             <span className="bg-gradient-to-r from-[#2997ff] to-[#5e5ce6] bg-clip-text text-transparent">
-              2時間→50分
+              2時間から50分へ。
             </span>
-            に
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-[18px] leading-relaxed text-[#a1a1a6]">
-            会議音声をアップロードするだけ。<br />
-            自社フォーマットに沿った議事録の下書きを生成し、<br />
-            決定事項と宿題・タスクまで整理します。
+            音声から自社書式の議事録を作成し、決定事項と宿題を<br />
+            案件・タスクへ自動登録。会議後の転記までKuraで終わります。
           </p>
           <HeroEmailForm />
           <p className="mt-4 text-[12px] text-[#636366]">
@@ -233,87 +231,6 @@ export default function LpPage() {
             <span>✓ 現場の課題から生まれたSaaS</span>
             <span>✓ 14日間無料トライアル受付中</span>
             <span>✓ 導入10分・IT担当者不要</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ── STATS ── */}
-      <section className="bg-[#f5f5f7]">
-        <div className="mx-auto max-w-5xl px-6 py-20">
-          <div className="grid grid-cols-1 gap-12 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-[#d2d2d7]">
-            {[
-              { num: '50分', label: '総会議事録の作成時間（目安）', note: '従来は約2時間' },
-              { num: '0件', label: '法定点検の期限漏れ', note: '自動アラートで管理' },
-              { num: '10分', label: '初期設定から利用開始', note: 'IT担当者不要' },
-            ].map(s => (
-              <div key={s.label} className="text-center px-8">
-                <p className="text-[52px] font-bold text-[#1d1d1f] tracking-tight leading-none">{s.num}</p>
-                <p className="mt-3 text-[15px] font-medium text-[#1d1d1f]">{s.label}</p>
-                <p className="mt-1 text-[13px] text-[#6e6e73]">{s.note}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── SIGNUP FLOW ── */}
-      <section className="bg-white px-6 py-16 border-b border-[#e5e5ea]">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-[13px] font-semibold text-[#0071e3] uppercase tracking-widest">登録から使い始めるまで</p>
-          <h2 className="mt-3 text-[28px] font-bold tracking-[-0.02em] text-[#1d1d1f]">
-            2分で登録、すぐに使えます。
-          </h2>
-          <p className="mt-3 text-[15px] text-[#6e6e73]">IT担当者の対応もシステム設定も不要。メールアドレスだけで今日から使い始められます。</p>
-        </div>
-        <div className="mx-auto mt-10 max-w-3xl grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {[
-            { num: '01', title: 'メールと会社名を入力', desc: 'クレジットカード不要。30秒で完了。', time: '約30秒' },
-            { num: '02', title: '物件・担当者を登録', desc: 'CSVインポートでまとめて登録できます。', time: '約1〜2分' },
-            { num: '03', title: '全機能が使い放題', desc: '14日間、制限なしで全機能をお試しいただけます。', time: 'すぐに開始' },
-          ].map(s => (
-            <div key={s.num} className="relative rounded-2xl border border-[#e5e5ea] bg-white p-6">
-              <span className="absolute -top-3 left-6 rounded-full bg-[#0071e3] px-3 py-0.5 text-[11px] font-semibold text-white">{s.time}</span>
-              <p className="text-[13px] font-bold text-[#6e6e73] mt-2">{s.num}</p>
-              <h3 className="mt-2 text-[15px] font-semibold text-[#1d1d1f]">{s.title}</h3>
-              <p className="mt-1 text-[13px] leading-relaxed text-[#6e6e73]">{s.desc}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-8 text-center">
-          <Link href="/signup"
-            className="inline-block rounded-full bg-[#0071e3] px-8 py-3 text-[15px] font-medium text-white hover:bg-[#0077ed] transition-colors">
-            今すぐ無料で登録する →
-          </Link>
-          <p className="mt-3 text-[12px] text-[#6e6e73]">クレジットカード不要・いつでも解約可能</p>
-        </div>
-      </section>
-
-      {/* ── FOUNDER STORY ── */}
-      <section className="bg-[#f5f5f7] px-6 py-16 border-t border-[#e5e5ea]">
-        <div className="mx-auto max-w-3xl">
-          <div className="rounded-2xl bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.06)] sm:p-10">
-            <p className="text-[12px] font-semibold uppercase tracking-widest text-[#0071e3]">開発者について</p>
-            <h2 className="mt-3 text-[22px] font-bold text-[#1d1d1f] leading-snug">
-              なぜ分譲マンション管理会社の<br className="hidden sm:block" />フロントが、このツールを作ったのか。
-            </h2>
-            <div className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#424245]">
-              <p>
-                私自身、分譲マンション管理会社でフロント担当として勤務していました。担当棟数は最大で20棟超。毎月の総会・理事会が終わるたびに、深夜まで議事録を清書していました。
-              </p>
-              <p>
-                引き継ぎのたびに膨大な口頭説明、退職したら消える過去の経緯、Excelで追いかける法定点検の期限。「これはツールで解決できる」と気づいたのに、使えるものが市場になかった。だからゼロから作りました。
-              </p>
-              <p className="font-medium text-[#1d1d1f]">
-                Kuraは、管理会社の現場で本当に必要なことだけを詰め込んだツールです。
-              </p>
-            </div>
-            <div className="mt-6 flex items-center gap-4 border-t border-[#e5e5ea] pt-6">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#0071e3] text-white text-[18px] font-bold">K</div>
-              <div>
-                <p className="text-[14px] font-semibold text-[#1d1d1f]">Kura 開発者</p>
-                <p className="text-[13px] text-[#6e6e73]">元・分譲マンション管理会社 フロント担当</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -354,6 +271,25 @@ export default function LpPage() {
               <p className="mt-3 text-[15px] leading-relaxed text-[#6e6e73]">{p.body}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── STATS ── */}
+      <section className="bg-[#f5f5f7]">
+        <div className="mx-auto max-w-5xl px-6 py-20">
+          <div className="grid grid-cols-1 gap-12 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-[#d2d2d7]">
+            {[
+              { num: '50分', label: '総会議事録の作成時間（目安）', note: '従来は約2時間' },
+              { num: '0件', label: '法定点検の期限漏れ', note: '自動アラートで管理' },
+              { num: '10分', label: '初期設定から利用開始', note: 'IT担当者不要' },
+            ].map(s => (
+              <div key={s.label} className="text-center px-8">
+                <p className="text-[52px] font-bold text-[#1d1d1f] tracking-tight leading-none">{s.num}</p>
+                <p className="mt-3 text-[15px] font-medium text-[#1d1d1f]">{s.label}</p>
+                <p className="mt-1 text-[13px] text-[#6e6e73]">{s.note}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -516,6 +452,94 @@ export default function LpPage() {
               <p className="mt-3 text-[15px] leading-relaxed text-[#a1a1a6]">{s.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+            {/* ── SECURITY ── */}
+      <section className="bg-white px-6 py-16 border-t border-[#e5e5ea]">
+        <div className="mx-auto max-w-4xl">
+          <div className="text-center mb-12">
+            <p className="text-[13px] font-semibold text-[#0071e3] uppercase tracking-widest">Security</p>
+            <h2 className="mt-3 text-[28px] font-bold tracking-[-0.02em] text-[#1d1d1f]">音声データの取り扱いについて</h2>
+            <p className="mt-3 text-[15px] text-[#6e6e73]">理事会・総会の音声には個人名・金額・クレームなど機密情報が含まれます。Kuraの取り扱いを明示します。</p>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: "🔒", title: "通信・保存", body: "すべての通信はTLS暗号化。データはISO 27001認定クラウド（Supabase）に保存します。" },
+              { icon: "🤖", title: "AI学習への利用なし", body: "アップロードされた音声・議事録データは、AI・モデルの学習・改善には一切使用しません。" },
+              { icon: "🗑️", title: "削除・退会", body: "マイページからいつでも音声データ・アカウントを削除できます。退会後は30日以内に完全消去します。" },
+              { icon: "👁️", title: "アクセス管理", body: "データへのアクセスは自社ユーザーのみ。操作ログを記録し、内部監査にも対応します。" },
+            ].map(item => (
+              <div key={item.title} className="rounded-2xl border border-[#e5e5ea] bg-[#f5f5f7] p-6">
+                <div className="text-[28px] mb-3">{item.icon}</div>
+                <p className="text-[14px] font-semibold text-[#1d1d1f] mb-2">{item.title}</p>
+                <p className="text-[13px] leading-relaxed text-[#6e6e73]">{item.body}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 text-center text-[12px] text-[#8e8e93]">稟議用のセキュリティ資料をご希望の場合は<a href="#contact" className="text-[#0071e3] hover:underline">お問い合わせ</a>ください。</p>
+        </div>
+      </section>
+
+{/* ── FOUNDER STORY ── */}
+      <section className="bg-[#f5f5f7] px-6 py-16 border-t border-[#e5e5ea]">
+        <div className="mx-auto max-w-3xl">
+          <div className="rounded-2xl bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.06)] sm:p-10">
+            <p className="text-[12px] font-semibold uppercase tracking-widest text-[#0071e3]">開発者について</p>
+            <h2 className="mt-3 text-[22px] font-bold text-[#1d1d1f] leading-snug">
+              なぜ分譲マンション管理会社の<br className="hidden sm:block" />フロントが、このツールを作ったのか。
+            </h2>
+            <div className="mt-5 space-y-3 text-[15px] leading-relaxed text-[#424245]">
+              <p>
+                私自身、分譲マンション管理会社でフロント担当として勤務していました。担当棟数は最大で20棟超。毎月の総会・理事会が終わるたびに、深夜まで議事録を清書していました。
+              </p>
+              <p>
+                引き継ぎのたびに膨大な口頭説明、退職したら消える過去の経緯、Excelで追いかける法定点検の期限。「これはツールで解決できる」と気づいたのに、使えるものが市場になかった。だからゼロから作りました。
+              </p>
+              <p className="font-medium text-[#1d1d1f]">
+                Kuraは、管理会社の現場で本当に必要なことだけを詰め込んだツールです。
+              </p>
+            </div>
+            <div className="mt-6 flex items-center gap-4 border-t border-[#e5e5ea] pt-6">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#0071e3] text-white text-[18px] font-bold">K</div>
+              <div>
+                <p className="text-[14px] font-semibold text-[#1d1d1f]">Kura 開発者</p>
+                <p className="text-[13px] text-[#6e6e73]">元・分譲マンション管理会社 フロント担当</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SIGNUP FLOW ── */}
+      <section className="bg-white px-6 py-16 border-b border-[#e5e5ea]">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-[13px] font-semibold text-[#0071e3] uppercase tracking-widest">登録から使い始めるまで</p>
+          <h2 className="mt-3 text-[28px] font-bold tracking-[-0.02em] text-[#1d1d1f]">
+            2分で登録、すぐに使えます。
+          </h2>
+          <p className="mt-3 text-[15px] text-[#6e6e73]">IT担当者の対応もシステム設定も不要。メールアドレスだけで今日から使い始められます。</p>
+        </div>
+        <div className="mx-auto mt-10 max-w-3xl grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {[
+            { num: '01', title: 'メールと会社名を入力', desc: 'クレジットカード不要。30秒で完了。', time: '約30秒' },
+            { num: '02', title: '物件・担当者を登録', desc: 'CSVインポートでまとめて登録できます。', time: '約1〜2分' },
+            { num: '03', title: '全機能が使い放題', desc: '14日間、制限なしで全機能をお試しいただけます。', time: 'すぐに開始' },
+          ].map(s => (
+            <div key={s.num} className="relative rounded-2xl border border-[#e5e5ea] bg-white p-6">
+              <span className="absolute -top-3 left-6 rounded-full bg-[#0071e3] px-3 py-0.5 text-[11px] font-semibold text-white">{s.time}</span>
+              <p className="text-[13px] font-bold text-[#6e6e73] mt-2">{s.num}</p>
+              <h3 className="mt-2 text-[15px] font-semibold text-[#1d1d1f]">{s.title}</h3>
+              <p className="mt-1 text-[13px] leading-relaxed text-[#6e6e73]">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-8 text-center">
+          <Link href="/signup"
+            className="inline-block rounded-full bg-[#0071e3] px-8 py-3 text-[15px] font-medium text-white hover:bg-[#0077ed] transition-colors">
+            今すぐ無料で登録する →
+          </Link>
+          <p className="mt-3 text-[12px] text-[#6e6e73]">クレジットカード不要・いつでも解約可能</p>
         </div>
       </section>
 
