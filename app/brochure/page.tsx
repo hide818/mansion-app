@@ -107,6 +107,9 @@ export default function BrochurePage() {
           </div>
         </div>
 
+        {/* PAGE BREAK after cover */}
+        <div className="page-break" />
+
         {/* MAIN CONTENT */}
         <div className="max-w-4xl mx-auto px-8 py-12">
 
@@ -303,7 +306,7 @@ export default function BrochurePage() {
           </section>
 
           {/* FOOTER */}
-          <div className="no-break border-t border-[#D4CFC5] pt-6 text-center">
+          <div className="border-t border-[#D4CFC5] pt-6 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
               <KuraLogo size={16} variant="seal" />
               <span className="text-[13px] font-semibold text-[#1C2B38]">Kura</span>
