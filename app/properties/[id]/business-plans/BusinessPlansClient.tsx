@@ -99,6 +99,18 @@ export default function BusinessPlansClient({
   const totalActual = filtered.reduce((s, p) => s + (p.actual_amount ?? 0), 0)
   const completedCount = filtered.filter(p => p.status === '完了').length
 
+  function dateAlert(scheduled_date: string | null, status: string): 'overdue' | 'warning' | null {
+    if (!scheduled_date || status === '完了') return null
+    const today = new Date(); today.setHours(0, 0, 0, 0)
+    const d = new Date(scheduled_date); d.setHours(0, 0, 0, 0)
+    const diffDays = Math.floor((d.getTime() - today.getTime()) / 86400000)
+    if (diffDays < 0) return 'overdue'
+    if (diffDays <= 30) return 'warning'
+    return null
+  }
+
+  const alertPlans = filtered.filter(p => dateAlert(p.scheduled_date, p.status) !== null)
+
   function openAdd() {
     setForm({ ...EMPTY_FORM, fiscal_year: selectedYear })
     setEditingPlan(null)
@@ -412,6 +424,25 @@ export default function BusinessPlansClient({
           ))}
         </div>
 
+        {/* 期限アラートバナー */}
+        {alertPlans.length > 0 && (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 space-y-2">
+            <p className="text-sm font-bold text-amber-800">⚠️ 実施時期が近い・過ぎている計画があります</p>
+            {alertPlans.map(plan => {
+              const kind = dateAlert(plan.scheduled_date, plan.status)
+              return (
+                <div key={plan.id} className={`flex items-center gap-3 rounded-xl px-4 py-2 text-sm ${kind === 'overdue' ? 'bg-red-50 border border-red-200' : 'bg-amber-100 border border-amber-200'}`}>
+                  <span className={`font-semibold ${kind === 'overdue' ? 'text-red-700' : 'text-amber-700'}`}>
+                    {kind === 'overdue' ? '期限切れ' : 'もうすぐ'}
+                  </span>
+                  <span className="text-slate-700">{plan.name}</span>
+                  <span className="text-slate-500">実施時期: {fmtDate(plan.scheduled_date)}</span>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
         {/* サマリー */}
         <div className="grid grid-cols-3 gap-4">
           {[
@@ -451,8 +482,15 @@ export default function BusinessPlansClient({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {filtered.map(plan => (
-                    <tr key={plan.id} className="hover:bg-slate-50 transition">
+                  {filtered.map(plan => {
+                    const alert = dateAlert(plan.scheduled_date, plan.status)
+                    const rowBg = alert === 'overdue'
+                      ? 'bg-red-50 hover:bg-red-100'
+                      : alert === 'warning'
+                      ? 'bg-amber-50 hover:bg-amber-100'
+                      : 'hover:bg-slate-50'
+                    return (
+                    <tr key={plan.id} className={`transition ${rowBg}`}>
                       <td className="px-4 py-3 font-medium text-slate-800">
                         {plan.name}
                         {plan.notes && <p className="mt-0.5 text-xs text-slate-400 font-normal">{plan.notes}</p>}
@@ -461,7 +499,11 @@ export default function BusinessPlansClient({
                       <td className="px-4 py-3 text-right tabular-nums text-slate-700">{fmt(plan.budget_amount)}</td>
                       <td className="px-4 py-3 text-right tabular-nums text-slate-700">{fmt(plan.actual_amount)}</td>
                       <td className="px-4 py-3 text-slate-600">{plan.contractor ?? '―'}</td>
-                      <td className="px-4 py-3 text-slate-600">{fmtDate(plan.scheduled_date)}</td>
+                      <td className={`px-4 py-3 font-medium ${alert === 'overdue' ? 'text-red-700' : alert === 'warning' ? 'text-amber-700' : 'text-slate-600'}`}>
+                        {fmtDate(plan.scheduled_date)}
+                        {alert === 'overdue' && <span className="ml-1 text-xs font-semibold text-red-600">期限切れ</span>}
+                        {alert === 'warning' && <span className="ml-1 text-xs font-semibold text-amber-600">もうすぐ</span>}
+                      </td>
                       <td className="px-4 py-3">
                         <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_COLORS[plan.status]}`}>
                           {plan.status}
@@ -474,7 +516,7 @@ export default function BusinessPlansClient({
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  )})}
                 </tbody>
                 <tfoot>
                   <tr className="border-t-2 border-slate-200 bg-slate-50 font-semibold">

@@ -156,10 +156,6 @@ export default function PaymentsPage() {
               </li>
             ))}
           </ol>
-          <div className="mt-6 rounded-xl bg-blue-50 border border-blue-100 p-4 text-sm text-blue-700">
-            <p className="font-semibold mb-1">ヒント</p>
-            <p>先に「デモデータ投入」でサンプルデータを作成すると、未払いのある状態を確認できます。</p>
-          </div>
         </div>
       ) : (
         <>

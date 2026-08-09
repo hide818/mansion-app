@@ -132,9 +132,6 @@ export default function AccountCategoriesPage() {
         )}
       </div>
 
-      <p className="mt-4 text-xs text-slate-400">
-        ヒント：修繕費・管理委託費・清掃費・点検費・光熱費・保険料などよく使う科目を登録しておくと便利です。
-      </p>
     </div>
   )
 }

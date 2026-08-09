@@ -71,7 +71,12 @@ export default async function DashboardPage() {
     taskQuery = taskQuery.is('assigned_to', null)
   }
 
-  const [{ data: taskData, error: taskError }, { data: propertyData, error: propertyError }] =
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const in30Days = new Date(today)
+  in30Days.setDate(today.getDate() + 30)
+
+  const [{ data: taskData, error: taskError }, { data: propertyData, error: propertyError }, { data: alertPlansData }] =
     await Promise.all([
       taskQuery,
       supabase
@@ -80,6 +85,15 @@ export default async function DashboardPage() {
         .eq('company_id', companyId)
         .order('created_at', { ascending: false })
         .limit(5),
+      supabase
+        .from('business_plans')
+        .select('id, name, scheduled_date, status, property_id, properties(name)')
+        .eq('company_id', companyId)
+        .neq('status', '完了')
+        .not('scheduled_date', 'is', null)
+        .lte('scheduled_date', in30Days.toISOString().slice(0, 10))
+        .order('scheduled_date', { ascending: true })
+        .limit(10),
     ])
 
   if (taskError || propertyError) {
@@ -234,6 +248,48 @@ export default async function DashboardPage() {
           <p className="mt-1 text-xs text-slate-400">件（自分担当）</p>
         </div>
       </section>
+
+      {/* 事業計画 期限アラート */}
+      {alertPlansData && alertPlansData.length > 0 && (() => {
+        const todayStr = today.toISOString().slice(0, 10)
+        const overdue = alertPlansData.filter(p => p.scheduled_date < todayStr)
+        const warning = alertPlansData.filter(p => p.scheduled_date >= todayStr)
+        return (
+          <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-lg">⚠️</span>
+              <h2 className="text-sm font-bold text-amber-900">事業計画の実施時期アラート</h2>
+              <span className="ml-auto rounded-full bg-amber-200 px-2.5 py-0.5 text-xs font-bold text-amber-800">{alertPlansData.length}件</span>
+            </div>
+            <div className="space-y-2">
+              {overdue.map(p => (
+                <Link
+                  key={p.id}
+                  href={`/properties/${p.property_id}/business-plans`}
+                  className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm hover:bg-red-100 transition"
+                >
+                  <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">期限切れ</span>
+                  <span className="font-medium text-red-900">{p.name}</span>
+                  <span className="text-xs text-red-600">{p.scheduled_date}</span>
+                  <span className="ml-auto text-xs text-slate-500">{(p.properties as unknown as { name: string } | null)?.name}</span>
+                </Link>
+              ))}
+              {warning.map(p => (
+                <Link
+                  key={p.id}
+                  href={`/properties/${p.property_id}/business-plans`}
+                  className="flex items-center gap-3 rounded-xl border border-amber-200 bg-white px-4 py-2.5 text-sm hover:bg-amber-50 transition"
+                >
+                  <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700">もうすぐ</span>
+                  <span className="font-medium text-slate-800">{p.name}</span>
+                  <span className="text-xs text-amber-600">{p.scheduled_date}</span>
+                  <span className="ml-auto text-xs text-slate-500">{(p.properties as unknown as { name: string } | null)?.name}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )
+      })()}
 
       {/* アラート */}
       <DashboardAlertsClient />
