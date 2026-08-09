@@ -7,9 +7,9 @@ export const metadata = { title: '事業計画進捗管理 | Kura' }
 
 export default async function BusinessPlansPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: propertyId } = await params
-  const supabase = await createSupabaseServerClient()
-  const companyId = await getUserCompanyId(supabase)
+  const companyId = await getUserCompanyId()
   if (!companyId) redirect('/login')
+  const supabase = await createSupabaseServerClient()
 
   const [{ data: property }, { data: plans }, { data: categories }] = await Promise.all([
     supabase.from('properties').select('id, name').eq('id', propertyId).eq('company_id', companyId).single(),

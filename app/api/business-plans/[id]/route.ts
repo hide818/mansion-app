@@ -4,9 +4,9 @@ import { getUserCompanyId } from '@/lib/getUserCompanyId'
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const supabase = await createSupabaseServerClient()
-  const companyId = await getUserCompanyId(supabase)
+  const companyId = await getUserCompanyId()
   if (!companyId) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  const supabase = await createSupabaseServerClient()
 
   const body = await request.json()
   const { data, error } = await supabase
@@ -33,9 +33,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
 export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const supabase = await createSupabaseServerClient()
-  const companyId = await getUserCompanyId(supabase)
+  const companyId = await getUserCompanyId()
   if (!companyId) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  const supabase = await createSupabaseServerClient()
 
   const { error } = await supabase
     .from('business_plans')

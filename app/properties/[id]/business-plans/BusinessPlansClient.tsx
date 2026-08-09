@@ -38,14 +38,26 @@ function fmtDate(s: string | null) {
 const currentYear = new Date().getFullYear()
 const FISCAL_YEARS = Array.from({ length: 5 }, (_, i) => currentYear + 1 - i)
 
-const EMPTY_FORM = {
+type FormState = {
+  fiscal_year: number
+  name: string
+  budget_amount: string
+  account_category_id: string
+  contractor: string
+  scheduled_date: string
+  status: Plan['status']
+  actual_amount: string
+  notes: string
+}
+
+const EMPTY_FORM: FormState = {
   fiscal_year: currentYear,
   name: '',
   budget_amount: '',
   account_category_id: '',
   contractor: '',
   scheduled_date: '',
-  status: '未着手' as const,
+  status: '未着手',
   actual_amount: '',
   notes: '',
 }

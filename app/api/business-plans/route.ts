@@ -3,9 +3,9 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 
 export async function GET(request: NextRequest) {
-  const supabase = await createSupabaseServerClient()
-  const companyId = await getUserCompanyId(supabase)
+  const companyId = await getUserCompanyId()
   if (!companyId) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  const supabase = await createSupabaseServerClient()
 
   const { searchParams } = new URL(request.url)
   const propertyId = searchParams.get('property_id')
@@ -27,10 +27,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const companyId = await getUserCompanyId()
+  if (!companyId) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const companyId = await getUserCompanyId(supabase)
-  if (!companyId || !user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
   const body = await request.json()
   const { property_id, fiscal_year, name, budget_amount, account_category_id, contractor, scheduled_date, status, actual_amount, notes } = body

@@ -3,9 +3,9 @@ import { createSupabaseServerClient } from '@/lib/supabaseServer'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 
 export async function GET() {
-  const supabase = await createSupabaseServerClient()
-  const companyId = await getUserCompanyId(supabase)
+  const companyId = await getUserCompanyId()
   if (!companyId) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  const supabase = await createSupabaseServerClient()
 
   const { data, error } = await supabase
     .from('account_categories')
@@ -19,9 +19,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createSupabaseServerClient()
-  const companyId = await getUserCompanyId(supabase)
+  const companyId = await getUserCompanyId()
   if (!companyId) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  const supabase = await createSupabaseServerClient()
 
   const { name, display_order } = await request.json()
   if (!name?.trim()) return NextResponse.json({ error: '名前は必須です' }, { status: 400 })

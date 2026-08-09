@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# outreach scripts
+outreach_wave*.mjs
+scripts/
+supabase_rls_fix2.sql
+supabase_business_plans.sql
