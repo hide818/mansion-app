@@ -193,10 +193,10 @@ export default function LpPage() {
                 分譲マンション管理会社専用 AI
               </p>
               <h1 className="text-[44px] font-bold leading-[1.08] tracking-[-0.03em] text-white lg:text-[58px]" style={{textWrap: 'balance'}}>
-                理事会・総会の<br />後処理を、<br />
-                <span className="text-[#4ABDA0]">2時間から50分へ。</span>
+                理事会・総会の後処理を<br />
+                <span className="text-[#4ABDA0]">2時間から50分へ</span>
               </h1>
-              <p className="mt-6 text-[16px] leading-[1.75] text-[#9BADB7] max-w-[420px]">
+              <p className="mt-6 text-[16px] leading-[1.75] text-[#C2D4DE] max-w-[420px]">
                 音声から自社書式の議事録を作成し、決定事項と宿題を案件・タスクへ自動登録。会議後の転記までKuraで終わります。
               </p>
               <div className="mt-8">
@@ -242,7 +242,7 @@ export default function LpPage() {
       </section>
 
       {/* ── PROBLEM ── */}
-      <section className="bg-[#F6F3EC] px-6 py-20">
+      <section className="bg-[#F6F3EC] px-6 py-14">
         <div className="mx-auto max-w-5xl">
           <div className="mb-10">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#1A6B4A] mb-4">管理会社が毎年繰り返す問題</p>
@@ -297,7 +297,7 @@ export default function LpPage() {
       <section id="features">
 
         {/* Feature 01 */}
-        <div className="bg-[#F6F3EC] px-6 py-24">
+        <div className="bg-[#F6F3EC] px-6 py-16">
           <div className="mx-auto max-w-5xl">
             <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
               <div>
@@ -338,7 +338,7 @@ export default function LpPage() {
         </div>
 
         {/* Feature 02 */}
-        <div className="bg-white px-6 py-24">
+        <div className="bg-white px-6 py-16">
           <div className="mx-auto max-w-5xl">
             <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
               <div className="order-2 lg:order-1">
@@ -373,7 +373,7 @@ export default function LpPage() {
                     </li>
                   ))}
                 </ul>
-                <p className="mt-4 text-[12px] text-[#7A9099]">
+                <p className="mt-4 text-[12px] text-[#9DB5BF]">
                   ※所要時間は議題数・録音品質・確認修正量によって異なります。
                 </p>
               </div>
@@ -382,7 +382,7 @@ export default function LpPage() {
         </div>
 
         {/* Feature 03 */}
-        <div className="bg-[#F6F3EC] px-6 py-24">
+        <div className="bg-[#F6F3EC] px-6 py-16">
           <div className="mx-auto max-w-5xl">
             <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
               <div>
@@ -432,13 +432,13 @@ export default function LpPage() {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section id="how" className="bg-[#0D1C2E] px-6 py-24 text-white">
+      <section id="how" className="bg-[#0D1C2E] px-6 py-16 text-white">
         <div className="mx-auto max-w-4xl text-center">
-          <p className="text-[13px] font-medium uppercase tracking-widest text-[#7A9099]">How it works</p>
+          <p className="text-[13px] font-medium uppercase tracking-widest text-[#9DB5BF]">How it works</p>
           <h2 className="mt-4 text-[40px] font-bold tracking-[-0.02em] leading-tight">
             たった3ステップ。
           </h2>
-          <p className="mt-4 text-[17px] text-[#9BADB7]">ITに詳しくなくても、当日から使えます。</p>
+          <p className="mt-4 text-[17px] text-[#C2D4DE]">ITに詳しくなくても、当日から使えます。</p>
         </div>
         <div className="mx-auto mt-16 max-w-4xl grid gap-px sm:grid-cols-3 bg-[#162435] rounded-2xl overflow-hidden">
           {[
@@ -449,7 +449,7 @@ export default function LpPage() {
             <div key={s.step} className="bg-[#0D1C2E] p-10">
               <p className="text-[32px] font-bold text-[#1A6B4A]">{s.step}</p>
               <h3 className="mt-4 text-[19px] font-semibold text-white">{s.title}</h3>
-              <p className="mt-3 text-[15px] leading-relaxed text-[#9BADB7]">{s.desc}</p>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#C2D4DE]">{s.desc}</p>
             </div>
           ))}
         </div>
@@ -461,7 +461,7 @@ export default function LpPage() {
           <div className="mb-10">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#4ABDA0] mb-4">Security</p>
             <h2 className="text-[26px] font-bold tracking-[-0.02em] text-white leading-snug" style={{textWrap: 'balance'}}>音声データの取り扱いについて</h2>
-            <p className="mt-3 text-[15px] text-[#9BADB7] max-w-xl">理事会・総会の音声には個人名・金額・クレームなど機密情報が含まれます。Kuraの取り扱いを明示します。</p>
+            <p className="mt-3 text-[15px] text-[#C2D4DE] max-w-xl">理事会・総会の音声には個人名・金額・クレームなど機密情報が含まれます。Kuraの取り扱いを明示します。</p>
           </div>
           <div className="divide-y divide-[#1F3447]">
             {[
@@ -472,7 +472,7 @@ export default function LpPage() {
             ].map(item => (
               <div key={item.label} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 py-4">
                 <p className="text-[13px] font-semibold text-white shrink-0 w-44">{item.label}</p>
-                <p className="text-[14px] leading-relaxed text-[#9BADB7]">{item.body}</p>
+                <p className="text-[14px] leading-relaxed text-[#C2D4DE]">{item.body}</p>
               </div>
             ))}
           </div>
@@ -543,7 +543,7 @@ export default function LpPage() {
       </section>
 
       {/* ── PRICING ── */}
-      <section id="pricing" className="bg-white px-6 py-24">
+      <section id="pricing" className="bg-white px-6 py-16">
         <div className="mx-auto max-w-5xl">
           <div className="text-center">
             <p className="text-[13px] font-medium uppercase tracking-widest text-[#546471]">Pricing</p>
@@ -583,7 +583,7 @@ export default function LpPage() {
               <p className="mt-1 text-[32px] font-bold tracking-tight text-[#1C2B38]">約70時間 <span className="text-[17px] font-normal text-[#546471]">/ 月</span></p>
               <p className="mt-1 text-[14px] text-[#374955]">時給3,000円換算で <span className="font-semibold text-[#1C2B38]">月約21万円相当</span> → スタータープラン月額5万円と比較すると <span className="font-semibold text-[#1A6B4A]">約4.2倍相当</span></p>
             </div>
-            <p className="mt-4 text-[11px] text-[#7A9099] leading-relaxed">
+            <p className="mt-4 text-[11px] text-[#9DB5BF] leading-relaxed">
               ※担当者5名、月2回の議事録作成、月20営業日、時給3,000円で計算した試算例です。実際の削減時間や費用対効果は利用状況によって異なり、導入効果を保証するものではありません。
             </p>
           </div>
@@ -626,7 +626,7 @@ export default function LpPage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section id="faq" className="bg-[#F6F3EC] px-6 py-24">
+      <section id="faq" className="bg-[#F6F3EC] px-6 py-16">
         <div className="mx-auto max-w-2xl">
           <div className="text-center">
             <p className="text-[13px] font-medium uppercase tracking-widest text-[#546471]">FAQ</p>
@@ -647,11 +647,11 @@ export default function LpPage() {
       {/* ── FINAL CTA ── */}
       <section className="bg-[#0D1C2E] px-6 py-24 text-white text-center">
         <div className="mx-auto max-w-2xl">
-          <p className="text-[13px] font-medium uppercase tracking-widest text-[#7A9099]">まずは無料で</p>
+          <p className="text-[13px] font-medium uppercase tracking-widest text-[#9DB5BF]">まずは無料で</p>
           <h2 className="mt-4 text-[28px] sm:text-[36px] lg:text-[40px] font-bold tracking-[-0.02em] leading-tight whitespace-nowrap">
             14日間、全機能を試してみてください。
           </h2>
-          <p className="mt-5 text-[17px] leading-relaxed text-[#9BADB7]">
+          <p className="mt-5 text-[17px] leading-relaxed text-[#C2D4DE]">
             議事録1本を実際にAIで作ってみると、<br className="hidden sm:block" />「これは使える」か「うちには合わない」かがすぐわかります。
           </p>
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
@@ -664,12 +664,12 @@ export default function LpPage() {
               導入前に質問する
             </Link>
           </div>
-          <p className="mt-5 text-[13px] text-[#7A9099]">クレジットカード不要 · 登録2分 · いつでも解約</p>
+          <p className="mt-5 text-[13px] text-[#9DB5BF]">クレジットカード不要 · 登録2分 · いつでも解約</p>
         </div>
       </section>
 
       {/* ── CONTACT ── */}
-      <section id="contact" className="bg-[#F6F3EC] px-6 py-24">
+      <section id="contact" className="bg-[#F6F3EC] px-6 py-16">
         <div className="mx-auto max-w-lg">
           <div className="text-center">
             <p className="text-[13px] font-medium uppercase tracking-widest text-[#546471]">Contact</p>
