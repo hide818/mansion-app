@@ -176,74 +176,100 @@ export default function BusinessPlansClient({
     const {
       Document, Packer, Paragraph, Table, TableRow, TableCell,
       TextRun, AlignmentType, WidthType, ShadingType,
-      BorderStyle, convertInchesToTwip, PageOrientation,
+      BorderStyle, convertInchesToTwip, PageOrientation, TableLayoutType,
     } = await import('docx')
 
     const today = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })
 
-    // 列幅（twip単位、横向きA4 = 約12240twip 余白1200×2引いて9840程度）
-    const COL_WIDTHS = [3000, 1400, 1300, 1300, 1600, 1500, 1000]
+    // 横向きA4（297mm）余白0.9in×2 → 使用幅 ≒ 14,220 twip
+    const COL_WIDTHS = [4000, 1600, 1500, 1500, 1900, 1800, 1100] // 合計 13,400
     const HEADERS   = ['計画名', '勘定科目', '予算', '実績', '施工会社', '実施時期', '状況']
 
     const BORDER = { style: BorderStyle.SINGLE, size: 4, color: 'CBD5E1' }
-    const HEADER_FILL = '1E3A5F'  // 濃紺
-    const TOTAL_FILL  = 'EFF6FF'  // 薄青
+    const HEADER_FILL = '1E3A5F'
+    const TOTAL_FILL  = 'EFF6FF'
+
+    function run(text: string, opts: { bold?: boolean; color?: string; size?: number } = {}) {
+      return new TextRun({
+        text,
+        bold: opts.bold ?? false,
+        size: opts.size ?? 18,
+        font: 'Meiryo',
+        color: opts.color ?? '1E293B',
+      })
+    }
 
     function makeCell(
-      text: string,
-      opts: {
-        bold?: boolean
-        alignRight?: boolean
-        fill?: string
-        color?: string
-        size?: number
-        italic?: boolean
-      } = {}
+      paragraphs: InstanceType<typeof Paragraph>[],
+      opts: { fill?: string; width?: number } = {}
     ) {
       return new TableCell({
         borders: { top: BORDER, bottom: BORDER, left: BORDER, right: BORDER },
         shading: opts.fill ? { type: ShadingType.CLEAR, fill: opts.fill } : undefined,
         margins: { top: 80, bottom: 80, left: 120, right: 120 },
-        children: [new Paragraph({
-          alignment: opts.alignRight ? AlignmentType.RIGHT : AlignmentType.LEFT,
-          children: [new TextRun({
-            text,
-            bold: opts.bold ?? false,
-            size: opts.size ?? 18,
-            font: 'Meiryo',
-            color: opts.color ?? '1E293B',
-            italics: opts.italic ?? false,
-          })],
-        })],
+        width: opts.width ? { size: opts.width, type: WidthType.DXA } : undefined,
+        children: paragraphs,
       })
+    }
+
+    function textCell(
+      text: string,
+      colIdx: number,
+      opts: { bold?: boolean; alignRight?: boolean; fill?: string; color?: string } = {}
+    ) {
+      const fill = opts.fill
+      return makeCell([
+        new Paragraph({
+          alignment: opts.alignRight ? AlignmentType.RIGHT : AlignmentType.LEFT,
+          children: [run(text, { bold: opts.bold, color: opts.color })],
+        }),
+      ], { fill, width: COL_WIDTHS[colIdx] })
+    }
+
+    // 計画名セル（備考は2行目に小さく）
+    function nameCell(plan: typeof filtered[0], fill: string) {
+      const children: InstanceType<typeof Paragraph>[] = [
+        new Paragraph({ children: [run(plan.name)] }),
+      ]
+      if (plan.notes) {
+        children.push(new Paragraph({
+          children: [run(`（${plan.notes}）`, { size: 16, color: '64748B' })],
+        }))
+      }
+      return makeCell(children, { fill, width: COL_WIDTHS[0] })
     }
 
     const headerRow = new TableRow({
       tableHeader: true,
-      children: HEADERS.map(h => makeCell(h, { bold: true, fill: HEADER_FILL, color: 'FFFFFF', size: 18 })),
+      children: HEADERS.map((h, ci) =>
+        textCell(h, ci, { bold: true, fill: HEADER_FILL, color: 'FFFFFF' })
+      ),
     })
 
-    const dataRows = filtered.map((plan, i) => new TableRow({
-      children: [
-        makeCell(plan.name + (plan.notes ? `\n（${plan.notes}）` : ''), { fill: i % 2 === 1 ? 'F8FAFC' : 'FFFFFF' }),
-        makeCell(getCategoryLabel(plan), { fill: i % 2 === 1 ? 'F8FAFC' : 'FFFFFF' }),
-        makeCell(fmt(plan.budget_amount), { alignRight: true, fill: i % 2 === 1 ? 'F8FAFC' : 'FFFFFF' }),
-        makeCell(fmt(plan.actual_amount), { alignRight: true, fill: i % 2 === 1 ? 'F8FAFC' : 'FFFFFF' }),
-        makeCell(plan.contractor ?? '―', { fill: i % 2 === 1 ? 'F8FAFC' : 'FFFFFF' }),
-        makeCell(fmtDate(plan.scheduled_date), { fill: i % 2 === 1 ? 'F8FAFC' : 'FFFFFF' }),
-        makeCell(plan.status, { fill: i % 2 === 1 ? 'F8FAFC' : 'FFFFFF' }),
-      ],
-    }))
+    const dataRows = filtered.map((plan, i) => {
+      const fill = i % 2 === 1 ? 'F8FAFC' : 'FFFFFF'
+      return new TableRow({
+        children: [
+          nameCell(plan, fill),
+          textCell(getCategoryLabel(plan), 1, { fill }),
+          textCell(fmt(plan.budget_amount), 2, { alignRight: true, fill }),
+          textCell(fmt(plan.actual_amount), 3, { alignRight: true, fill }),
+          textCell(plan.contractor ?? '―', 4, { fill }),
+          textCell(fmtDate(plan.scheduled_date), 5, { fill }),
+          textCell(plan.status, 6, { fill }),
+        ],
+      })
+    })
 
     const totalRow = new TableRow({
       children: [
-        makeCell('合計', { bold: true, fill: TOTAL_FILL }),
-        makeCell('', { fill: TOTAL_FILL }),
-        makeCell(fmt(totalBudget || null), { bold: true, alignRight: true, fill: TOTAL_FILL }),
-        makeCell(fmt(totalActual || null), { bold: true, alignRight: true, fill: TOTAL_FILL }),
-        makeCell('', { fill: TOTAL_FILL }),
-        makeCell('', { fill: TOTAL_FILL }),
-        makeCell('', { fill: TOTAL_FILL }),
+        textCell('合計', 0, { bold: true, fill: TOTAL_FILL }),
+        textCell('', 1, { fill: TOTAL_FILL }),
+        textCell(fmt(totalBudget || null), 2, { bold: true, alignRight: true, fill: TOTAL_FILL }),
+        textCell(fmt(totalActual || null), 3, { bold: true, alignRight: true, fill: TOTAL_FILL }),
+        textCell('', 4, { fill: TOTAL_FILL }),
+        textCell('', 5, { fill: TOTAL_FILL }),
+        textCell('', 6, { fill: TOTAL_FILL }),
       ],
     })
 
@@ -261,16 +287,9 @@ export default function BusinessPlansClient({
           },
         },
         children: [
-          // タイトル
           new Paragraph({
             spacing: { after: 60 },
-            children: [new TextRun({
-              text: '事業計画進捗報告書',
-              bold: true,
-              size: 36,
-              font: 'Meiryo',
-              color: '1E3A5F',
-            })],
+            children: [new TextRun({ text: '事業計画進捗報告書', bold: true, size: 36, font: 'Meiryo', color: '1E3A5F' })],
           }),
           // サブ情報行
           new Paragraph({
@@ -283,7 +302,7 @@ export default function BusinessPlansClient({
           }),
           // 本体表
           new Table({
-            width: { size: 100, type: WidthType.PERCENTAGE },
+            layout: TableLayoutType.FIXED,
             columnWidths: COL_WIDTHS,
             rows: [headerRow, ...dataRows, totalRow],
           }),
