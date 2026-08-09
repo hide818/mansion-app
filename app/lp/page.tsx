@@ -293,6 +293,25 @@ export default function LpPage() {
         </div>
       </section>
 
+      {/* ── DEMO VIDEO ── */}
+      <section className="bg-[#F6F3EC] px-6 pb-16">
+        <div className="mx-auto max-w-4xl">
+          <div className="text-center mb-8">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#1A6B4A] mb-3">Demo</p>
+            <h2 className="text-[28px] font-bold tracking-[-0.02em] text-[#1C2B38]">実際の画面をご覧ください。</h2>
+          </div>
+          <div className="rounded-2xl overflow-hidden shadow-[0_4px_32px_rgba(0,0,0,0.12)]">
+            <video
+              src="/kura-demo.mp4"
+              controls
+              playsInline
+              className="w-full"
+              preload="metadata"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* ── FEATURES ── */}
       <section id="features">
 
