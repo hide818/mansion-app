@@ -4,6 +4,7 @@ import KuraLogo from '@/app/components/KuraLogo'
 import ContactForm from '@/app/components/ContactForm'
 import StickyCtaBar from '@/app/components/StickyCtaBar'
 import LpMobileNav from '@/app/components/LpMobileNav'
+import HeroEmailForm from '@/app/components/HeroEmailForm'
 
 export const metadata = {
   title: 'Kura — 担当者が辞めても止まらない管理会社へ',
@@ -199,26 +200,11 @@ export default function LpPage() {
             自社フォーマットに沿った議事録の下書きを生成し、<br />
             決定事項と宿題・タスクまで整理します。
           </p>
-          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Link href="/signup"
-              className="rounded-full bg-[#0071e3] px-8 py-3.5 text-[17px] font-medium text-white hover:bg-[#0077ed] transition-colors shadow-[0_0_24px_rgba(0,113,227,0.4)]">
-              今すぐ14日間無料で試す →
-            </Link>
-            <Link href="#contact"
-              className="rounded-full border border-[#424245] px-8 py-3.5 text-[17px] font-medium text-white hover:border-[#6e6e73] transition-colors">
-              導入前に質問する
-            </Link>
-          </div>
-          <div className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-[13px] text-[#8e8e93]">
-            <span>クレジットカード不要</span>
-            <span>登録2分</span>
-            <span>14日間無料</span>
-            <span>いつでも解約可能</span>
-          </div>
-          <p className="mt-2 text-[12px] text-[#636366]">
+          <HeroEmailForm />
+          <p className="mt-4 text-[12px] text-[#636366]">
             導入前のご質問は<Link href="#contact" className="underline underline-offset-2 hover:text-[#8e8e93] transition-colors">お問い合わせフォーム</Link>から受け付けています
           </p>
-          <p className="mt-2 text-[11px] text-[#48484a]">
+          <p className="mt-1 text-[11px] text-[#48484a]">
             ※所要時間は、議題数・録音品質・自社フォーマット・確認修正量によって異なります。
           </p>
 

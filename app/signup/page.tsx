@@ -1,23 +1,27 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import KuraLogo from '@/app/components/KuraLogo'
 
 export default function SignupPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [form, setForm] = useState({
     companyName: '',
-    displayName: '',
     email: '',
     password: '',
-    confirmPassword: '',
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [loadingStep, setLoadingStep] = useState('')
+
+  useEffect(() => {
+    const emailParam = searchParams.get('email')
+    if (emailParam) setForm(prev => ({ ...prev, email: emailParam }))
+  }, [searchParams])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -26,7 +30,6 @@ export default function SignupPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
-    if (form.password !== form.confirmPassword) { setError('パスワードが一致しません'); return }
     if (form.password.length < 8) { setError('パスワードは8文字以上にしてください'); return }
     setLoading(true)
     try {
@@ -37,7 +40,7 @@ export default function SignupPage() {
         body: JSON.stringify({
           email: form.email,
           password: form.password,
-          displayName: form.displayName,
+          displayName: '',
           companyName: form.companyName,
         }),
       })
@@ -101,11 +104,6 @@ export default function SignupPage() {
                   className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/30" />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold text-blue-200">お名前</label>
-                <input type="text" name="displayName" value={form.displayName} onChange={handleChange} placeholder="山田 太郎"
-                  className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/30" />
-              </div>
-              <div>
                 <label className="mb-1 block text-xs font-semibold text-blue-200">メールアドレス <span className="text-red-400">*</span></label>
                 <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="yamada@example.com" required autoComplete="email"
                   className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/30" />
@@ -113,11 +111,6 @@ export default function SignupPage() {
               <div>
                 <label className="mb-1 block text-xs font-semibold text-blue-200">パスワード（8文字以上） <span className="text-red-400">*</span></label>
                 <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="8文字以上" required autoComplete="new-password"
-                  className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/30" />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-blue-200">パスワード（確認） <span className="text-red-400">*</span></label>
-                <input type="password" name="confirmPassword" value={form.confirmPassword} onChange={handleChange} placeholder="もう一度入力" required autoComplete="new-password"
                   className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/30" />
               </div>
 
