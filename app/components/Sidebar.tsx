@@ -38,6 +38,23 @@ export default function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
       ],
     },
     {
+      label: '事業計画',
+      summary: '総会承認の事業計画を進捗管理・理事会報告',
+      featured: true,
+      children: [
+        {
+          label: '事業計画進捗管理',
+          href: '/properties',
+          description: '物件を選んで事業計画の進捗・予算・実績を管理',
+        },
+        {
+          label: '勘定科目の設定',
+          href: '/settings/account-categories',
+          description: '自社の勘定科目を登録・管理',
+        },
+      ],
+    },
+    {
       label: '法定点検',
       summary: 'エレベーター・消防・貯水槽の期限管理',
       featured: true,

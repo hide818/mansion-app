@@ -316,6 +316,12 @@ export default async function PropertyDetailPage({ params, searchParams }: Props
             >
               タスク一覧を見る
             </Link>
+            <Link
+              href={`/properties/${id}/business-plans`}
+              className="rounded-xl border border-indigo-300 px-4 py-2.5 text-center text-sm font-medium text-indigo-700 hover:bg-indigo-50"
+            >
+              事業計画進捗管理
+            </Link>
           </div>
         </div>
 
