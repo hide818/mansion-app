@@ -185,16 +185,15 @@ export default function LpPage() {
       {/* ── HERO ── */}
       <section className="bg-[#0D1C2E] text-white overflow-hidden">
         <div className="mx-auto max-w-6xl px-6 pt-16 lg:pt-24">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-end">
+          <div className="grid lg:grid-cols-[3fr_2fr] gap-10 lg:gap-16 items-end">
 
             {/* Left: Text + CTA */}
             <div className="pb-16 lg:pb-24">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#4ABDA0] mb-7">
                 分譲マンション管理会社専用 AI
               </p>
-              <h1 className="text-[34px] font-bold leading-[1.2] tracking-[-0.03em] text-white lg:text-[52px]">
-                理事会・総会の<br />
-                後処理を<br />
+              <h1 className="text-[28px] font-bold leading-[1.2] tracking-[-0.03em] text-white lg:text-[44px]">
+                理事会・総会の<br className="lg:hidden" />後処理を<br />
                 <span className="text-[#4ABDA0]">2時間から50分へ</span>
               </h1>
               <p className="mt-6 text-[16px] leading-[1.75] text-[#C2D4DE] max-w-[420px]">
@@ -653,7 +652,7 @@ export default function LpPage() {
             14日間、全機能を試してみてください。
           </h2>
           <p className="mt-5 text-[17px] leading-relaxed text-[#C2D4DE]">
-            議事録1本を実際にAIで作ってみると、「これは使える」か「うちには合わない」かがすぐわかります。
+            議事録1本をAIで作ってみると、「使える」か「合わない」かがすぐわかります。
           </p>
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link href="/signup"
