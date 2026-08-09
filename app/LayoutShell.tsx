@@ -12,7 +12,7 @@ type Props = {
   isAdmin?: boolean
 }
 
-const NO_SHELL_PATHS = ['/', '/login', '/signup', '/privacy', '/terms', '/security', '/lp', '/promo', '/promo/logo', '/features']
+const NO_SHELL_PATHS = ['/', '/login', '/signup', '/privacy', '/terms', '/security', '/lp', '/promo', '/promo/logo', '/features', '/brochure']
 
 function isNoShell(pathname: string) {
   return NO_SHELL_PATHS.includes(pathname) ||
