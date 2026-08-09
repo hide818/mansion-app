@@ -251,19 +251,24 @@ export default function BusinessPlansClient({
   return (
     <>
       <style>{`
-        @media print {
-          body > * { display: none !important; }
-          #business-plan-print { display: block !important; }
-          .no-print { display: none !important; }
-        }
         #business-plan-print { display: none; }
         @media print {
-          #business-plan-print { display: block; }
+          html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
+          body * { visibility: hidden !important; }
+          #business-plan-print, #business-plan-print * { visibility: visible !important; }
+          #business-plan-print {
+            display: block !important;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            padding: 20px;
+            background: #fff !important;
+          }
         }
       `}</style>
 
       {/* 印刷専用レイアウト */}
-      <div id="business-plan-print" style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+      <div id="business-plan-print" style={{ fontFamily: 'sans-serif' }}>
         <h2 style={{ fontSize: '16px', marginBottom: '4px' }}>{propertyName}｜{selectedYear}年度 事業計画進捗報告</h2>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
           <thead>
