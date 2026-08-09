@@ -10,61 +10,22 @@ export const metadata: Metadata = {
 }
 
 const SECURITY_ITEMS = [
-  {
-    label: '通信暗号化',
-    body: 'すべての通信はTLS（HTTPS）で暗号化。平文での送受信は行いません。',
-  },
-  {
-    label: 'クラウド基盤',
-    body: 'データはSupabase（ISO/IEC 27001認定・SOC 2 Type II認定）に保存。クラウドセキュリティの国際基準に準拠しています。',
-  },
-  {
-    label: 'AI学習への利用なし',
-    body: 'アップロードされた音声・議事録データは、AIモデルの学習・改善には一切使用しません。データは議事録生成のみに使用します。',
-  },
-  {
-    label: 'データ削除・退会',
-    body: 'マイページからいつでも音声・議事録データを削除できます。退会後30日以内に全データを完全消去します。',
-  },
-  {
-    label: '役割別アクセス権限',
-    body: '管理者・一般・閲覧の3種類の権限を設定可能。担当者ごとにアクセスできる情報を制限します。',
-  },
-  {
-    label: '操作ログ記録',
-    body: 'だれがいつ何を操作したかを自動記録。内部監査・情報セキュリティ管理に活用できます。',
-  },
-  {
-    label: '会社ごとのデータ完全分離',
-    body: '複数の管理会社が同一システムを利用しても、データは会社単位で完全に分離されています。他社のデータに触れることは物理的に不可能です。',
-  },
+  { label: '通信暗号化', body: 'すべての通信はTLS（HTTPS）で暗号化。平文での送受信は行いません。' },
+  { label: 'クラウド基盤', body: 'データはSupabase（ISO/IEC 27001認定・SOC 2 Type II認定）に保存。クラウドセキュリティの国際基準に準拠しています。' },
+  { label: 'AI学習への利用なし', body: 'アップロードされた音声・議事録データは、AIモデルの学習・改善には一切使用しません。データは議事録生成のみに使用します。' },
+  { label: 'データ削除・退会', body: 'マイページからいつでも音声・議事録データを削除できます。退会後30日以内に全データを完全消去します。' },
+  { label: '役割別アクセス権限', body: '管理者・一般・閲覧の3種類の権限を設定可能。担当者ごとにアクセスできる情報を制限します。' },
+  { label: '操作ログ記録', body: 'だれがいつ何を操作したかを自動記録。内部監査・情報セキュリティ管理に活用できます。' },
+  { label: '会社ごとのデータ完全分離', body: '複数の管理会社が同一システムを利用しても、データは会社単位で完全に分離されています。他社のデータに触れることは物理的に不可能です。' },
 ]
 
 const ALL_FEATURES = [
-  {
-    cat: '物件・居住者管理',
-    items: ['物件管理', '居住者管理', '居住者ポータル（問い合わせ受付）'],
-  },
-  {
-    cat: 'クレーム・トラブル対応',
-    items: ['クレーム管理', 'アラート通知（メール自動送信）'],
-  },
-  {
-    cat: '修繕・工事管理',
-    items: ['事業計画進捗管理', '修繕工事管理', '長期修繕計画管理', '法定点検管理'],
-  },
-  {
-    cat: '見積・収支管理',
-    items: ['見積管理', 'AI見積比較（複数見積を自動比較）'],
-  },
-  {
-    cat: '業者・外部連携',
-    items: ['業者管理', 'CSVインポート（物件・居住者の一括登録）'],
-  },
-  {
-    cat: '分析・管理',
-    items: ['ダッシュボード（全物件をリアルタイム俯瞰）', 'カレンダー（理事会・点検・工事の予定管理）', 'AI月次レポート自動作成', 'ユーザー管理・権限設定', '操作ログ記録'],
-  },
+  { cat: '物件・居住者管理', items: ['物件管理', '居住者管理', '居住者ポータル（問い合わせ受付）'] },
+  { cat: 'クレーム・トラブル対応', items: ['クレーム管理', 'アラート通知（メール自動送信）'] },
+  { cat: '修繕・工事管理', items: ['事業計画進捗管理', '修繕工事管理', '長期修繕計画管理', '法定点検管理'] },
+  { cat: '見積・収支管理', items: ['見積管理', 'AI見積比較（複数見積を自動比較）'] },
+  { cat: '業者・外部連携', items: ['業者管理', 'CSVインポート（物件・居住者の一括登録）'] },
+  { cat: '分析・管理', items: ['ダッシュボード（全物件をリアルタイム俯瞰）', 'カレンダー（理事会・点検・工事の予定管理）', 'AI月次レポート自動作成', 'ユーザー管理・権限設定', '操作ログ記録'] },
 ]
 
 const PRICING = [
@@ -106,6 +67,9 @@ export default function BrochurePage() {
           .page-break { page-break-before: always; break-before: page; }
           @page { margin: 15mm; size: A4; }
           body { font-size: 10pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .no-break { break-inside: avoid; page-break-inside: avoid; }
+          h2 { break-after: avoid; page-break-after: avoid; }
+          h3 { break-after: avoid; page-break-after: avoid; }
         }
       `}</style>
 
@@ -125,7 +89,7 @@ export default function BrochurePage() {
         </div>
 
         {/* COVER */}
-        <div className="bg-[#0D1C2E] text-white px-8 py-20 text-center">
+        <div className="no-break bg-[#0D1C2E] text-white px-8 py-20 text-center">
           <div className="flex justify-center mb-6">
             <KuraLogo size={52} variant="seal" />
           </div>
@@ -154,20 +118,11 @@ export default function BrochurePage() {
             </p>
             <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
               {[
-                {
-                  title: '担当者が辞めると業務が止まる',
-                  body: '引き継ぎに1〜3ヶ月かかり、対外クレームが多発。AIが引き継ぎ書を自動生成し、担当交代コストを最小化します。',
-                },
-                {
-                  title: '議事録作成に毎回2時間以上',
-                  body: '音声をアップロードするだけで、自社書式の議事録を約50分で作成。宿題タスクも自動抽出します。',
-                },
-                {
-                  title: 'Excelでの期限管理は限界',
-                  body: '法定点検・修繕計画の期限をシステムで一元管理。期限漏れをゼロにします。',
-                },
+                { title: '担当者が辞めると業務が止まる', body: '引き継ぎに1〜3ヶ月かかり、対外クレームが多発。AIが引き継ぎ書を自動生成し、担当交代コストを最小化します。' },
+                { title: '議事録作成に毎回2時間以上', body: '音声をアップロードするだけで、自社書式の議事録を約50分で作成。宿題タスクも自動抽出します。' },
+                { title: 'Excelでの期限管理は限界', body: '法定点検・修繕計画の期限をシステムで一元管理。期限漏れをゼロにします。' },
               ].map(p => (
-                <div key={p.title} className="rounded-xl border border-[#D4CFC5] p-5">
+                <div key={p.title} className="no-break rounded-xl border border-[#D4CFC5] p-5">
                   <h3 className="text-[13px] font-bold text-[#1C2B38] mb-2 leading-snug">{p.title}</h3>
                   <p className="text-[12px] leading-relaxed text-[#546471]">{p.body}</p>
                 </div>
@@ -196,7 +151,7 @@ export default function BrochurePage() {
                   items: ['物件ごとの引き継ぎ書を一括生成', '案件・タスク・クレーム履歴を自動整理', 'Word / PDF 出力対応', '担当者交代履歴の記録'],
                 },
               ].map(f => (
-                <div key={f.name} className="rounded-xl border border-[#D4CFC5] p-6">
+                <div key={f.name} className="no-break rounded-xl border border-[#D4CFC5] p-6">
                   <h3 className="text-[16px] font-bold text-[#1C2B38] mb-1">{f.name}</h3>
                   <p className="text-[13px] text-[#546471] leading-relaxed mb-4">{f.desc}</p>
                   <ul className="grid grid-cols-2 gap-x-6 gap-y-1">
@@ -219,7 +174,7 @@ export default function BrochurePage() {
             <h2 className="text-[22px] font-bold text-[#1C2B38] pb-3 border-b-2 border-[#1A6B4A]">3. 全機能一覧</h2>
             <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {ALL_FEATURES.map(cat => (
-                <div key={cat.cat} className="rounded-xl border border-[#D4CFC5] p-5">
+                <div key={cat.cat} className="no-break rounded-xl border border-[#D4CFC5] p-5">
                   <h3 className="text-[12px] font-bold uppercase tracking-wide text-[#546471] mb-3 pb-2 border-b border-[#D4CFC5]">
                     {cat.cat}
                   </h3>
@@ -237,27 +192,18 @@ export default function BrochurePage() {
           </section>
 
           {/* 4. スマートフォン対応 */}
-          <section className="mb-14">
+          <section className="no-break mb-14">
             <h2 className="text-[22px] font-bold text-[#1C2B38] pb-3 border-b-2 border-[#1A6B4A]">4. スマートフォン・外出先からの利用</h2>
             <p className="mt-5 text-[15px] leading-[1.8] text-[#374955]">
               Kuraはスマートフォンブラウザに完全対応しています。アプリのインストールは不要です。外出先や現場からでも、ダッシュボード・案件確認・アラート確認が可能です。
             </p>
             <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
               {[
-                {
-                  title: 'アプリ不要',
-                  desc: 'ブラウザだけで利用可能。iPhoneでもAndroidでも同じ画面で使えます。',
-                },
-                {
-                  title: '現場から即確認',
-                  desc: '外出先から案件・期限・アラートをリアルタイム確認できます。',
-                },
-                {
-                  title: 'どのデバイスでも同期',
-                  desc: 'PCで入力したデータがスマホにも即時反映。担当者間でリアルタイム共有。',
-                },
+                { title: 'アプリ不要', desc: 'ブラウザだけで利用可能。iPhoneでもAndroidでも同じ画面で使えます。' },
+                { title: '現場から即確認', desc: '外出先から案件・期限・アラートをリアルタイム確認できます。' },
+                { title: 'どのデバイスでも同期', desc: 'PCで入力したデータがスマホにも即時反映。担当者間でリアルタイム共有。' },
               ].map(item => (
-                <div key={item.title} className="rounded-xl bg-[#F6F3EC] p-5">
+                <div key={item.title} className="no-break rounded-xl bg-[#F6F3EC] p-5">
                   <h3 className="text-[13px] font-bold text-[#1C2B38] mb-2">{item.title}</h3>
                   <p className="text-[12px] text-[#546471] leading-relaxed">{item.desc}</p>
                 </div>
@@ -276,7 +222,7 @@ export default function BrochurePage() {
             </p>
             <div className="mt-6 rounded-xl border border-[#D4CFC5] overflow-hidden divide-y divide-[#D4CFC5]">
               {SECURITY_ITEMS.map(item => (
-                <div key={item.label} className="flex gap-6 px-6 py-4 bg-white">
+                <div key={item.label} className="no-break flex gap-6 px-6 py-4 bg-white">
                   <p className="text-[13px] font-semibold text-[#1C2B38] shrink-0 w-44 leading-relaxed">{item.label}</p>
                   <p className="text-[13px] leading-relaxed text-[#546471]">{item.body}</p>
                 </div>
@@ -286,6 +232,9 @@ export default function BrochurePage() {
               ※セキュリティに関する詳細はkura-management.com/securityをご覧ください。
             </p>
           </section>
+
+          {/* PAGE BREAK */}
+          <div className="page-break" />
 
           {/* 6. 料金プラン */}
           <section className="mb-14">
@@ -297,7 +246,7 @@ export default function BrochurePage() {
               {PRICING.map(plan => (
                 <div
                   key={plan.name}
-                  className={`rounded-xl p-6 ${plan.highlight ? 'bg-[#1A6B4A] text-white' : 'border border-[#D4CFC5]'}`}
+                  className={`no-break rounded-xl p-6 ${plan.highlight ? 'bg-[#1A6B4A] text-white' : 'border border-[#D4CFC5]'}`}
                 >
                   <h3 className={`text-[15px] font-bold ${plan.highlight ? 'text-white' : 'text-[#1C2B38]'}`}>{plan.name}</h3>
                   <p className={`text-[11px] mt-0.5 ${plan.highlight ? 'text-white/70' : 'text-[#546471]'}`}>{plan.sub}</p>
@@ -308,10 +257,7 @@ export default function BrochurePage() {
                   <p className={`text-[12px] mt-1 ${plan.highlight ? 'text-white/80' : 'text-[#546471]'}`}>{plan.users}</p>
                   <ul className="mt-4 space-y-1.5">
                     {plan.features.map(f => (
-                      <li
-                        key={f}
-                        className={`text-[12px] flex items-start gap-1.5 ${plan.highlight ? 'text-white/90' : 'text-[#374955]'}`}
-                      >
+                      <li key={f} className={`text-[12px] flex items-start gap-1.5 ${plan.highlight ? 'text-white/90' : 'text-[#374955]'}`}>
                         <span className={`shrink-0 font-bold ${plan.highlight ? 'text-white' : 'text-[#1A6B4A]'}`}>✓</span>
                         {f}
                       </li>
@@ -327,23 +273,11 @@ export default function BrochurePage() {
             <h2 className="text-[22px] font-bold text-[#1C2B38] pb-3 border-b-2 border-[#1A6B4A]">7. 導入ステップ・お問い合わせ</h2>
             <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
               {[
-                {
-                  step: '01',
-                  title: '無料トライアル申込',
-                  desc: 'kura-management.com/signup から会社名・メールアドレスを登録。カード不要・2分で完了。',
-                },
-                {
-                  step: '02',
-                  title: '物件・担当者を登録',
-                  desc: 'CSVインポートで一括登録できます。IT担当者の対応不要。',
-                },
-                {
-                  step: '03',
-                  title: '全機能を14日間無料で',
-                  desc: '本番環境と同一機能を制限なしでお試しいただけます。',
-                },
+                { step: '01', title: '無料トライアル申込', desc: 'kura-management.com/signup から会社名・メールアドレスを登録。カード不要・2分で完了。' },
+                { step: '02', title: '物件・担当者を登録', desc: 'CSVインポートで一括登録できます。IT担当者の対応不要。' },
+                { step: '03', title: '全機能を14日間無料で', desc: '本番環境と同一機能を制限なしでお試しいただけます。' },
               ].map(s => (
-                <div key={s.step} className="rounded-xl bg-[#F6F3EC] p-5">
+                <div key={s.step} className="no-break rounded-xl bg-[#F6F3EC] p-5">
                   <p className="text-[26px] font-bold text-[#1A6B4A]">{s.step}</p>
                   <h3 className="mt-2 text-[14px] font-semibold text-[#1C2B38]">{s.title}</h3>
                   <p className="mt-1 text-[12px] text-[#546471] leading-relaxed">{s.desc}</p>
@@ -351,7 +285,7 @@ export default function BrochurePage() {
               ))}
             </div>
 
-            <div className="mt-6 rounded-xl border border-[#D4CFC5] p-6">
+            <div className="no-break mt-6 rounded-xl border border-[#D4CFC5] p-6">
               <h3 className="text-[15px] font-bold text-[#1C2B38] mb-4">お問い合わせ</h3>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 text-[13px]">
                 <div>
@@ -369,7 +303,7 @@ export default function BrochurePage() {
           </section>
 
           {/* FOOTER */}
-          <div className="border-t border-[#D4CFC5] pt-6 text-center">
+          <div className="no-break border-t border-[#D4CFC5] pt-6 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
               <KuraLogo size={16} variant="seal" />
               <span className="text-[13px] font-semibold text-[#1C2B38]">Kura</span>
