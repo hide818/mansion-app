@@ -121,19 +121,34 @@ function ManagerIcon({ active }: { active: boolean }) {
 }
 
 function FreeMinutesTopBar() {
+  const pathname = usePathname()
   return (
-    <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-slate-200 bg-white px-4">
-      <Link href="/ai-minutes" className="flex items-center gap-1.5">
+    <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-slate-200 bg-white px-4 gap-3">
+      <Link href="/ai-minutes" className="flex items-center gap-1.5 shrink-0">
         <KuraLogo size={24} variant="seal" />
         <span className="text-sm font-bold text-slate-800">Kura</span>
         <span className="ml-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">無料体験中</span>
       </Link>
-      <Link
-        href="/free-minutes"
-        className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700 transition-colors"
-      >
-        本格利用へ →
-      </Link>
+      <nav className="flex items-center gap-2 text-xs font-medium text-slate-600">
+        <Link
+          href="/ai-minutes"
+          className={`px-2.5 py-1 rounded-lg transition-colors ${pathname === '/ai-minutes' ? 'bg-slate-100 text-slate-900' : 'hover:bg-slate-50'}`}
+        >
+          AI議事録
+        </Link>
+        <Link
+          href="/properties/create"
+          className={`px-2.5 py-1 rounded-lg transition-colors ${pathname.startsWith('/properties') ? 'bg-slate-100 text-slate-900' : 'hover:bg-slate-50'}`}
+        >
+          物件を登録
+        </Link>
+        <Link
+          href="/free-minutes"
+          className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700 transition-colors"
+        >
+          本格利用へ →
+        </Link>
+      </nav>
     </header>
   )
 }
