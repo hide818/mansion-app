@@ -394,6 +394,15 @@ export default function LpPage() {
                 <p className="mt-4 text-[12px] text-[#9DB5BF]">
                   ※所要時間は議題数・録音品質・確認修正量によって異なります。
                 </p>
+                <div className="mt-8">
+                  <a
+                    href="/free-minutes"
+                    className="inline-flex items-center gap-2 rounded-2xl bg-[#1A6B4A] px-6 py-3 text-[15px] font-bold text-white hover:bg-[#155a3d] transition-colors"
+                  >
+                    月2回無料で試してみる →
+                  </a>
+                  <p className="mt-2 text-[12px] text-[#9DB5BF]">登録のみ・クレジットカード不要</p>
+                </div>
               </div>
             </div>
           </div>
