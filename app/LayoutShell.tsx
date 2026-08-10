@@ -10,6 +10,7 @@ type Props = {
   children: ReactNode
   sidebar: ReactNode
   isAdmin?: boolean
+  isFreeMinutes?: boolean
 }
 
 const NO_SHELL_PATHS = ['/', '/login', '/signup', '/privacy', '/terms', '/security', '/lp', '/promo', '/promo/logo', '/features', '/brochure', '/free-minutes', '/diagnosis']
@@ -119,11 +120,40 @@ function ManagerIcon({ active }: { active: boolean }) {
   )
 }
 
-export default function LayoutShell({ children, sidebar, isAdmin = false }: Props) {
+function FreeMinutesTopBar() {
+  return (
+    <header className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-slate-200 bg-white px-4">
+      <Link href="/ai-minutes" className="flex items-center gap-1.5">
+        <KuraLogo size={24} variant="seal" />
+        <span className="text-sm font-bold text-slate-800">Kura</span>
+        <span className="ml-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">無料体験中</span>
+      </Link>
+      <Link
+        href="/free-minutes"
+        className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700 transition-colors"
+      >
+        本格利用へ →
+      </Link>
+    </header>
+  )
+}
+
+export default function LayoutShell({ children, sidebar, isAdmin = false, isFreeMinutes = false }: Props) {
   const pathname = usePathname()
 
   if (isNoShell(pathname)) {
     return <>{children}</>
+  }
+
+  if (isFreeMinutes) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <FreeMinutesTopBar />
+        <main className="min-w-0 flex-1 overflow-x-hidden">
+          {children}
+        </main>
+      </div>
+    )
   }
 
   return (

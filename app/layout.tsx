@@ -47,6 +47,17 @@ export default async function RootLayout({
   const profile = await getUserProfile()
   const isAdmin = profile?.role === 'admin' || profile?.can_view_all_data === true
 
+  let isFreeMinutes = false
+  if (profile?.company_id) {
+    const supabase = await import('@/lib/supabaseServer').then(m => m.createSupabaseServerClient())
+    const { data: company } = await supabase
+      .from('companies')
+      .select('plan')
+      .eq('id', profile.company_id)
+      .maybeSingle()
+    isFreeMinutes = company?.plan === 'free_minutes'
+  }
+
   return (
     <html lang="ja">
       <head>
@@ -57,6 +68,7 @@ export default async function RootLayout({
       <body className="overflow-x-hidden bg-gray-50 text-slate-900 antialiased">
         <LayoutShell
           isAdmin={isAdmin}
+          isFreeMinutes={isFreeMinutes}
           sidebar={
             <aside className="relative z-30 hidden w-[220px] shrink-0 border-r border-gray-200 bg-white lg:block">
               <div className="sticky top-0 h-screen overflow-y-auto">
