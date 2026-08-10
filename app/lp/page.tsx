@@ -339,7 +339,7 @@ export default function LpPage() {
               実際のKuraの操作をご覧いただけます。営業担当から説明を受けなくても、画面と操作の流れをそのままご確認いただけます。
             </p>
           </div>
-          <DemoVideoPlayer videoId="4Ut9LwEA3jM" />
+          <DemoVideoPlayer />
           {/* 動画後CTA */}
           <div className="mt-8 grid sm:grid-cols-2 gap-4">
             <Link
