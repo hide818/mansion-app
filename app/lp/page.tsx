@@ -163,10 +163,9 @@ export default function LpPage() {
           </Link>
           <div className="hidden items-center gap-8 text-[13px] text-[#546471] sm:flex">
             <Link href="/features" className="hover:text-[#1C2B38] transition-colors">機能</Link>
-            <Link href="#how" className="hover:text-[#1C2B38] transition-colors">使い方</Link>
             <Link href="#pricing" className="hover:text-[#1C2B38] transition-colors">料金</Link>
             <Link href="#faq" className="hover:text-[#1C2B38] transition-colors">FAQ</Link>
-            <Link href="#contact" className="hover:text-[#1C2B38] transition-colors">お問い合わせ</Link>
+            <Link href="/diagnosis" className="hover:text-[#1C2B38] transition-colors">業務診断</Link>
             <Link href="/blog" className="hover:text-[#1C2B38] transition-colors">ブログ</Link>
           </div>
           <div className="flex items-center gap-3">
@@ -293,12 +292,51 @@ export default function LpPage() {
         </div>
       </section>
 
+      {/* ── 3つの入口 ── */}
+      <section className="bg-white px-6 py-14">
+        <div className="mx-auto max-w-5xl">
+          <div className="text-center mb-10">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#1A6B4A] mb-3">どこから始めますか？</p>
+            <h2 className="text-[26px] font-bold tracking-[-0.02em] text-[#1C2B38]">あなたに合った方法で確認できます</h2>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-5">
+            <Link href="#demo" className="group flex flex-col justify-between rounded-2xl border border-[#D4CFC5] bg-[#F6F3EC] p-6 hover:border-[#1A6B4A] transition">
+              <div>
+                <p className="text-[11px] font-semibold text-[#1A6B4A] uppercase tracking-wide mb-3">まず見る</p>
+                <p className="text-[17px] font-bold text-[#1C2B38] mb-2">デモ動画を見る</p>
+                <p className="text-[13px] text-[#546471] leading-relaxed">実際の操作画面を確認。登録不要・2分以内。</p>
+              </div>
+              <p className="mt-5 text-[13px] font-semibold text-[#1A6B4A] group-hover:underline">動画を見る →</p>
+            </Link>
+            <Link href="/free-minutes" className="group flex flex-col justify-between rounded-2xl border border-[#D4CFC5] bg-[#F6F3EC] p-6 hover:border-[#1A6B4A] transition">
+              <div>
+                <p className="text-[11px] font-semibold text-[#1A6B4A] uppercase tracking-wide mb-3">実際に試す</p>
+                <p className="text-[17px] font-bold text-[#1C2B38] mb-2">AI議事録を無料で試す</p>
+                <p className="text-[13px] text-[#546471] leading-relaxed">月2回無料・登録のみ・クレジットカード不要。</p>
+              </div>
+              <p className="mt-5 text-[13px] font-semibold text-[#1A6B4A] group-hover:underline">試してみる →</p>
+            </Link>
+            <Link href="/diagnosis" className="group flex flex-col justify-between rounded-2xl border border-[#D4CFC5] bg-[#F6F3EC] p-6 hover:border-[#1A6B4A] transition">
+              <div>
+                <p className="text-[11px] font-semibold text-[#1A6B4A] uppercase tracking-wide mb-3">課題を確認する</p>
+                <p className="text-[17px] font-bold text-[#1C2B38] mb-2">業務効率化診断</p>
+                <p className="text-[13px] text-[#546471] leading-relaxed">6つの質問で業務の課題を整理。登録不要・1分。</p>
+              </div>
+              <p className="mt-5 text-[13px] font-semibold text-[#1A6B4A] group-hover:underline">診断してみる →</p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ── DEMO VIDEO ── */}
-      <section className="bg-[#F6F3EC] px-6 pb-16">
+      <section id="demo" className="bg-[#F6F3EC] px-6 pb-16">
         <div className="mx-auto max-w-4xl">
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#1A6B4A] mb-3">Demo</p>
-            <h2 className="text-[28px] font-bold tracking-[-0.02em] text-[#1C2B38]">実際の画面をご覧ください。</h2>
+            <h2 className="text-[28px] font-bold tracking-[-0.02em] text-[#1C2B38] mb-3">実際の画面をご覧ください。</h2>
+            <p className="text-[15px] text-[#546471] max-w-xl mx-auto">
+              実際のKuraの操作をご覧いただけます。営業担当から説明を受けなくても、画面と操作の流れをそのままご確認いただけます。
+            </p>
           </div>
           <div className="rounded-2xl overflow-hidden shadow-[0_4px_32px_rgba(0,0,0,0.12)] relative" style={{paddingBottom: '56.25%'}}>
             <iframe
@@ -307,6 +345,35 @@ export default function LpPage() {
               allowFullScreen
               className="absolute inset-0 w-full h-full"
             />
+          </div>
+          {/* 動画後CTA */}
+          <div className="mt-8 grid sm:grid-cols-2 gap-4">
+            <Link
+              href="/free-minutes"
+              className="flex items-center justify-between bg-[#1A6B4A] text-white rounded-2xl px-6 py-5 hover:bg-[#155C3E] transition group"
+            >
+              <div>
+                <p className="text-[11px] font-semibold text-white/70 uppercase tracking-wide mb-1">まず試す</p>
+                <p className="text-[16px] font-bold">AI議事録を無料で試す</p>
+                <p className="text-[12px] text-white/70 mt-0.5">月2回無料・登録のみ・カード不要</p>
+              </div>
+              <svg className="h-5 w-5 text-white/60 shrink-0 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
+            <Link
+              href="/signup"
+              className="flex items-center justify-between bg-[#1C2B38] text-white rounded-2xl px-6 py-5 hover:bg-[#243547] transition group"
+            >
+              <div>
+                <p className="text-[11px] font-semibold text-white/70 uppercase tracking-wide mb-1">全機能を試す</p>
+                <p className="text-[16px] font-bold">14日間無料トライアル</p>
+                <p className="text-[12px] text-white/70 mt-0.5">全機能・クレジットカード不要</p>
+              </div>
+              <svg className="h-5 w-5 text-white/60 shrink-0 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
