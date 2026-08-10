@@ -327,10 +327,11 @@ export default function LpPage() {
           <div className="text-center mb-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#1A6B4A] mb-3">Demo</p>
             <h2 className="text-[28px] font-bold tracking-[-0.02em] text-[#1C2B38] mb-3">実際の画面をご覧ください。</h2>
-            <p className="text-[15px] text-[#546471] max-w-xl mx-auto">
-              実際のKuraの操作をご覧いただけます。営業担当から説明を受けなくても、画面と操作の流れをそのままご確認いただけます。
-            </p>
           </div>
+          <p className="text-[15px] text-[#546471] max-w-xl mx-auto mb-6">
+            実際のKuraの操作をご覧いただけます。営業担当から説明を受けなくても、<br />
+            画面と操作の流れをそのままご確認いただけます。
+          </p>
           <DemoVideoPlayer />
           {/* 動画後CTA */}
           <div className="mt-8">
