@@ -1040,6 +1040,28 @@ function AiMinutesInner() {
   const [reuseMessage, setReuseMessage] = useState('')
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false)
 
+  // 無料AI議事録ユーザー向け
+  type FreeStatus = {
+    isFreeMinutesUser: boolean
+    yearMonth: string
+    usedCount: number
+    maxUses: number
+    remaining: number
+    surveyBonus: boolean
+    hasUsedOnce: boolean
+    surveyAnsweredThisMonth: boolean
+    ctaClicked: boolean
+  }
+  const [freeStatus, setFreeStatus] = useState<FreeStatus | null>(null)
+  const [showSurveyModal, setShowSurveyModal] = useState(false)
+  const [surveyQ1, setSurveyQ1] = useState('')
+  const [surveyQ2, setSurveyQ2] = useState('')
+  const [surveyQ3, setSurveyQ3] = useState('')
+  const [surveyComment, setSurveyComment] = useState('')
+  const [surveyLoading, setSurveyLoading] = useState(false)
+  const [surveyError, setSurveyError] = useState('')
+  const [surveyDone, setSurveyDone] = useState(false)
+
   const selectedProperty = useMemo(() => {
     return properties.find((item) => item.id === propertyId) ?? null
   }, [properties, propertyId])
@@ -1233,6 +1255,20 @@ function AiMinutesInner() {
   useEffect(() => {
     if (!signatureDate && heldOn) setSignatureDate(heldOn)
   }, [heldOn, signatureDate])
+
+  useEffect(() => {
+    fetch('/api/free-minutes/status')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => d && setFreeStatus(d))
+      .catch(() => {})
+  }, [])
+
+  function refreshFreeStatus() {
+    fetch('/api/free-minutes/status')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => d && setFreeStatus(d))
+      .catch(() => {})
+  }
 
   useEffect(() => {
     setMinutesLayoutType(meetingType === '理事会' ? 'board_formal' : 'standard')
@@ -1531,6 +1567,20 @@ function AiMinutesInner() {
           createType: item.recommendedType,
         })),
       )
+      // 無料ユーザーの状態を更新し、アンケートモーダルを表示
+      refreshFreeStatus()
+      setTimeout(() => {
+        fetch('/api/free-minutes/status')
+          .then(r => r.ok ? r.json() : null)
+          .then(d => {
+            if (!d) return
+            setFreeStatus(d)
+            if (d.isFreeMinutesUser && d.hasUsedOnce && !d.surveyAnsweredThisMonth) {
+              setTimeout(() => setShowSurveyModal(true), 2000)
+            }
+          })
+          .catch(() => {})
+      }, 1500)
     } catch (error) {
       console.error(error)
       setErrorMessage('通信エラーが発生しました。')
@@ -1542,6 +1592,37 @@ function AiMinutesInner() {
   async function handleCopy() {
     if (!editableMinutes) return
     await navigator.clipboard.writeText(editableMinutes)
+  }
+
+  async function handleSurveySubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setSurveyLoading(true)
+    setSurveyError('')
+    try {
+      const res = await fetch('/api/free-minutes/survey', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          q1_usability: surveyQ1,
+          q2_current_time: surveyQ2,
+          q3_kura_interest: surveyQ3,
+          comment: surveyComment || null,
+        }),
+      })
+      const d = await res.json()
+      if (!res.ok) throw new Error(d.error || 'アンケートの送信に失敗しました')
+      setSurveyDone(true)
+      refreshFreeStatus()
+    } catch (err: unknown) {
+      setSurveyError(err instanceof Error ? err.message : '送信に失敗しました')
+    } finally {
+      setSurveyLoading(false)
+    }
+  }
+
+  function handleCtaClick() {
+    fetch('/api/free-minutes/cta-click', { method: 'POST' }).catch(() => {})
+    window.location.href = '/signup'
   }
 
   function buildSavePayload(sourceRecordId?: string) {
@@ -1928,6 +2009,53 @@ function AiMinutesInner() {
           会議情報と音声をもとに議事録を作成し、保存・再編集・印刷まで一括で行います。
         </p>
       </section>
+
+      {/* 無料AI議事録バナー */}
+      {freeStatus?.isFreeMinutesUser && (
+        <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-emerald-800">
+                無料AI議事録 — {freeStatus.yearMonth}
+              </p>
+              <div className="mt-1 flex items-center gap-3">
+                <div className="flex gap-1">
+                  {Array.from({ length: freeStatus.maxUses }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={`h-2 w-6 rounded-full ${i < freeStatus.usedCount ? 'bg-emerald-300' : 'bg-emerald-600'}`}
+                    />
+                  ))}
+                </div>
+                <span className="text-sm text-emerald-700">
+                  残り{freeStatus.remaining}回 / {freeStatus.maxUses}回
+                </span>
+              </div>
+              {!freeStatus.surveyBonus && freeStatus.hasUsedOnce && !freeStatus.surveyAnsweredThisMonth && (
+                <p className="mt-1 text-xs text-emerald-700">
+                  アンケートに回答すると今月さらに1回追加されます →{' '}
+                  <button
+                    type="button"
+                    onClick={() => setShowSurveyModal(true)}
+                    className="underline font-medium"
+                  >
+                    回答する
+                  </button>
+                </p>
+              )}
+            </div>
+            {freeStatus.remaining === 0 && (
+              <button
+                type="button"
+                onClick={handleCtaClick}
+                className="shrink-0 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-slate-800 transition"
+              >
+                無制限プランを見る →
+              </button>
+            )}
+          </div>
+        </section>
+      )}
 
       {reuseMessage ? (
         <section className="rounded-3xl border border-sky-200 bg-sky-50 p-6 shadow-sm">
@@ -2909,8 +3037,172 @@ function AiMinutesInner() {
               </pre>
             </details>
           ) : null}
+
+          {/* 無料ユーザー向けKura CTA */}
+          {freeStatus?.isFreeMinutesUser && result && (
+            <section className="rounded-3xl border border-slate-900 bg-slate-900 p-8 text-white text-center shadow-sm">
+              <p className="text-xs font-medium text-white/60 mb-2 uppercase tracking-wider">次のステップ</p>
+              <h3 className="text-xl font-bold mb-2">議事録だけじゃない。Kuraで管理業務をまるごと効率化</h3>
+              <p className="text-white/70 text-sm mb-6 leading-relaxed">
+                案件・タスク管理・引き継ぎAI・議事録の承認ワークフロー。<br />
+                14日間無料トライアルで、チーム全員で使えます。
+              </p>
+              <button
+                type="button"
+                onClick={handleCtaClick}
+                className="inline-block bg-white text-slate-900 font-bold text-sm px-8 py-3 rounded-xl hover:bg-white/90 transition"
+              >
+                14日間無料トライアルを始める →
+              </button>
+            </section>
+          )}
         </>
       ) : null}
+
+      {/* アンケートモーダル */}
+      {showSurveyModal && (
+        <div
+          className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
+          onClick={e => e.target === e.currentTarget && setShowSurveyModal(false)}
+        >
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8">
+            {surveyDone ? (
+              <div className="text-center py-8">
+                <div className="text-5xl mb-4">🎉</div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">ありがとうございました！</h3>
+                <p className="text-slate-600 text-sm mb-2">今月の利用上限が<strong>+1回</strong>追加されました。</p>
+                <p className="text-slate-500 text-xs">
+                  残り：{(freeStatus?.remaining ?? 0) + 1}回
+                </p>
+                <button
+                  onClick={() => { setShowSurveyModal(false); setSurveyDone(false) }}
+                  className="mt-6 bg-slate-900 text-white font-bold text-sm px-6 py-2.5 rounded-xl hover:bg-slate-800 transition"
+                >
+                  閉じる
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-lg font-bold text-slate-900">ご意見をお聞かせください</h2>
+                  <button onClick={() => setShowSurveyModal(false)} className="text-slate-400 hover:text-slate-600 text-xl">✕</button>
+                </div>
+                <p className="text-sm text-emerald-700 bg-emerald-50 px-4 py-2 rounded-xl mb-6">
+                  回答すると今月の利用回数が<strong>+1回</strong>追加されます（所要1分）
+                </p>
+                <form onSubmit={handleSurveySubmit} className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Q1. 生成された議事録はそのまま使えましたか？ <span className="text-red-500">*</span>
+                    </label>
+                    <div className="space-y-2">
+                      {[
+                        { value: 'ready', label: 'ほぼそのまま使えた' },
+                        { value: 'minor_edit', label: '少し修正して使えた' },
+                        { value: 'major_edit', label: '大幅な修正が必要だった' },
+                        { value: 'not_useful', label: '使えなかった' },
+                      ].map(o => (
+                        <label key={o.value} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="q1"
+                            value={o.value}
+                            checked={surveyQ1 === o.value}
+                            onChange={() => setSurveyQ1(o.value)}
+                            required
+                            className="accent-slate-900"
+                          />
+                          <span className="text-sm text-slate-700">{o.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Q2. 議事録作成に普段かかっている時間は？ <span className="text-red-500">*</span>
+                    </label>
+                    <div className="space-y-2">
+                      {[
+                        { value: 'lt30', label: '30分未満' },
+                        { value: '30to60', label: '30分〜1時間' },
+                        { value: '60to120', label: '1〜2時間' },
+                        { value: '120to180', label: '2〜3時間' },
+                        { value: 'gt180', label: '3時間以上' },
+                      ].map(o => (
+                        <label key={o.value} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="q2"
+                            value={o.value}
+                            checked={surveyQ2 === o.value}
+                            onChange={() => setSurveyQ2(o.value)}
+                            required
+                            className="accent-slate-900"
+                          />
+                          <span className="text-sm text-slate-700">{o.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Q3. 案件管理・引き継ぎAIも含む有料プランに興味はありますか？ <span className="text-red-500">*</span>
+                    </label>
+                    <div className="space-y-2">
+                      {[
+                        { value: 'yes', label: '興味がある・導入を検討したい' },
+                        { value: 'try', label: 'まず無料トライアルを試したい' },
+                        { value: 'more_info', label: '詳しい説明を聞いてから判断したい' },
+                        { value: 'not_interested', label: '今のところ興味がない' },
+                      ].map(o => (
+                        <label key={o.value} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="q3"
+                            value={o.value}
+                            checked={surveyQ3 === o.value}
+                            onChange={() => setSurveyQ3(o.value)}
+                            required
+                            className="accent-slate-900"
+                          />
+                          <span className="text-sm text-slate-700">{o.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      自由コメント（任意）
+                    </label>
+                    <textarea
+                      value={surveyComment}
+                      onChange={e => setSurveyComment(e.target.value)}
+                      rows={3}
+                      placeholder="使ってみての感想・要望など"
+                      className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none"
+                    />
+                  </div>
+
+                  {surveyError && (
+                    <p className="text-red-600 text-sm bg-red-50 px-4 py-2 rounded-lg">{surveyError}</p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={surveyLoading || !surveyQ1 || !surveyQ2 || !surveyQ3}
+                    className="w-full bg-slate-900 text-white font-bold text-sm py-3 rounded-xl hover:bg-slate-800 transition disabled:opacity-50"
+                  >
+                    {surveyLoading ? '送信中…' : '回答して+1回もらう'}
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

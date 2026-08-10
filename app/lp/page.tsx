@@ -300,15 +300,12 @@ export default function LpPage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#1A6B4A] mb-3">Demo</p>
             <h2 className="text-[28px] font-bold tracking-[-0.02em] text-[#1C2B38]">実際の画面をご覧ください。</h2>
           </div>
-          <div className="rounded-2xl overflow-hidden shadow-[0_4px_32px_rgba(0,0,0,0.12)]">
-            <video
-              src="/kura-demo.mp4"
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full"
-              preload="auto"
+          <div className="rounded-2xl overflow-hidden shadow-[0_4px_32px_rgba(0,0,0,0.12)] relative" style={{paddingBottom: '56.25%'}}>
+            <iframe
+              src="https://www.youtube.com/embed/4Ut9LwEA3jM?autoplay=1&mute=1&loop=1&playlist=4Ut9LwEA3jM&controls=0&modestbranding=1&rel=0&playsinline=1"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+              className="absolute inset-0 w-full h-full"
             />
           </div>
         </div>

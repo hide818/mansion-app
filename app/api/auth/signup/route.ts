@@ -8,7 +8,8 @@ export const runtime = 'nodejs'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, password, displayName, companyName } = body
+    const { email, password, displayName, companyName, source } = body
+    const isFreeMinutes = source === 'free_minutes'
 
     if (!email || !password || !companyName) {
       return NextResponse.json({ error: 'メールアドレス・パスワード・会社名は必須です' }, { status: 400 })
@@ -27,14 +28,19 @@ export async function POST(request: NextRequest) {
     const companyId = crypto.randomUUID()
 
     // ① companies テーブルに会社レコードを先に作成
+    const companyInsertData: Record<string, unknown> = {
+      id: companyId,
+      name: companyName,
+      plan: isFreeMinutes ? 'free_minutes' : 'trial',
+      source: isFreeMinutes ? 'free_minutes' : null,
+    }
+    if (!isFreeMinutes) {
+      companyInsertData.trial_ends_at = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
+    }
+
     const { error: companyError } = await supabaseAdmin
       .from('companies')
-      .insert({
-        id: companyId,
-        name: companyName,
-        plan: 'trial',
-        trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-      })
+      .insert(companyInsertData)
 
     if (companyError) {
       console.error('company insert error:', companyError)
@@ -185,13 +191,14 @@ export async function POST(request: NextRequest) {
       resend.emails.send({
         from: `Kura <${fromEmail}>`,
         to: toEmail,
-        subject: `【Kura 新規登録】${companyName}`,
+        subject: isFreeMinutes ? `【無料AI議事録 新規登録】${companyName}` : `【Kura 新規登録】${companyName}`,
         html: `
-          <h2 style="color:#1e3a5f;">新規ユーザーが登録しました</h2>
+          <h2 style="color:#1e3a5f;">${isFreeMinutes ? '無料AI議事録ユーザーが登録しました' : '新規ユーザーが登録しました'}</h2>
           <table border="1" cellpadding="8" style="border-collapse:collapse;margin-top:12px;">
             <tr><th style="background:#f1f5f9;text-align:left;">会社名</th><td>${companyName}</td></tr>
             <tr><th style="background:#f1f5f9;text-align:left;">担当者名</th><td>${displayName || '未入力'}</td></tr>
             <tr><th style="background:#f1f5f9;text-align:left;">メール</th><td>${email}</td></tr>
+            <tr><th style="background:#f1f5f9;text-align:left;">種別</th><td>${isFreeMinutes ? '無料AI議事録（月2回）' : '14日間無料トライアル'}</td></tr>
             <tr><th style="background:#f1f5f9;text-align:left;">登録日時</th><td>${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}</td></tr>
           </table>
           <p style="margin-top:16px;color:#666;font-size:13px;">Kura 自動通知</p>

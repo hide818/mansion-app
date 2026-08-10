@@ -8,6 +8,7 @@ import { randomUUID } from 'node:crypto'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 import { createSupabaseServerClient, createSupabaseServiceClient } from '@/lib/supabaseServer'
+import { createClient } from '@supabase/supabase-js'
 import { getUserCompanyId } from '@/lib/getUserCompanyId'
 import ffmpegStatic from 'ffmpeg-static'
 
@@ -474,6 +475,47 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '認証が必要です。' }, { status: 401 })
     }
 
+    // 無料AI議事録ユーザーの利用制限チェック
+    const adminForCheck = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    )
+    const { data: profileForCheck } = await adminForCheck
+      .from('profiles')
+      .select('company_id')
+      .eq('id', user.id)
+      .single()
+
+    const { data: companyForCheck } = profileForCheck?.company_id
+      ? await adminForCheck.from('companies').select('source, plan').eq('id', profileForCheck.company_id).single()
+      : { data: null }
+
+    const isFreeMinutesUser = companyForCheck?.source === 'free_minutes'
+
+    let freeMinutesYearMonth: string | null = null
+    if (isFreeMinutesUser) {
+      const now = new Date()
+      freeMinutesYearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+
+      const { data: usageRow } = await adminForCheck
+        .from('free_minutes_usage')
+        .select('used_count, survey_bonus_granted')
+        .eq('user_id', user.id)
+        .eq('year_month', freeMinutesYearMonth)
+        .maybeSingle()
+
+      const usedCount = usageRow?.used_count ?? 0
+      const surveyBonus = usageRow?.survey_bonus_granted ?? false
+      const maxUses = 2 + (surveyBonus ? 1 : 0)
+
+      if (usedCount >= maxUses) {
+        return NextResponse.json(
+          { error: `今月の無料利用回数（${maxUses}回）に達しました。アンケートに回答すると1回追加されます。` },
+          { status: 429 },
+        )
+      }
+    }
+
     const body = await request.json()
 
     const meetingTypeRaw = String(body.meetingType ?? '').trim()
@@ -590,6 +632,14 @@ export async function POST(request: Request) {
       transcript: transcriptText,
       minutes,
     })
+
+    // 無料ユーザーの利用回数記録（atomic increment via RPC）
+    if (isFreeMinutesUser && freeMinutesYearMonth) {
+      void adminForCheck.rpc('increment_free_minutes_usage', {
+        p_user_id: user.id,
+        p_year_month: freeMinutesYearMonth,
+      })
+    }
 
     return NextResponse.json({
       transcript: transcriptText,
