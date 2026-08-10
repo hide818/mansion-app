@@ -293,14 +293,14 @@ export default function LpPage() {
         </div>
       </section>
 
-      {/* ── 3つの入口 ── */}
+      {/* ── 2つの入口 ── */}
       <section className="bg-white px-6 py-14">
         <div className="mx-auto max-w-5xl">
           <div className="text-center mb-10">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#1A6B4A] mb-3">どこから始めますか？</p>
             <h2 className="text-[26px] font-bold tracking-[-0.02em] text-[#1C2B38]">あなたに合った方法で確認できます</h2>
           </div>
-          <div className="grid sm:grid-cols-3 gap-5">
+          <div className="grid sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
             <Link href="#demo" className="group flex flex-col justify-between rounded-2xl border border-[#D4CFC5] bg-[#F6F3EC] p-6 hover:border-[#1A6B4A] transition">
               <div>
                 <p className="text-[11px] font-semibold text-[#1A6B4A] uppercase tracking-wide mb-3">まず見る</p>
@@ -308,14 +308,6 @@ export default function LpPage() {
                 <p className="text-[13px] text-[#546471] leading-relaxed">実際の操作画面を確認。登録不要・2分以内。</p>
               </div>
               <p className="mt-5 text-[13px] font-semibold text-[#1A6B4A] group-hover:underline">動画を見る →</p>
-            </Link>
-            <Link href="/free-minutes" className="group flex flex-col justify-between rounded-2xl border border-[#D4CFC5] bg-[#F6F3EC] p-6 hover:border-[#1A6B4A] transition">
-              <div>
-                <p className="text-[11px] font-semibold text-[#1A6B4A] uppercase tracking-wide mb-3">実際に試す</p>
-                <p className="text-[17px] font-bold text-[#1C2B38] mb-2">AI議事録を無料で試す</p>
-                <p className="text-[13px] text-[#546471] leading-relaxed">月2回無料・登録のみ・クレジットカード不要。</p>
-              </div>
-              <p className="mt-5 text-[13px] font-semibold text-[#1A6B4A] group-hover:underline">試してみる →</p>
             </Link>
             <Link href="/diagnosis" className="group flex flex-col justify-between rounded-2xl border border-[#D4CFC5] bg-[#F6F3EC] p-6 hover:border-[#1A6B4A] transition">
               <div>
@@ -341,28 +333,15 @@ export default function LpPage() {
           </div>
           <DemoVideoPlayer />
           {/* 動画後CTA */}
-          <div className="mt-8 grid sm:grid-cols-2 gap-4">
+          <div className="mt-8">
             <Link
-              href="/free-minutes"
+              href="/signup"
               className="flex items-center justify-between bg-[#1A6B4A] text-white rounded-2xl px-6 py-5 hover:bg-[#155C3E] transition group"
             >
               <div>
-                <p className="text-[11px] font-semibold text-white/70 uppercase tracking-wide mb-1">まず試す</p>
-                <p className="text-[16px] font-bold">AI議事録を無料で試す</p>
-                <p className="text-[12px] text-white/70 mt-0.5">月2回無料・登録のみ・カード不要</p>
-              </div>
-              <svg className="h-5 w-5 text-white/60 shrink-0 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-              </svg>
-            </Link>
-            <Link
-              href="/signup"
-              className="flex items-center justify-between bg-[#1C2B38] text-white rounded-2xl px-6 py-5 hover:bg-[#243547] transition group"
-            >
-              <div>
                 <p className="text-[11px] font-semibold text-white/70 uppercase tracking-wide mb-1">全機能を試す</p>
-                <p className="text-[16px] font-bold">14日間無料トライアル</p>
-                <p className="text-[12px] text-white/70 mt-0.5">全機能・クレジットカード不要</p>
+                <p className="text-[16px] font-bold">14日間無料トライアルを始める</p>
+                <p className="text-[12px] text-white/70 mt-0.5">クレジットカード不要・いつでも解約可</p>
               </div>
               <svg className="h-5 w-5 text-white/60 shrink-0 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -455,21 +434,21 @@ export default function LpPage() {
                 <p className="mt-4 text-[12px] text-[#9DB5BF]">
                   ※所要時間は議題数・録音品質・確認修正量によって異なります。
                 </p>
-                <a
-                  href="/free-minutes"
+                <Link
+                  href="/signup"
                   className="mt-8 flex items-center justify-between gap-4 rounded-2xl bg-[#1C2B38] px-6 py-5 hover:bg-[#243547] transition-colors group"
                 >
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="rounded-full bg-[#1A6B4A] px-2.5 py-0.5 text-[11px] font-bold text-white uppercase tracking-wide">無料</span>
-                      <span className="text-[11px] text-[#9DB5BF]">登録のみ・カード不要</span>
+                      <span className="rounded-full bg-[#1A6B4A] px-2.5 py-0.5 text-[11px] font-bold text-white uppercase tracking-wide">14日間無料</span>
+                      <span className="text-[11px] text-[#9DB5BF]">カード不要</span>
                     </div>
-                    <p className="text-[17px] font-bold text-white leading-tight">月2回、無料で試してみる</p>
+                    <p className="text-[17px] font-bold text-white leading-tight">全機能を無料でトライアル</p>
                   </div>
                   <svg className="h-6 w-6 shrink-0 text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                   </svg>
-                </a>
+                </Link>
               </div>
             </div>
           </div>
