@@ -184,6 +184,11 @@ export default function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
           href: '/users',
           description: 'ユーザーと権限管理',
         },
+        {
+          label: 'プロフィール設定',
+          href: '/settings/profile',
+          description: '表示名を変更する',
+        },
       ],
     },
   ]
