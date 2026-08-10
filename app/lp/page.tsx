@@ -394,15 +394,21 @@ export default function LpPage() {
                 <p className="mt-4 text-[12px] text-[#9DB5BF]">
                   ※所要時間は議題数・録音品質・確認修正量によって異なります。
                 </p>
-                <div className="mt-8">
-                  <a
-                    href="/free-minutes"
-                    className="inline-flex items-center gap-2 rounded-2xl bg-[#1A6B4A] px-6 py-3 text-[15px] font-bold text-white hover:bg-[#155a3d] transition-colors"
-                  >
-                    月2回無料で試してみる →
-                  </a>
-                  <p className="mt-2 text-[12px] text-[#9DB5BF]">登録のみ・クレジットカード不要</p>
-                </div>
+                <a
+                  href="/free-minutes"
+                  className="mt-8 flex items-center justify-between gap-4 rounded-2xl bg-[#1C2B38] px-6 py-5 hover:bg-[#243547] transition-colors group"
+                >
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="rounded-full bg-[#1A6B4A] px-2.5 py-0.5 text-[11px] font-bold text-white uppercase tracking-wide">無料</span>
+                      <span className="text-[11px] text-[#9DB5BF]">登録のみ・カード不要</span>
+                    </div>
+                    <p className="text-[17px] font-bold text-white leading-tight">月2回、無料で試してみる</p>
+                  </div>
+                  <svg className="h-6 w-6 shrink-0 text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                  </svg>
+                </a>
               </div>
             </div>
           </div>
