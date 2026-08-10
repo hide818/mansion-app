@@ -4,7 +4,14 @@ import { useState } from 'react'
 
 export default function DemoVideoPlayer({ videoId }: { videoId: string }) {
   const [playing, setPlaying] = useState(false)
+  const [coverTop, setCoverTop] = useState(false)
   const thumb = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+
+  function handlePlay() {
+    setPlaying(true)
+    setCoverTop(true)
+    setTimeout(() => setCoverTop(false), 4000)
+  }
 
   return (
     <div
@@ -12,15 +19,23 @@ export default function DemoVideoPlayer({ videoId }: { videoId: string }) {
       style={{ paddingBottom: '56.25%' }}
     >
       {playing ? (
-        <iframe
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
-          allow="autoplay; encrypted-media; fullscreen"
-          allowFullScreen
-          className="absolute inset-0 w-full h-full"
-        />
+        <>
+          <iframe
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
+            allow="autoplay; encrypted-media; fullscreen"
+            allowFullScreen
+            className="absolute inset-0 w-full h-full"
+          />
+          {coverTop && (
+            <div
+              className="absolute inset-x-0 top-0 pointer-events-none z-10"
+              style={{ height: '14%', background: 'linear-gradient(to bottom, #000 60%, transparent)' }}
+            />
+          )}
+        </>
       ) : (
         <button
-          onClick={() => setPlaying(true)}
+          onClick={handlePlay}
           aria-label="動画を再生する"
           className="absolute inset-0 w-full h-full group"
         >
