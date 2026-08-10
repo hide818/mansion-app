@@ -145,12 +145,9 @@ export default function DiagnosisPage() {
       <nav className="bg-white border-b border-slate-200">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link href="/lp" className="text-[17px] font-semibold text-[#1C2B38] tracking-tight">Kura</Link>
-          <div className="flex items-center gap-4">
-            <Link href="/free-minutes" className="text-sm text-[#1A6B4A] hover:underline">無料AI議事録</Link>
-            <Link href="/signup" className="rounded-full bg-[#1A6B4A] px-4 py-1.5 text-[13px] font-medium text-white hover:bg-[#155C3E] transition-colors">
-              無料で試す
-            </Link>
-          </div>
+          <Link href="/signup" className="rounded-full bg-[#1A6B4A] px-4 py-1.5 text-[13px] font-medium text-white hover:bg-[#155C3E] transition-colors">
+            無料で試す
+          </Link>
         </div>
       </nav>
 
@@ -267,103 +264,56 @@ export default function DiagnosisPage() {
 
               {/* 議事録課題が高い場合 */}
               {result.ctaType === 'minutes' && (
-                <div className="space-y-4">
-                  <div className="rounded-2xl border-2 border-[#1A6B4A] bg-[#f0faf6] p-6">
-                    <p className="text-sm font-semibold text-[#1A6B4A] mb-1">まず試せること</p>
-                    <p className="text-[#1C2B38] font-bold text-base mb-3">
-                      AI議事録を1回無料で試してみる
-                    </p>
-                    <p className="text-sm text-[#546471] mb-4">
-                      音声をアップロードするだけ。10〜15分で議事録の下書きが完成します。月2回まで無料・登録のみ。
-                    </p>
-                    <a
-                      href="/free-minutes"
-                      onClick={() => sendGAEvent(GA_EVENTS.FREE_DIAGNOSIS_TO_AI_MINUTES)}
-                      className="inline-block bg-[#1A6B4A] text-white font-bold text-sm px-6 py-3 rounded-xl hover:bg-[#155C3E] transition"
-                    >
-                      AI議事録を無料で試す →
-                    </a>
+                <a
+                  href="/signup"
+                  onClick={() => sendGAEvent(GA_EVENTS.FREE_DIAGNOSIS_TO_TRIAL)}
+                  className="flex items-center justify-between rounded-2xl border-2 border-[#1A6B4A] bg-[#f0faf6] p-6 hover:bg-[#e8f5ee] transition group"
+                >
+                  <div>
+                    <p className="text-xs font-semibold text-[#1A6B4A] mb-1">まず試せること</p>
+                    <p className="text-base font-bold text-[#1C2B38] mb-1">Kura全機能を14日間無料で試す</p>
+                    <p className="text-sm text-[#546471]">AI議事録・案件管理・引き継ぎ書まで一括・カード不要</p>
                   </div>
-                  <a
-                    href="/signup"
-                    onClick={() => sendGAEvent(GA_EVENTS.FREE_DIAGNOSIS_TO_TRIAL)}
-                    className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 hover:border-slate-400 transition group"
-                  >
-                    <div>
-                      <p className="text-sm font-bold text-[#1C2B38]">Kura全機能を14日間無料で試す</p>
-                      <p className="text-xs text-[#546471] mt-0.5">案件管理・AI議事録・引き継ぎ書まで一括</p>
-                    </div>
-                    <svg className="h-5 w-5 text-slate-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                    </svg>
-                  </a>
-                </div>
+                  <svg className="h-5 w-5 text-[#1A6B4A] shrink-0 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                  </svg>
+                </a>
               )}
 
               {/* 案件/タスク課題が高い場合 */}
               {result.ctaType === 'case' && (
-                <div className="space-y-4">
-                  <a
-                    href="/signup"
-                    onClick={() => sendGAEvent(GA_EVENTS.FREE_DIAGNOSIS_TO_TRIAL)}
-                    className="flex items-center justify-between rounded-2xl border-2 border-[#1A6B4A] bg-[#f0faf6] p-6 hover:bg-[#e8f5ee] transition group"
-                  >
-                    <div>
-                      <p className="text-xs font-semibold text-[#1A6B4A] mb-1">まず試せること</p>
-                      <p className="text-base font-bold text-[#1C2B38] mb-1">Kuraを14日間無料で試す</p>
-                      <p className="text-sm text-[#546471]">案件・タスク管理の全機能を無料トライアルで</p>
-                    </div>
-                    <svg className="h-5 w-5 text-[#1A6B4A] shrink-0 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                    </svg>
-                  </a>
-                  <a
-                    href="/free-minutes"
-                    onClick={() => sendGAEvent(GA_EVENTS.FREE_DIAGNOSIS_TO_AI_MINUTES)}
-                    className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 hover:border-slate-400 transition group"
-                  >
-                    <div>
-                      <p className="text-sm font-bold text-[#1C2B38]">AI議事録だけ先に試す</p>
-                      <p className="text-xs text-[#546471] mt-0.5">月2回無料・登録のみ</p>
-                    </div>
-                    <svg className="h-5 w-5 text-slate-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                    </svg>
-                  </a>
-                </div>
+                <a
+                  href="/signup"
+                  onClick={() => sendGAEvent(GA_EVENTS.FREE_DIAGNOSIS_TO_TRIAL)}
+                  className="flex items-center justify-between rounded-2xl border-2 border-[#1A6B4A] bg-[#f0faf6] p-6 hover:bg-[#e8f5ee] transition group"
+                >
+                  <div>
+                    <p className="text-xs font-semibold text-[#1A6B4A] mb-1">まず試せること</p>
+                    <p className="text-base font-bold text-[#1C2B38] mb-1">Kuraを14日間無料で試す</p>
+                    <p className="text-sm text-[#546471]">案件・タスク管理の全機能を無料トライアルで</p>
+                  </div>
+                  <svg className="h-5 w-5 text-[#1A6B4A] shrink-0 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                  </svg>
+                </a>
               )}
 
               {/* 全体的に高い場合 */}
               {result.ctaType === 'all' && (
-                <div className="space-y-4">
-                  <a
-                    href="/signup"
-                    onClick={() => sendGAEvent(GA_EVENTS.FREE_DIAGNOSIS_TO_TRIAL)}
-                    className="flex items-center justify-between rounded-2xl border-2 border-[#1A6B4A] bg-[#f0faf6] p-6 hover:bg-[#e8f5ee] transition group"
-                  >
-                    <div>
-                      <p className="text-xs font-semibold text-[#1A6B4A] mb-1">おすすめ</p>
-                      <p className="text-base font-bold text-[#1C2B38] mb-1">Kuraを14日間無料で試す</p>
-                      <p className="text-sm text-[#546471]">全機能・クレジットカード不要</p>
-                    </div>
-                    <svg className="h-5 w-5 text-[#1A6B4A] shrink-0 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                    </svg>
-                  </a>
-                  <a
-                    href="/free-minutes"
-                    onClick={() => sendGAEvent(GA_EVENTS.FREE_DIAGNOSIS_TO_AI_MINUTES)}
-                    className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 hover:border-slate-400 transition group"
-                  >
-                    <div>
-                      <p className="text-sm font-bold text-[#1C2B38]">まずAI議事録だけ無料で試す</p>
-                      <p className="text-xs text-[#546471] mt-0.5">月2回・登録のみ・カード不要</p>
-                    </div>
-                    <svg className="h-5 w-5 text-slate-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                    </svg>
-                  </a>
-                </div>
+                <a
+                  href="/signup"
+                  onClick={() => sendGAEvent(GA_EVENTS.FREE_DIAGNOSIS_TO_TRIAL)}
+                  className="flex items-center justify-between rounded-2xl border-2 border-[#1A6B4A] bg-[#f0faf6] p-6 hover:bg-[#e8f5ee] transition group"
+                >
+                  <div>
+                    <p className="text-xs font-semibold text-[#1A6B4A] mb-1">おすすめ</p>
+                    <p className="text-base font-bold text-[#1C2B38] mb-1">Kuraを14日間無料で試す</p>
+                    <p className="text-sm text-[#546471]">全機能・クレジットカード不要</p>
+                  </div>
+                  <svg className="h-5 w-5 text-[#1A6B4A] shrink-0 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                  </svg>
+                </a>
               )}
             </div>
 
