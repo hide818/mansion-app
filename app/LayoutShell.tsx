@@ -12,13 +12,15 @@ type Props = {
   isAdmin?: boolean
 }
 
-const NO_SHELL_PATHS = ['/', '/login', '/signup', '/privacy', '/terms', '/security', '/lp', '/promo', '/promo/logo', '/features', '/brochure']
+const NO_SHELL_PATHS = ['/', '/login', '/signup', '/privacy', '/terms', '/security', '/lp', '/promo', '/promo/logo', '/features', '/brochure', '/free-minutes', '/diagnosis']
 
 function isNoShell(pathname: string) {
   return NO_SHELL_PATHS.includes(pathname) ||
     pathname.startsWith('/lp/') ||
     pathname.startsWith('/blog') ||
-    pathname.startsWith('/features')
+    pathname.startsWith('/features') ||
+    pathname.startsWith('/free-minutes') ||
+    pathname.startsWith('/diagnosis')
 }
 
 function MobileTopBar() {

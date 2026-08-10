@@ -199,13 +199,13 @@ export default function FreeMinutesPage() {
       {/* 特徴 */}
       <section className="bg-slate-50 border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-4 py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-12 text-center">なぜ管理会社に選ばれるか</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-12 text-center">できること</h2>
           <div className="grid sm:grid-cols-2 gap-6">
             {[
-              { title: '管理会社専用の精度', desc: '「修繕積立金」「長期修繕計画」「理事長」など、管理業務特有の用語を正確に認識。一般的なAIとは精度が違います。' },
-              { title: '議事録フォーマットを学習', desc: '自社の過去議事録を登録すると、表現や構成のクセを学習。追記・修正が最小限になります。' },
-              { title: '承認・共有ワークフロー', desc: '生成した議事録はKura内で管理。担当者→マネージャー→理事長への確認依頼も一元管理できます。' },
-              { title: 'アクション項目の自動抽出', desc: '「〇〇を確認する」「見積を取る」などの宿題を自動で一覧化。タスク化も1クリックです。' },
+              { title: '文字起こし＋議事録の下書きを自動生成', desc: '録音を文字起こしし、議題に沿った議事録の下書きをAIが作成。清書・転記の手間を大幅に削減できます。' },
+              { title: '議事録フォーマットを学習（有料機能）', desc: '自社の過去議事録を登録すると、表現や構成を反映した議事録を生成できます。無料プランでは標準フォーマットで生成されます。' },
+              { title: 'アクション項目の自動抽出', desc: '「〇〇を確認する」「見積を取る」などの宿題を議事録から自動で一覧化します。' },
+              { title: '承認・共有ワークフロー（有料機能）', desc: '生成した議事録をKura内で管理し、担当者→マネージャー→理事長への確認依頼を一元管理できます。' },
             ].map(f => (
               <div key={f.title} className="bg-white rounded-2xl border border-slate-200 p-6">
                 <h3 className="font-bold text-slate-900 mb-2">{f.title}</h3>
@@ -234,8 +234,8 @@ export default function FreeMinutesPage() {
           </div>
           <div className="rounded-2xl border-2 border-slate-900 p-8 relative overflow-hidden">
             <div className="absolute top-0 right-0 bg-slate-900 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">おすすめ</div>
-            <div className="text-sm font-medium text-slate-500 mb-2">Kura スタンダード</div>
-            <div className="text-3xl font-bold text-slate-900 mb-1">¥29,800</div>
+            <div className="text-sm font-medium text-slate-500 mb-2">Kura スターター</div>
+            <div className="text-3xl font-bold text-slate-900 mb-1">¥50,000</div>
             <div className="text-sm text-slate-500 mb-6">/月（税抜）〜</div>
             <ul className="space-y-2 text-sm text-slate-700">
               <li className="flex items-start gap-2"><span className="text-emerald-500 mt-0.5">✓</span>AI議事録（無制限）</li>

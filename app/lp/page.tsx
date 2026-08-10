@@ -5,6 +5,7 @@ import ContactForm from '@/app/components/ContactForm'
 import StickyCtaBar from '@/app/components/StickyCtaBar'
 import LpMobileNav from '@/app/components/LpMobileNav'
 import HeroEmailForm from '@/app/components/HeroEmailForm'
+import DemoVideoPlayer from '@/app/components/DemoVideoPlayer'
 
 export const metadata = {
   title: 'Kura — 担当者が辞めても止まらない管理会社へ',
@@ -338,14 +339,7 @@ export default function LpPage() {
               実際のKuraの操作をご覧いただけます。営業担当から説明を受けなくても、画面と操作の流れをそのままご確認いただけます。
             </p>
           </div>
-          <div className="rounded-2xl overflow-hidden shadow-[0_4px_32px_rgba(0,0,0,0.12)] relative" style={{paddingBottom: '56.25%'}}>
-            <iframe
-              src="https://www.youtube.com/embed/4Ut9LwEA3jM?autoplay=1&mute=1&loop=1&playlist=4Ut9LwEA3jM&controls=0&modestbranding=1&rel=0&playsinline=1"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-              className="absolute inset-0 w-full h-full"
-            />
-          </div>
+          <DemoVideoPlayer videoId="4Ut9LwEA3jM" />
           {/* 動画後CTA */}
           <div className="mt-8 grid sm:grid-cols-2 gap-4">
             <Link
