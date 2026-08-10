@@ -20,21 +20,9 @@ export async function GET() {
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
     )
 
-    // admin権限チェック
-    const { data: profile } = await admin
-      .from('profiles')
-      .select('role, company_id, can_view_all_data')
-      .eq('id', user.id)
-      .single()
-
-    const { data: company } = await admin
-      .from('companies')
-      .select('source')
-      .eq('id', profile?.company_id)
-      .single()
-
-    const isOwnerAdmin = company?.source === null && (profile?.role === 'admin' || profile?.can_view_all_data)
-    if (!isOwnerAdmin) {
+    // オーナー本人のみアクセス可（環境変数のOWNER_EMAILと一致する場合のみ）
+    const ownerEmail = process.env.OWNER_EMAIL
+    if (!ownerEmail || user.email !== ownerEmail) {
       return NextResponse.json({ error: '権限がありません' }, { status: 403 })
     }
 
