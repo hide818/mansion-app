@@ -11,16 +11,16 @@ const PLANS = [
   {
     key: 'starter',
     label: 'スタータープラン',
-    price: '¥29,800/月',
+    price: '¥50,000/月',
     users: '5名まで',
-    buildings: '50棟まで',
+    buildings: '棟数無制限',
   },
   {
     key: 'standard',
     label: 'スタンダードプラン',
-    price: '¥59,800/月',
-    users: '20名まで',
-    buildings: '200棟まで',
+    price: '¥98,000/月',
+    users: '15名まで',
+    buildings: '棟数無制限',
   },
 ]
 

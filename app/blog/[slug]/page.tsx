@@ -58,6 +58,12 @@ import { ArticleRinjiSokai } from '../posts/rinji-sokai'
 import { ArticleAkiyaKanri } from '../posts/akiya-kanri'
 import { ArticleFrontRishoku } from '../posts/front-rishoku'
 import { ArticleDxJirei } from '../posts/dx-jirei'
+import { ArticleKanriGyomuShuninShikaku } from '../posts/kanri-gyomu-shunin-shikaku'
+import { ArticleKanriKaishaShinkiju } from '../posts/kanri-kaisha-shinkiju'
+import { ArticleKanriKaishaBcp } from '../posts/kanri-kaisha-bcp'
+import { ArticleKanriKaishaManualTsukurikata } from '../posts/kanri-kaisha-manual-tsukurikata'
+import { ArticleKanriKaishaSaiyouIkusei } from '../posts/kanri-kaisha-saiyou-ikusei'
+import { ArticleKanriKaishaDxHojyokin } from '../posts/kanri-kaisha-dx-hojyokin'
 import { TableOfContents } from '../components/TableOfContents'
 import type { Metadata } from 'next'
 
@@ -121,6 +127,12 @@ const ARTICLES: Record<string, React.FC> = {
   'akiya-kanri': ArticleAkiyaKanri,
   'front-rishoku': ArticleFrontRishoku,
   'dx-jirei': ArticleDxJirei,
+  'kanri-gyomu-shunin-shikaku': ArticleKanriGyomuShuninShikaku,
+  'kanri-kaisha-shinkiju': ArticleKanriKaishaShinkiju,
+  'kanri-kaisha-bcp': ArticleKanriKaishaBcp,
+  'kanri-kaisha-manual-tsukurikata': ArticleKanriKaishaManualTsukurikata,
+  'kanri-kaisha-saiyou-ikusei': ArticleKanriKaishaSaiyouIkusei,
+  'kanri-kaisha-dx-hojyokin': ArticleKanriKaishaDxHojyokin,
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -261,9 +273,17 @@ export default async function BlogPostPage({ params }: Props) {
           <Link href="/lp" className="text-lg font-extrabold text-slate-900 tracking-tight">
             Kura
           </Link>
-          <Link href="/blog" className="text-sm text-slate-500 hover:text-slate-900">
-            ← ブログ一覧
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/blog" className="text-sm text-slate-500 hover:text-slate-900">
+              ← ブログ一覧
+            </Link>
+            <Link
+              href="/signup?utm_source=blog&utm_medium=nav&utm_campaign=header_cta"
+              className="rounded-full bg-[#1A6B4A] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#155C3E] transition-colors"
+            >
+              14日間無料で試す
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -294,10 +314,10 @@ export default async function BlogPostPage({ params }: Props) {
             この記事の課題を解決するSaaS「Kura」— AI議事録・案件管理・引き継ぎ書を1つに
           </p>
           <Link
-            href={`/lp?utm_source=blog&utm_medium=article&utm_campaign=${slug}&utm_content=top_cta`}
+            href={`/signup?utm_source=blog&utm_medium=article&utm_campaign=${slug}&utm_content=top_cta`}
             className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700"
           >
-            無料で試す →
+            14日無料で試す →
           </Link>
         </div>
 
@@ -327,7 +347,7 @@ export default async function BlogPostPage({ params }: Props) {
           <h2 className="mb-3 text-xl font-extrabold">この記事で紹介した業務を自動化する</h2>
           <p className="mb-6 text-sm opacity-80">AI議事録・案件管理・引き継ぎ書自動生成を1つにまとめたSaaS。14日間無料・カード不要。</p>
           <Link
-            href={`/lp?utm_source=blog&utm_medium=article&utm_campaign=${slug}&utm_content=bottom_cta`}
+            href={`/signup?utm_source=blog&utm_medium=article&utm_campaign=${slug}&utm_content=bottom_cta`}
             style={{ color: '#1d4ed8', backgroundColor: '#ffffff' }}
             className="inline-block rounded-xl px-8 py-3 text-sm font-bold hover:bg-blue-50"
           >
