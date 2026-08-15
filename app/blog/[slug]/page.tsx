@@ -64,6 +64,11 @@ import { ArticleKanriKaishaBcp } from '../posts/kanri-kaisha-bcp'
 import { ArticleKanriKaishaManualTsukurikata } from '../posts/kanri-kaisha-manual-tsukurikata'
 import { ArticleKanriKaishaSaiyouIkusei } from '../posts/kanri-kaisha-saiyou-ikusei'
 import { ArticleKanriKaishaDxHojyokin } from '../posts/kanri-kaisha-dx-hojyokin'
+import { ArticleAiGijirokuToolErabi } from '../posts/ai-gijiroku-tool-erabi'
+import { ArticleKanriKaishaZangyoTaisaku } from '../posts/kanri-kaisha-zangyo-taisaku'
+import { ArticleSokaiGijirokuHokan } from '../posts/sokai-gijiroku-hokan'
+import { ArticleMansionJishuKanriRisk } from '../posts/mansion-jishu-kanri-risk'
+import { ArticleFrontTeichakuSenryaku } from '../posts/front-teichaku-senryaku'
 import { TableOfContents } from '../components/TableOfContents'
 import type { Metadata } from 'next'
 
@@ -133,6 +138,11 @@ const ARTICLES: Record<string, React.FC> = {
   'kanri-kaisha-manual-tsukurikata': ArticleKanriKaishaManualTsukurikata,
   'kanri-kaisha-saiyou-ikusei': ArticleKanriKaishaSaiyouIkusei,
   'kanri-kaisha-dx-hojyokin': ArticleKanriKaishaDxHojyokin,
+  'ai-gijiroku-tool-erabi': ArticleAiGijirokuToolErabi,
+  'kanri-kaisha-zangyo-taisaku': ArticleKanriKaishaZangyoTaisaku,
+  'sokai-gijiroku-hokan': ArticleSokaiGijirokuHokan,
+  'mansion-jishu-kanri-risk': ArticleMansionJishuKanriRisk,
+  'front-teichaku-senryaku': ArticleFrontTeichakuSenryaku,
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
